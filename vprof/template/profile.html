@@ -1,0 +1,79 @@
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js">
+    </script>
+  </head>
+  <body>
+    <script>
+      var WIDTH = 1000;
+      var HEIGHT = 500
+      var PAD_TOP = 25;
+      var PAD_RIGHT = 5;
+      var PAD_BOTTOM = 5;
+      var PAD_LEFT = 5;
+      var OFFSET = 5;
+      var TEXT_OFFSET = 17;
+
+      var color = d3.scale.category10();
+
+      var canvas = d3.select("body")
+          .append("svg")
+          .attr("width", WIDTH)
+          .attr("height", HEIGHT);
+
+      d3.json("insert_json_filename_here", function(data) {
+        var treemap = d3.layout.treemap()
+            .size([WIDTH, HEIGHT])
+            .mode('dice')
+            .value(function (d) { return d.cum_time; })
+            .padding([PAD_TOP, PAD_RIGHT, PAD_LEFT ,PAD_BOTTOM])
+            .nodes(data);
+
+        var cells = canvas.selectAll(".cell")
+            .data(treemap)
+            .enter()
+            .append("g")
+            .attr("class", "cell")
+            .each(function(d, i) {
+              // Adjust treemap layout.
+              if (!d.children) return;
+              var cummulative_y = 0;
+              for (var i = 0; i < d.children.length; i++) {
+                d.children[i].start_y = d.y + cummulative_y + OFFSET;
+                var c = d.children[i].cum_time / d.cum_time;
+                d.children[i].height = c * d.children[i].dy;
+                cummulative_y += d.children[i].height;
+              }
+            });
+
+        cells.append("rect")
+            .attr("x", function(d) {
+              return d.x;
+            })
+            .attr("y", function(d) {
+              if (!d.start_y) return d.y;
+              return d.start_y;
+            })
+            .attr("width", function(d) {
+              return d.dx;
+            })
+            .attr("height", function(d) {
+              if (!d.height) return d.dy;
+              return d.height;
+            })
+            .attr("fill", function(d) { return color(d.name); });
+
+        cells.append("text")
+            .attr("x", function(d) {
+              return d.x + OFFSET;
+            })
+            .attr("y", function(d) {
+              var pos = d.start_y ? d.start_y : d.dy;
+              return pos + TEXT_OFFSET;
+            })
+            .style("font-size","14px")
+            .text(function(d) {return d.name; })
+      })
+    </script>
+  </body>
+</html>
