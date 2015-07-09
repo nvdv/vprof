@@ -62,11 +62,13 @@ def main():
     stats = pstats.Stats(_TMP_FILE)
     transformed_stats = transform_stats(stats)
     os.remove(_TMP_FILE)
+
     with tempfile.NamedTemporaryFile(delete=False) as outfile:
         outfile.write(json.dumps(transformed_stats, indent=2))
         stats_filename = outfile.name
     temp_dir = os.path.dirname(stats_filename)
     temp_filename = os.path.basename(stats_filename)
+
     with open(_PROFILE_HTML) as prof_html:
         html_data = prof_html.read()
     # TODO(nvdv): Find another way to do substitution.

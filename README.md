@@ -9,7 +9,7 @@ repository and executing command:
     pip . install
 
 ## Usage
-To profile Python program execute:
+To profile Python program run
 
     vprof <test_script>
 
