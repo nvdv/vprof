@@ -35,7 +35,7 @@
             .append("g")
             .attr("class", "cell")
             .each(function(d, i) {
-              // Adjust treemap layout.
+              // Adjusting treemap layout.
               if (!d.children) return;
               var cummulative_y = 0;
               for (var i = 0; i < d.children.length; i++) {
@@ -61,7 +61,9 @@
               if (!d.height) return d.dy;
               return d.height;
             })
-            .attr("fill", function(d) { return color(d.name); });
+            .attr("fill", function(d) {
+              return color(d.name);
+            });
 
         cells.append("text")
             .attr("x", function(d) {
