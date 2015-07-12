@@ -6,13 +6,13 @@
   <body>
     <script>
       var WIDTH = 1000;
-      var HEIGHT = 500
+      var HEIGHT = 500;
       var PAD_TOP = 25;
       var PAD_RIGHT = 5;
       var PAD_BOTTOM = 5;
       var PAD_LEFT = 5;
       var OFFSET = 5;
-      var TEXT_OFFSET = 17;
+      var TEXT_OFFSET = 15;
 
       var color = d3.scale.category10();
 
@@ -25,7 +25,7 @@
         var treemap = d3.layout.treemap()
             .size([WIDTH, HEIGHT])
             .mode('dice')
-            .value(function (d) { return d.cum_time; })
+            .value(function(d) { return d.cum_time; })
             .padding([PAD_TOP, PAD_RIGHT, PAD_LEFT ,PAD_BOTTOM])
             .nodes(data);
 
@@ -36,36 +36,23 @@
             .attr("class", "cell")
             .each(function(d, i) {
               // Adjusting treemap layout.
-              console.log(d);
               if (!d.children) return;
-              var cummulative_y = 0;
+              var cummulative_y = d.y;
               for (var i = 0; i < d.children.length; i++) {
-                d.children[i].start_y = d.y + cummulative_y + OFFSET;
+                d.children[i].start_y = cummulative_y + OFFSET;
                 var c = d.children[i].cum_time / d.cum_time;
-                d.children[i].height = c * d.children[i].dy;
+                var height = d.height ? d.height : d.dy
+                d.children[i].height = c * height;
                 cummulative_y += d.children[i].height;
               }
-
             });
 
         cells.append("rect")
-            .attr("x", function(d) {
-              return d.x;
-            })
-            .attr("y", function(d) {
-              if (!d.start_y) return d.y;
-              return d.start_y;
-            })
-            .attr("width", function(d) {
-              return d.dx;
-            })
-            .attr("height", function(d) {
-              if (!d.height) return d.dy;
-              return d.height;
-            })
-            .attr("fill", function(d) {
-              return color(d.name + d.depth.toString());
-            });
+            .attr("x", function(d) { return d.x; })
+            .attr("y", function(d) { return d.start_y ? d.start_y : d.y; })
+            .attr("width", function(d) { return d.dx; })
+            .attr("height", function(d) { return d.height ? d.height : d.dy;})
+            .attr("fill", function(d) { return color(d.name + d.depth.toString()); });
 
         cells.append("text")
             .attr("x", function(d) {
