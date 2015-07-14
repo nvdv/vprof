@@ -12,7 +12,7 @@
       var PAD_BOTTOM = 3;
       var PAD_LEFT = 3;
       var TEXT_OFFSET_X = 5;
-      var TEXT_OFFSET_Y= 15;
+      var TEXT_OFFSET_Y= 14;
 
       var color = d3.scale.category10();
 
@@ -36,8 +36,12 @@
             .attr("class", "cell")
             .each(function(d, i) {
               // Adjusting treemap layout.
+              if (!d.parent) {
+                d.start_y = d.y;
+                d.height = d.dy;
+              }
               if (!d.children) return;
-              var curr_y = d.y + PAD_TOP;
+              var curr_y = d.start_y + PAD_TOP;
               for (var i = 0; i < d.children.length; i++) {
                 d.children[i].start_y = curr_y;
                 var height = d.height ? d.height : d.dy
@@ -48,9 +52,9 @@
 
         cells.append("rect")
             .attr("x", function(d) { return d.x; })
-            .attr("y", function(d) { return d.start_y ? d.start_y : d.y; })
+            .attr("y", function(d) { return d.start_y; })
             .attr("width", function(d) { return d.dx; })
-            .attr("height", function(d) { return d.height ? d.height : d.dy; })
+            .attr("height", function(d) { return d.height; })
             .attr("fill", function(d) { return color(d.name + d.depth.toString()); });
 
         cells.append("text")
