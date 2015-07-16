@@ -42,10 +42,10 @@
               }
               if (!d.children) return;
               var curr_y = d.start_y + PAD_TOP;
+              var usable_height = d.height - PAD_TOP - PAD_BOTTOM
               for (var i = 0; i < d.children.length; i++) {
                 d.children[i].start_y = curr_y;
-                var height = d.height ? d.height : d.dy
-                d.children[i].height = height * (d.children[i].cum_time / d.cum_time);
+                d.children[i].height = (usable_height * (d.children[i].cum_time / d.cum_time));
                 curr_y += d.children[i].height;
               }
             });
@@ -59,10 +59,7 @@
 
         cells.append("text")
             .attr("x", function(d) { return d.x + TEXT_OFFSET_X; })
-            .attr("y", function(d) {
-              var pos = d.start_y ? d.start_y : d.y;
-              return pos + TEXT_OFFSET_Y;
-            })
+            .attr("y", function(d) { return d.start_y + TEXT_OFFSET_Y; })
             .style("font-size","13px")
             .text(function(d) { return d.name; })
       })
