@@ -26,7 +26,7 @@
             .size([WIDTH, HEIGHT])
             .mode('dice')
             .value(function(d) { return d.cum_time; })
-            .padding([PAD_TOP, PAD_RIGHT, PAD_LEFT ,PAD_BOTTOM])
+            .padding([PAD_TOP, PAD_RIGHT, PAD_BOTTOM, PAD_LEFT])
             .nodes(data);
 
         var cells = canvas.selectAll(".cell")
@@ -42,10 +42,11 @@
               }
               if (!d.children) return;
               var curr_y = d.start_y + PAD_TOP;
-              var usable_height = d.height - PAD_TOP - PAD_BOTTOM
+              var usable_height = d.height - (PAD_BOTTOM + PAD_TOP);
               for (var i = 0; i < d.children.length; i++) {
                 d.children[i].start_y = curr_y;
-                d.children[i].height = (usable_height * (d.children[i].cum_time / d.cum_time));
+                var c = d.children[i].cum_time / d.cum_time;
+                d.children[i].height = usable_height * Math.round(c * 1000) / 1000;
                 curr_y += d.children[i].height;
               }
             });
