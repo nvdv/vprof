@@ -23,12 +23,13 @@
           .attr("height", HEIGHT);
 
       d3.json("insert_json_filename_here", function(data) {
+
         var treemap = d3.layout.treemap()
             .size([WIDTH, HEIGHT])
             .mode('dice')
             .value(function(d) { return d.cum_time; })
             .padding([PAD_TOP, PAD_RIGHT, PAD_BOTTOM, PAD_LEFT])
-            .nodes(data);
+            .nodes(data.call_stats);
 
         var cells = canvas.selectAll(".cell")
             .data(treemap)

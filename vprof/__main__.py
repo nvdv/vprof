@@ -63,10 +63,16 @@ def main():
     stats = pstats.Stats(_TMP_FILE)
     transformed_stats = transform_stats(stats)
     os.remove(_TMP_FILE)
-    print(json.dumps(stats, indent=2))
 
+    program_info = {
+        'program_name': args.source[0],
+        'run_time': stats.total_tt,
+        'primitive_calls': stats.prim_calls,
+        'total_calls': stats.total_calls,
+        'call_stats': transformed_stats,
+    }
     with tempfile.NamedTemporaryFile(delete=False) as outfile:
-        outfile.write(json.dumps(transformed_stats, indent=2))
+        outfile.write(json.dumps(program_info, indent=2))
         stats_filename = outfile.name
     temp_dir = os.path.dirname(stats_filename)
     temp_filename = os.path.basename(stats_filename)
@@ -80,7 +86,7 @@ def main():
     with open(output_html_filename, 'w') as output_file:
         output_file.write(output_html)
 
-    # subprocess.call(['open', output_html_filename])
+    subprocess.call(['open', output_html_filename])
 
 
 if __name__ == "__main__":
