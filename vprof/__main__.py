@@ -10,7 +10,7 @@ import tempfile
 _MODULE_DESC = 'Python visual profiler.'
 _TMP_FILE = '/tmp/tempstats'
 _PROFILE_FILENAME = 'profile.html'
-_PROFILE_HTML = 'template/%s' % _PROFILE_FILENAME
+_PROFILE_HTML = 'vprof/template/%s' % _PROFILE_FILENAME
 
 
 def _change_stats_format(stats):
@@ -29,6 +29,7 @@ def _change_stats_format(stats):
     return result_stats
 
 
+# TODO(nvdv): Make this function iterative.
 def _fill_stats(curr_node, all_callees, stats):
     """Recursively populates starts in call order."""
     curr_stats = {}
@@ -62,6 +63,7 @@ def main():
     stats = pstats.Stats(_TMP_FILE)
     transformed_stats = transform_stats(stats)
     os.remove(_TMP_FILE)
+    print(json.dumps(stats, indent=2))
 
     with tempfile.NamedTemporaryFile(delete=False) as outfile:
         outfile.write(json.dumps(transformed_stats, indent=2))
@@ -78,7 +80,7 @@ def main():
     with open(output_html_filename, 'w') as output_file:
         output_file.write(output_html)
 
-    subprocess.call(['open', output_html_filename])
+    # subprocess.call(['open', output_html_filename])
 
 
 if __name__ == "__main__":

@@ -1,3 +1,4 @@
+<!-- TODO(nvdv): Split this file. -->
 <html>
   <head>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js">
@@ -40,6 +41,10 @@
                 d.start_y = d.y;
                 d.height = d.dy;
               }
+              // TODO(nvdv)
+              // In some cases total cummulative run time of children can
+              // be greater than cummulative run time of parent which
+              // affects rendering.
               if (!d.children) return;
               var curr_y = d.start_y + PAD_TOP;
               var usable_height = d.height - (PAD_BOTTOM + PAD_TOP);
