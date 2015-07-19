@@ -6,7 +6,7 @@ Visual Python profiler
 vprof is in active development and can be installed via cloning this
 repository and executing command:
 
-    pip . install
+    make install
 
 ## Usage
 To profile Python program run
