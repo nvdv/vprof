@@ -1,1 +1,2 @@
-include pydg/templates/profile.html
+include vprof/frontend/profile.html
+include vprof/frontend/main.js

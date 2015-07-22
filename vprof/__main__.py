@@ -4,13 +4,16 @@ import cProfile
 import json
 import os
 import pstats
+import shutil
 import subprocess
 import tempfile
 
 _MODULE_DESC = 'Python visual profiler.'
 _TMP_FILE = '/tmp/tempstats'
 _PROFILE_FILENAME = 'profile.html'
-_PROFILE_HTML = 'vprof/template/%s' % _PROFILE_FILENAME
+_PROFILE_HTML = 'frontend/%s' % _PROFILE_FILENAME
+_PROFILE_JS = 'frontend/main.js'
+_JSON_FILENAME = 'profile.json'
 
 
 def _change_stats_format(stats):
@@ -71,22 +74,13 @@ def main():
         'total_calls': stats.total_calls,
         'call_stats': transformed_stats,
     }
-    with tempfile.NamedTemporaryFile(delete=False) as outfile:
-        outfile.write(json.dumps(program_info, indent=2))
-        stats_filename = outfile.name
-    temp_dir = os.path.dirname(stats_filename)
-    temp_filename = os.path.basename(stats_filename)
-
-    with open(_PROFILE_HTML) as prof_html:
-        html_data = prof_html.read()
-    # TODO(nvdv): Find another way to do substitution.
-    output_html = html_data.replace(
-        'insert_json_filename_here', temp_filename)
-    output_html_filename = temp_dir + os.sep + _PROFILE_FILENAME
-    with open(output_html_filename, 'w') as output_file:
-        output_file.write(output_html)
-
-    subprocess.call(['open', output_html_filename])
+    temp_dir = tempfile.mkdtemp()
+    profile_json_name = temp_dir + os.sep + _JSON_FILENAME
+    with open(profile_json_name, 'w') as json_file:
+        json_file.write(json.dumps(program_info, indent=2))
+    shutil.copy(os.path.dirname(__file__) + os.sep + _PROFILE_JS, temp_dir)
+    shutil.copy(os.path.dirname(__file__) + os.sep + _PROFILE_HTML, temp_dir)
+    subprocess.call(['open', temp_dir + os.sep + _PROFILE_FILENAME])
 
 
 if __name__ == "__main__":

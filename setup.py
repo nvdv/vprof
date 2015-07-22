@@ -6,8 +6,9 @@ setup(
     packages=['vprof'],
     description="Visual profiler for Python",
     url='http//github.com/nvdv/vprof',
-    licence='BSD',
+    license='BSD',
     author='nvdv',
+    include_package_data=True,
     entry_points={
         'console_scripts': [
             'vprof = vprof.__main__:main'
