@@ -1,0 +1,12 @@
+{
+  "name": "vprof-frontend",
+  "author": "nvdv",
+  "main": "vprof/frontend/main.js",
+  "dependencies": {
+    "jshint": "latest"
+  },
+  "scripts": {
+    "lint": "jshint vprof/frontend/*.js"
+  },
+  "license": "BSD"
+}
