@@ -6,7 +6,8 @@
     "jshint": "latest"
   },
   "scripts": {
-    "lint": "jshint vprof/frontend/*.js"
+    "lint": "jshint vprof/frontend/main.js",
+    "build": "browserify vprof/frontend/main.js -o vprof/frontend/vprof.js"
   },
   "license": "BSD"
 }

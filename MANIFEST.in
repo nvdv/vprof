@@ -1,2 +1,2 @@
 include vprof/frontend/profile.html
-include vprof/frontend/main.js
+include vprof/frontend/vprof.js

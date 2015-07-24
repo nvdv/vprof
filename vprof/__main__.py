@@ -12,7 +12,7 @@ _MODULE_DESC = 'Python visual profiler.'
 _TMP_FILE = '/tmp/tempstats'
 _PROFILE_FILENAME = 'profile.html'
 _PROFILE_HTML = 'frontend/%s' % _PROFILE_FILENAME
-_PROFILE_JS = 'frontend/main.js'
+_PROFILE_JS = 'frontend/vprof.js'
 _JSON_FILENAME = 'profile.json'
 
 
