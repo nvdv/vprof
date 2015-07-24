@@ -21,8 +21,7 @@ def _change_stats_format(stats):
     result_stats = {}
     for func_params, stats in stats.items():
         cum_calls, num_calls, time_per_call, cum_time, callers = stats
-        func_name = func_params
-        result_stats[func_name] = {
+        result_stats[func_params] = {
             'cum_calls': cum_calls,
             'num_calls': num_calls,
             'time_per_call': time_per_call,
