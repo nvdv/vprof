@@ -16,8 +16,8 @@ _PROFILE_JS = 'frontend/vprof.js'
 _JSON_FILENAME = 'profile.json'
 
 
-def _change_stats_format(stats):
-    """Changes format of stats from cProfile."""
+def _annotate_stats(stats):
+    """Adds description to cProfile stats."""
     result_stats = {}
     for func_params, stats in stats.items():
         cum_calls, num_calls, time_per_call, cum_time, callers = stats
@@ -33,7 +33,7 @@ def _change_stats_format(stats):
 
 # TODO(nvdv): Make this function iterative.
 def _fill_stats(curr_node, all_callees, stats):
-    """Recursively populates starts in call order."""
+    """Recursively populates stats in call order."""
     curr_stats = {}
     curr_stats['name'] = ':'.join(str(token) for token in curr_node)
     curr_stats['cum_calls'] = stats[curr_node]['cum_calls']
@@ -49,7 +49,7 @@ def _fill_stats(curr_node, all_callees, stats):
 def transform_stats(stats):
     """Converts start from cProfile format to recusive dict."""
     stats.calc_callees()
-    changed_stats = _change_stats_format(stats.stats)
+    changed_stats = _annotate_stats(stats.stats)
     root = max(changed_stats.items(), key=lambda s: s[1]['cum_time'])
     return _fill_stats(root[0], stats.all_callees, changed_stats)
 
