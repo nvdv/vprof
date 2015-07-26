@@ -7,6 +7,7 @@ install:
 
 devdeps_install:
 	npm install
+	pip install -r requirements.txt
 
 lint:
 	npm run lint
