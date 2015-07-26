@@ -15,6 +15,28 @@ var PAD_LEFT = 3;
 var TEXT_OFFSET_X = 5;
 var TEXT_OFFSET_Y= 14;
 
+/** Calculates node rendering params. */
+function calculateNode(d, n) {
+  // Adjusting treemap layout.
+  if (!d.parent) {
+    d.start_y = d.y;
+    d.height = d.dy;
+  }
+  // TODO(nvdv)
+  // In some cases total cummulative run time of children can
+  // be greater than cummulative run time of parent which
+  // affects rendering.
+  if (!d.children) return;
+  var curr_y = d.start_y + PAD_TOP;
+  var usable_height = d.height - (PAD_BOTTOM + PAD_TOP);
+  for (var i = 0; i < d.children.length; i++) {
+    d.children[i].start_y = curr_y;
+    var c = d.children[i].cum_time / d.cum_time;
+    d.children[i].height = usable_height * Math.round(c * 1000) / 1000;
+    curr_y += d.children[i].height;
+  }
+}
+
 /** Renders whole page. */
 renderView = function() {
   var color = d3.scale.category10();
@@ -38,26 +60,7 @@ renderView = function() {
         .enter()
         .append("g")
         .attr("class", "cell")
-        .each(function(d, n) {
-          // Adjusting treemap layout.
-          if (!d.parent) {
-            d.start_y = d.y;
-            d.height = d.dy;
-          }
-          // TODO(nvdv)
-          // In some cases total cummulative run time of children can
-          // be greater than cummulative run time of parent which
-          // affects rendering.
-          if (!d.children) return;
-          var curr_y = d.start_y + PAD_TOP;
-          var usable_height = d.height - (PAD_BOTTOM + PAD_TOP);
-          for (var i = 0; i < d.children.length; i++) {
-            d.children[i].start_y = curr_y;
-            var c = d.children[i].cum_time / d.cum_time;
-            d.children[i].height = usable_height * Math.round(c * 1000) / 1000;
-            curr_y += d.children[i].height;
-          }
-        });
+        .each(calculateNode);
 
     cells.append("rect")
         .attr("x", function(d) { return d.x; })
