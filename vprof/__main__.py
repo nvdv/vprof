@@ -9,7 +9,6 @@ import subprocess
 import tempfile
 
 _MODULE_DESC = 'Python visual profiler.'
-_TMP_FILE = '/tmp/tempstats'
 _PROFILE_FILENAME = 'profile.html'
 _PROFILE_HTML = 'frontend/%s' % _PROFILE_FILENAME
 _PROFILE_JS = 'frontend/vprof.js'
@@ -56,24 +55,31 @@ def transform_stats(stats):
     return _fill_stats(root[0], stats.all_callees, changed_stats)
 
 
+def get_stats(filename):
+    """Returns profile statistics for Python program specified by filename."""
+    prof = cProfile.Profile()
+    try:
+        with open(filename) as srcfile:
+            prof.run(srcfile.read())
+    except SystemExit:
+        pass
+    prof.create_stats()
+    return pstats.Stats(prof)
+
+
 def main():
     parser = argparse.ArgumentParser(description=_MODULE_DESC)
     parser.add_argument('source', metavar='src', nargs=1,
                         help='Python program to profile.')
     args = parser.parse_args()
 
-    with open(args.source[0]) as srcfile:
-        cProfile.run(srcfile.read(), _TMP_FILE)
-    stats = pstats.Stats(_TMP_FILE)
-    transformed_stats = transform_stats(stats)
-    os.remove(_TMP_FILE)
-
+    stats = get_stats(args.source[0])
     program_info = {
         'program_name': args.source[0],
         'run_time': stats.total_tt,
         'primitive_calls': stats.prim_calls,
         'total_calls': stats.total_calls,
-        'call_stats': transformed_stats,
+        'call_stats': transform_stats(stats),
     }
     temp_dir = tempfile.mkdtemp()
     profile_json_name = temp_dir + os.sep + _JSON_FILENAME
