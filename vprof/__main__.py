@@ -34,16 +34,18 @@ def _annotate_stats(stats):
 # TODO(nvdv): Make this function iterative.
 def _fill_stats(curr_node, all_callees, stats):
     """Recursively populates stats in call order."""
-    curr_stats = {}
-    curr_stats['name'] = ':'.join(str(token) for token in curr_node)
-    curr_stats['cum_calls'] = stats[curr_node]['cum_calls']
-    curr_stats['num_calls'] = stats[curr_node]['num_calls']
-    curr_stats['time_per_call'] = stats[curr_node]['time_per_call']
-    curr_stats['cum_time'] = stats[curr_node]['cum_time']
-    curr_stats['children'] = [
-        _fill_stats(child, all_callees, stats)
-        for child in all_callees[curr_node]]
-    return curr_stats
+    module_name, lineno, func_name = curr_node
+    return {
+        'module_name': module_name,
+        'lineno': lineno,
+        'func_name': func_name,
+        'cum_calls': stats[curr_node]['cum_calls'],
+        'num_calls': stats[curr_node]['num_calls'],
+        'time_per_call': stats[curr_node]['time_per_call'],
+        'cum_time': stats[curr_node]['cum_time'],
+        'children': [_fill_stats(child, all_callees, stats)
+                     for child in all_callees[curr_node]]
+    }
 
 
 def transform_stats(stats):

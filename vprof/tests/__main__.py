@@ -3,58 +3,64 @@ import vprof.__main__ as vp
 import unittest
 
 _RUN_STATS = {
-    ('main',): (10, 10, 0.01, 0.5, ()),
-    ('foo',): (5, 5, 0.02, 0.3, ('main')),
-    ('bar',): (3, 3, 0.01, 0.5, ('foo'))}
+    ('baz', 10, 'main'): (10, 10, 0.01, 0.5, ()),
+    ('baz', 11, 'foo'): (5, 5, 0.02, 0.3, ('baz', 10, 'main')),
+    ('baz', 12, 'bar'): (3, 3, 0.01, 0.5, ('baz', 11, 'foo'))}
 
 _ANNOTATED_STATS = {
-    ('main',): {
+    ('baz', 10, 'main'): {
         'cum_calls': 10,
         'num_calls': 10,
         'time_per_call': 0.01,
         'cum_time': 0.5,
         'callers': ()},
-    ('foo',): {
+    ('baz', 11, 'foo'): {
         'cum_calls': 5,
         'num_calls': 5,
         'time_per_call': 0.02,
         'cum_time': 0.3,
-        'callers': ('main')},
-    ('bar',): {
+        'callers': ('baz', 10, 'main')},
+    ('baz', 12, 'bar'): {
         'cum_calls': 3,
         'num_calls': 3,
         'time_per_call': 0.01,
         'cum_time': 0.5,
-        'callers': ('foo')}}
+        'callers': ('baz', 11, 'foo')}}
 
 _CALLERS = {
-    ('main',): {
-        ('foo',): (10, 10, 0.01, 0.5),
+    ('baz', 10, 'main'): {
+        ('baz', 11, 'foo'): (10, 10, 0.01, 0.5),
     },
-    ('foo',): {
-        ('bar',): (3, 3, 0.01, 0.5),
+    ('baz', 11, 'foo'): {
+        ('baz', 12, 'bar'): (3, 3, 0.01, 0.5),
     },
-    ('bar',): {}
+    ('baz', 12, 'bar'): {}
 }
 
 _CALL_GRAPH = {
-    'name': 'main',
+    'func_name': 'main',
     'cum_calls': 10,
     'num_calls': 10,
     'time_per_call': 0.01,
     'cum_time': 0.5,
+    'lineno': 10,
+    'module_name': 'baz',
     'children': [{
-        'name': 'foo',
+        'func_name': 'foo',
         'cum_calls': 5,
         'num_calls': 5,
         'time_per_call': 0.02,
         'cum_time': 0.3,
+        'lineno': 11,
+        'module_name': 'baz',
         'children': [{
-            'name': 'bar',
+            'func_name': 'bar',
             'cum_calls': 3,
             'num_calls': 3,
             'time_per_call': 0.01,
             'cum_time': 0.5,
+            'lineno': 12,
+            'module_name': 'baz',
             'children': [],
         }]
     }]

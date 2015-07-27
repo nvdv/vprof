@@ -37,8 +37,13 @@ function calculateNode(d, n) {
   }
 }
 
+/** Returns full node name. */
+function getNodeName(d) {
+  return d.module_name + '.' + d.func_name + '@' + d.lineno.toString();
+}
+
 /** Renders whole page. */
-renderView = function() {
+function renderView() {
   var color = d3.scale.category10();
 
   var canvas = d3.select("body")
@@ -67,14 +72,14 @@ renderView = function() {
         .attr("y", function(d) { return d.start_y; })
         .attr("width", function(d) { return d.dx; })
         .attr("height", function(d) { return d.height; })
-        .attr("fill", function(d) { return color(d.name + d.depth.toString()); });
+        .attr("fill", function(d) { return color(getNodeName(d) + d.depth.toString()); });
 
     cells.append("text")
         .attr("x", function(d) { return d.x + TEXT_OFFSET_X; })
         .attr("y", function(d) { return d.start_y + TEXT_OFFSET_Y; })
         .style("font-size","13px")
-        .text(function(d) { return d.name; });
+        .text(function(d) { return getNodeName(d); });
     });
-};
+}
 
 renderView();
