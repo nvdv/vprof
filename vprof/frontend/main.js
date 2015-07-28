@@ -42,8 +42,8 @@ function getNodeName(d) {
   return d.module_name + '.' + d.func_name + '@' + d.lineno.toString();
 }
 
-/** Renders whole page. */
-function renderView() {
+/** Renders treemap. */
+function renderTreeMap(data) {
   var color = d3.scale.category10();
 
   var canvas = d3.select("body")
@@ -51,34 +51,38 @@ function renderView() {
       .attr("width", WIDTH)
       .attr("height", HEIGHT);
 
+  var treemap = d3.layout.treemap()
+    .size([WIDTH, HEIGHT])
+    .mode('dice')
+    .value(function(d) { return d.cum_time; })
+    .padding([PAD_TOP, PAD_RIGHT, PAD_BOTTOM, PAD_LEFT])
+    .nodes(data.call_stats);
+
+  var cells = canvas.selectAll(".cell")
+    .data(treemap)
+    .enter()
+    .append("g")
+    .attr("class", "cell")
+    .each(calculateNode);
+
+  cells.append("rect")
+    .attr("x", function(d) { return d.x; })
+    .attr("y", function(d) { return d.start_y; })
+    .attr("width", function(d) { return d.dx; })
+    .attr("height", function(d) { return d.height; })
+    .attr("fill", function(d) { return color(getNodeName(d) + d.depth.toString()); });
+
+  cells.append("text")
+    .attr("x", function(d) { return d.x + TEXT_OFFSET_X; })
+    .attr("y", function(d) { return d.start_y + TEXT_OFFSET_Y; })
+    .style("font-size","13px")
+    .text(function(d) { return getNodeName(d); });
+}
+
+/** Renders whole page. */
+function renderView() {
   d3.json(JSON_FILENAME, function(data) {
-
-    var treemap = d3.layout.treemap()
-        .size([WIDTH, HEIGHT])
-        .mode('dice')
-        .value(function(d) { return d.cum_time; })
-        .padding([PAD_TOP, PAD_RIGHT, PAD_BOTTOM, PAD_LEFT])
-        .nodes(data.call_stats);
-
-    var cells = canvas.selectAll(".cell")
-        .data(treemap)
-        .enter()
-        .append("g")
-        .attr("class", "cell")
-        .each(calculateNode);
-
-    cells.append("rect")
-        .attr("x", function(d) { return d.x; })
-        .attr("y", function(d) { return d.start_y; })
-        .attr("width", function(d) { return d.dx; })
-        .attr("height", function(d) { return d.height; })
-        .attr("fill", function(d) { return color(getNodeName(d) + d.depth.toString()); });
-
-    cells.append("text")
-        .attr("x", function(d) { return d.x + TEXT_OFFSET_X; })
-        .attr("y", function(d) { return d.start_y + TEXT_OFFSET_Y; })
-        .style("font-size","13px")
-        .text(function(d) { return getNodeName(d); });
+    renderTreeMap(data);
     });
 }
 
