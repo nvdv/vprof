@@ -42,14 +42,36 @@ function getNodeName(d) {
   return d.module_name + '.' + d.func_name + '@' + d.lineno.toString();
 }
 
+/** Flattens stats object. */
+function flattenStats(stats) {
+
+  function processNode(node) {
+    var curr_node = {};
+    for (var stat in node) {
+      if (node.hasOwnProperty(stat) && stat != 'children') {
+        curr_node[stat] = node[stat];
+      }
+    }
+    results.push(curr_node);
+    if (!node.hasOwnProperty('children')) {
+      return;
+    }
+    node.children.forEach(function(child) { processNode(child); });
+  }
+
+  var results = [];
+  processNode(stats);
+  return results;
+}
+
 /** Renders treemap. */
 function renderTreeMap(data) {
   var color = d3.scale.category10();
 
   var canvas = d3.select("body")
-      .append("svg")
-      .attr("width", WIDTH)
-      .attr("height", HEIGHT);
+    .append("svg")
+    .attr("width", WIDTH)
+    .attr("height", HEIGHT);
 
   var treemap = d3.layout.treemap()
     .size([WIDTH, HEIGHT])
@@ -79,11 +101,56 @@ function renderTreeMap(data) {
     .text(function(d) { return getNodeName(d); });
 }
 
+/** Renders profile stats. */
+function renderTable(data) {
+  var columns = [
+    { head: 'Name', cl: 'title', html: function(row) { return getNodeName(row); }},
+    { head: 'Cum. time', cl: 'num', html: function(row) { return row.cum_time; }},
+    { head: 'Time per call', cl: 'num', html: function(row) { return row.time_per_call; }},
+    { head: 'Num. calls', cl: 'num', html: function(row) { return row.num_calls; }},
+    { head: 'Cum. calls', cl: 'num', html: function(row) { return row.cum_calls; }},
+  ];
+
+  var table = d3.select("body").append('table');
+
+  table.append('thead').append('tr')
+   .selectAll('th')
+   .data(columns)
+   .enter()
+   .append('th')
+   .attr('class', function(col) { return col.cl; })
+   .text(function(col) { return col.head; });
+
+  var stats = flattenStats(data.call_stats);
+
+  table.append('tbody')
+   .selectAll('tr')
+   .data(stats)
+   .enter()
+   .append('tr')
+   .selectAll('td')
+   .data(function(row, i) {
+      console.log(row);
+      return columns.map(function(c) {
+        var cell = {};
+        d3.keys(c).forEach(function(k) {
+            cell[k] = typeof c[k] == 'function' ? c[k](row,i) : c[k];
+        });
+        return cell;
+      });
+   })
+   .enter()
+   .append('td')
+   .html(function(d) { return d.html; })
+   .attr('class', function(d) { return d.cl; });
+}
+
 /** Renders whole page. */
 function renderView() {
   d3.json(JSON_FILENAME, function(data) {
     renderTreeMap(data);
-    });
+    renderTable(data);
+  });
 }
 
 renderView();
