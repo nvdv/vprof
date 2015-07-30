@@ -113,7 +113,8 @@ function renderTable(data) {
 
   var table = d3.select("body").append('table');
 
-  table.append('thead').append('tr')
+  table.append('thead')
+   .append('tr')
    .selectAll('th')
    .data(columns)
    .enter()

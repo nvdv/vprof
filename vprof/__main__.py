@@ -12,6 +12,7 @@ _MODULE_DESC = 'Python visual profiler.'
 _PROFILE_FILENAME = 'profile.html'
 _PROFILE_HTML = 'frontend/%s' % _PROFILE_FILENAME
 _PROFILE_JS = 'frontend/vprof.js'
+_PROFILE_CSS = 'frontend/vprof.css'
 _JSON_FILENAME = 'profile.json'
 
 
@@ -87,6 +88,7 @@ def main():
         json_file.write(json.dumps(program_info, indent=2))
     shutil.copy(os.path.dirname(__file__) + os.sep + _PROFILE_JS, temp_dir)
     shutil.copy(os.path.dirname(__file__) + os.sep + _PROFILE_HTML, temp_dir)
+    shutil.copy(os.path.dirname(__file__) + os.sep + _PROFILE_CSS, temp_dir)
     subprocess.call(['open', temp_dir + os.sep + _PROFILE_FILENAME])
 
 

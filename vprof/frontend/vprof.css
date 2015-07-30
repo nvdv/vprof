@@ -1,0 +1,30 @@
+body {
+  font-family: 'Helvetica Neue', Helvetica;
+  font-weight: 300;
+  display: flex;
+  flex-direction: row;
+}
+
+svg {
+  padding: 15px;
+}
+
+table {
+  padding: 15px;
+}
+
+th {
+  text-align: left;
+}
+
+th, td {
+  padding: 0 1em 0.5ex 0;
+}
+
+th.center, td.center {
+  text-align: center;
+}
+
+th.num, td.num {
+  text-align: right;
+}
