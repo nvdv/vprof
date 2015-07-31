@@ -51,9 +51,14 @@ def _fill_stats(curr_node, all_callees, stats):
 
 def transform_stats(stats):
     """Converts start from cProfile format to recusive dict."""
+
+    def _statcmp(stat):
+        _, params = stat
+        return params['cum_time']
+
     stats.calc_callees()
     changed_stats = _annotate_stats(stats.stats)
-    root = max(changed_stats.items(), key=lambda s: s[1]['cum_time'])
+    root = max(changed_stats.items(), key=_statcmp)
     return _fill_stats(root[0], stats.all_callees, changed_stats)
 
 
@@ -77,6 +82,7 @@ class StatsHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         self._profile_json = kwargs['profile_json']
         del kwargs['profile_json']
+        # Since this class is old-style - call parent method directly.
         SimpleHTTPServer.SimpleHTTPRequestHandler.__init__(
             self, *args, **kwargs)
 
