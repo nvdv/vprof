@@ -1,19 +1,20 @@
 """Visual profiler for Python."""
 import argparse
 import cProfile
+import functools
 import json
 import os
 import pstats
-import shutil
+import SimpleHTTPServer
+import SocketServer
 import subprocess
-import tempfile
+import sys
 
 _MODULE_DESC = 'Python visual profiler.'
-_PROFILE_FILENAME = 'profile.html'
-_PROFILE_HTML = 'frontend/%s' % _PROFILE_FILENAME
-_PROFILE_JS = 'frontend/vprof.js'
-_PROFILE_CSS = 'frontend/vprof.css'
-_JSON_FILENAME = 'profile.json'
+_STATIC_DIR = 'frontend'
+_PROFILE_HTML = '%s/profile.html' % _STATIC_DIR
+_HOST = 'localhost'
+_PORT = 8000
 
 
 def _annotate_stats(stats):
@@ -68,12 +69,55 @@ def get_stats(filename):
     return pstats.Stats(prof)
 
 
+class StatsHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
+    """Serves profiles stats."""
+    ROOT_URI = '/'
+    PROFILE_URI = '/profile'
+
+    def __init__(self, *args, **kwargs):
+        self._profile_json = kwargs['profile_json']
+        del kwargs['profile_json']
+        SimpleHTTPServer.SimpleHTTPRequestHandler.__init__(
+            self, *args, **kwargs)
+
+    def do_GET(self):
+        """Handles HTTP GET request."""
+        if self.path == self.ROOT_URI:
+            res_filename = os.path.dirname(__file__) + '/' + _PROFILE_HTML
+            with open(res_filename) as res_file:
+                output = res_file.read()
+            content_type = 'text/html'
+        elif self.path == self.PROFILE_URI:
+            output = self._profile_json
+            content_type = 'text/json'
+        else:
+            res_filename = os.path.dirname(__file__) + '/' + _STATIC_DIR + self.path
+            with open(res_filename) as res_file:
+                output = res_file.read()
+            _, extension = os.path.splitext(self.path)
+            content_type = 'text/%s' % extension
+
+        self._send_response(
+            200, headers=(('Content-type', '%s; charset=utf-8' % content_type),
+                          ('Content-Length', len(output))))
+        self.wfile.write(output)
+
+    def _send_response(self, http_code, message=None, headers=None):
+        """Sends HTTP response code, message and headers."""
+        self.send_response(http_code, message)
+        if headers:
+            for header in headers:
+                self.send_header(*header)
+            self.end_headers()
+
+
 def main():
     parser = argparse.ArgumentParser(description=_MODULE_DESC)
     parser.add_argument('source', metavar='src', nargs=1,
                         help='Python program to profile.')
     args = parser.parse_args()
 
+    print('Collecting profile stats...')
     stats = get_stats(args.source[0])
     program_info = {
         'program_name': args.source[0],
@@ -82,14 +126,18 @@ def main():
         'total_calls': stats.total_calls,
         'call_stats': transform_stats(stats),
     }
-    temp_dir = tempfile.mkdtemp()
-    profile_json_name = temp_dir + os.sep + _JSON_FILENAME
-    with open(profile_json_name, 'w') as json_file:
-        json_file.write(json.dumps(program_info, indent=2))
-    shutil.copy(os.path.dirname(__file__) + os.sep + _PROFILE_JS, temp_dir)
-    shutil.copy(os.path.dirname(__file__) + os.sep + _PROFILE_HTML, temp_dir)
-    shutil.copy(os.path.dirname(__file__) + os.sep + _PROFILE_CSS, temp_dir)
-    subprocess.call(['open', temp_dir + os.sep + _PROFILE_FILENAME])
+
+    print('Serving results...')
+    SocketServer.TCPServer.allow_reuse_address = True
+    partial_handler = functools.partial(
+        StatsHandler, profile_json=json.dumps(program_info))
+    subprocess.call(['open', 'http://%s:%s' % (_HOST, _PORT)])
+    try:
+        SocketServer.TCPServer(
+            (_HOST, _PORT), partial_handler).serve_forever()
+    except KeyboardInterrupt:
+        print('Stopping...')
+        sys.exit(0)
 
 
 if __name__ == "__main__":

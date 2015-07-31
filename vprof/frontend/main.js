@@ -3,7 +3,7 @@
  */
 var d3 = require('d3');
 
-var JSON_FILENAME = "profile.json";
+var JSON_URI = "profile";
 
 // Treemap parameters
 var WIDTH = 1000;
@@ -148,7 +148,7 @@ function renderTable(data) {
 
 /** Renders whole page. */
 function renderView() {
-  d3.json(JSON_FILENAME, function(data) {
+  d3.json(JSON_URI, function(data) {
     renderTreeMap(data);
     renderTable(data);
   });
