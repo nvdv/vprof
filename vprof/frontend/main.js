@@ -7,7 +7,7 @@ var JSON_URI = "profile";
 
 // Treemap parameters
 var WIDTH = 1000;
-var HEIGHT = 500;
+var HEIGHT_SCALE = 0.95;
 var PAD_TOP = 20;
 var PAD_RIGHT = 3;
 var PAD_BOTTOM = 3;
@@ -71,10 +71,10 @@ function renderTreeMap(data) {
   var canvas = d3.select("body")
     .append("svg")
     .attr("width", WIDTH)
-    .attr("height", HEIGHT);
+    .attr("height", HEIGHT_SCALE * window.innerHeight);
 
   var treemap = d3.layout.treemap()
-    .size([WIDTH, HEIGHT])
+    .size([WIDTH, HEIGHT_SCALE * window.innerHeight])
     .mode('dice')
     .value(function(d) { return d.cum_time; })
     .padding([PAD_TOP, PAD_RIGHT, PAD_BOTTOM, PAD_LEFT])
@@ -104,14 +104,27 @@ function renderTreeMap(data) {
 /** Renders profile stats. */
 function renderTable(data) {
   var columns = [
-    { head: 'Name', cl: 'title', html: function(row) { return getNodeName(row); }},
-    { head: 'Cum. time', cl: 'num', html: function(row) { return row.cum_time; }},
-    { head: 'Time per call', cl: 'num', html: function(row) { return row.time_per_call; }},
-    { head: 'Num. calls', cl: 'num', html: function(row) { return row.num_calls; }},
-    { head: 'Cum. calls', cl: 'num', html: function(row) { return row.cum_calls; }},
+    { head: 'Name', cl: 'title', text: function(row) { return getNodeName(row); }},
+    { head: 'Cum. time', cl: 'num', text: function(row) { return row.cum_time; }},
+    { head: 'Time per call', cl: 'num', text: function(row) { return row.time_per_call; }},
+    { head: 'Num. calls', cl: 'num', text: function(row) { return row.num_calls; }},
+    { head: 'Cum. calls', cl: 'num', text: function(row) { return row.cum_calls; }},
   ];
 
-  var table = d3.select("body").append('table');
+  var prof_stats = d3.select("body")
+    .append('profile_stats');
+
+  prof_stats.append('summary')
+    .append('p')
+    .text('Program name: ' + data.program_name)
+    .append('p')
+    .text('Total runtime: ' + data.run_time + 's')
+    .append('p')
+    .text('Total calls: ' + data.total_calls)
+    .append('p')
+    .text('Primitive calls: ' + data.primitive_calls);
+
+  var table = prof_stats.append('table');
 
   table.append('thead')
    .append('tr')
@@ -131,7 +144,6 @@ function renderTable(data) {
    .append('tr')
    .selectAll('td')
    .data(function(row, i) {
-      console.log(row);
       return columns.map(function(c) {
         var cell = {};
         d3.keys(c).forEach(function(k) {
@@ -142,7 +154,7 @@ function renderTable(data) {
    })
    .enter()
    .append('td')
-   .html(function(d) { return d.html; })
+   .text(function(d) { return d.text; })
    .attr('class', function(d) { return d.cl; });
 }
 
