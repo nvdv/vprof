@@ -74,6 +74,10 @@ def get_stats(filename):
     return pstats.Stats(prof)
 
 
+class StatsServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
+    allow_reuse_address = True
+
+
 class StatsHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     """Serves profiles stats."""
     ROOT_URI = '/'
@@ -134,13 +138,11 @@ def main():
     }
 
     print('Serving results...')
-    SocketServer.TCPServer.allow_reuse_address = True
     partial_handler = functools.partial(
         StatsHandler, profile_json=json.dumps(program_info))
     subprocess.call(['open', 'http://%s:%s' % (_HOST, _PORT)])
     try:
-        SocketServer.TCPServer(
-            (_HOST, _PORT), partial_handler).serve_forever()
+        StatsServer((_HOST, _PORT), partial_handler).serve_forever()
     except KeyboardInterrupt:
         print('Stopping...')
         sys.exit(0)
