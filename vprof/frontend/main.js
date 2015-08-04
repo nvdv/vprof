@@ -6,7 +6,7 @@ var d3 = require('d3');
 var JSON_URI = "profile";
 
 // Treemap parameters
-var WIDTH = 1000;
+var WIDTH = 900;
 var HEIGHT_SCALE = 0.95;
 var PAD_TOP = 20;
 var PAD_RIGHT = 3;
@@ -104,11 +104,34 @@ function renderTreeMap(data) {
 /** Renders profile stats. */
 function renderTable(data) {
   var columns = [
-    { head: 'Name', cl: 'title', text: function(row) { return getNodeName(row); }},
-    { head: 'Cum. time', cl: 'num', text: function(row) { return row.cum_time; }},
-    { head: 'Time per call', cl: 'num', text: function(row) { return row.time_per_call; }},
-    { head: 'Num. calls', cl: 'num', text: function(row) { return row.num_calls; }},
-    { head: 'Cum. calls', cl: 'num', text: function(row) { return row.cum_calls; }},
+    {
+      head: 'Name',
+      cl: 'title',
+      text: function(row) { return getNodeName(row); }},
+    {
+      head: 'Time %',
+      cl: 'num',
+      text: function(row) {
+        var percent = row.cum_time / data.run_time;
+        return Math.round(percent * 1000) / 1000;
+      }
+    }, {
+      head: 'Cum. time',
+      cl: 'num',
+      text: function(row) { return row.cum_time; }
+    }, {
+      head: 'Time per call',
+      cl: 'num',
+      text: function(row) { return row.time_per_call; }
+    }, {
+      head: 'Num. calls',
+      cl: 'num',
+      text: function(row) { return row.num_calls; }
+    }, {
+      head: 'Cum. calls',
+      cl: 'num',
+      text: function(row) { return row.cum_calls; }
+    },
   ];
 
   var prof_stats = d3.select("body")
