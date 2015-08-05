@@ -14,6 +14,8 @@ var PAD_BOTTOM = 3;
 var PAD_LEFT = 3;
 var TEXT_OFFSET_X = 5;
 var TEXT_OFFSET_Y= 14;
+var ROUND_RADIUS_X = 7;
+var ROUND_RADIUS_Y = 7;
 
 /** Calculates node rendering params. */
 function calculateNode(d, n) {
@@ -90,6 +92,8 @@ function renderTreeMap(data) {
   cells.append("rect")
     .attr("x", function(d) { return d.x; })
     .attr("y", function(d) { return d.start_y; })
+    .attr('rx', ROUND_RADIUS_X)
+    .attr('ry', ROUND_RADIUS_Y)
     .attr("width", function(d) { return d.dx; })
     .attr("height", function(d) { return d.height; })
     .attr("fill", function(d) { return color(getNodeName(d) + d.depth.toString()); });
@@ -130,22 +134,37 @@ function renderTable(data) {
     }, {
       head: 'Cum. calls',
       cl: 'num',
-      text: function(row) { return row.cum_calls; }
-    },
+      text: function(row) { return row.cum_calls; }},
   ];
 
   var prof_stats = d3.select("body")
     .append('profile_stats');
 
-  prof_stats.append('summary')
-    .append('p')
-    .text('Program name: ' + data.program_name)
-    .append('p')
-    .text('Total runtime: ' + data.run_time + 's')
-    .append('p')
-    .text('Total calls: ' + data.total_calls)
-    .append('p')
-    .text('Primitive calls: ' + data.primitive_calls);
+  var summary = prof_stats.append('summary');
+  summary.append('p')
+    .attr('class', 'summary_name')
+    .text('Program name: ')
+    .append('span')
+    .attr('class', 'summary_value')
+    .text(data.program_name);
+  summary.append('p')
+    .attr('class', 'summary_name')
+    .text('Total runtime: ')
+    .append('span')
+    .attr('class', 'summary_value')
+    .text(data.run_time + ' s');
+  summary.append('p')
+    .attr('class', 'summary_name')
+    .text('Total calls: ')
+    .append('span')
+    .attr('class', 'summary_value')
+    .text(data.total_calls);
+  summary.append('p')
+    .attr('class', 'summary_name')
+    .text('Primitive calls: ')
+    .append('span')
+    .attr('class', 'summary_value')
+    .text(data.primitive_calls);
 
   var table = prof_stats.append('table');
 

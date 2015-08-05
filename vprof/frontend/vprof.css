@@ -12,6 +12,43 @@ profile_stats {
   padding: 15px;
 }
 
+table {
+  border-collapse: collapse;
+}
+
 th {
   text-align: left;
+  background: #ccc;
+  border: 1px solid #aaa;
+  padding:5px 10px
+}
+
+td {
+  border: solid 1px #CCC;
+  padding: 5px 10px;
+}
+
+tr:nth-child(odd)
+{
+  background-color: #eee;
+}
+
+rect {
+  stroke: white;
+  stroke-width: 2;
+  opacity: 0.5;
+}
+
+.summary-head {
+  font-weight: bold;
+}
+
+.summary_name {
+  margin: 5px 0;
+  font-weight: bold;
+  color: #333;
+}
+
+.summary_value {
+  font-weight: normal;
 }
