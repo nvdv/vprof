@@ -16,6 +16,9 @@ var TEXT_OFFSET_X = 5;
 var TEXT_OFFSET_Y= 14;
 var ROUND_RADIUS_X = 7;
 var ROUND_RADIUS_Y = 7;
+var HEIGHT_TRANS_STEP = 2;
+var OPACITY_TRANS_START = 0.5
+var OPACITY_TRANS_END = 0.55;
 
 /** Calculates node rendering params. */
 function calculateNode(d, n) {
@@ -96,7 +99,23 @@ function renderTreeMap(data) {
     .attr('ry', ROUND_RADIUS_Y)
     .attr("width", function(d) { return d.dx; })
     .attr("height", function(d) { return d.height; })
-    .attr("fill", function(d) { return color(getNodeName(d) + d.depth.toString()); });
+    .attr("fill", function(d) { return color(getNodeName(d) + d.depth.toString()); })
+    .on("mouseover", function() {
+      d3.select(this)
+        .transition()
+        .attr('width', function(d) { return WIDTH; })
+        .attr('height', function(d) { return d.height + HEIGHT_TRANS_STEP; })
+        .attr('x', 0)
+        .style('opacity', OPACITY_TRANS_END);
+    })
+    .on("mouseout", function() {
+      d3.select(this)
+        .transition()
+        .attr('width', function(d) { return d.dx; })
+        .attr('height', function(d) { return d.height - HEIGHT_TRANS_STEP; })
+        .attr('x', function(d) { return d.x; })
+        .style('opacity', OPACITY_TRANS_START);
+    });
 
   cells.append("text")
     .attr("x", function(d) { return d.x + TEXT_OFFSET_X; })
