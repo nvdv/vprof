@@ -136,7 +136,7 @@ function renderTable(data) {
       cl: 'num',
       text: function(row) {
         var percent = row.cum_time / data.run_time;
-        return Math.round(percent * 1000) / 1000;
+        return 100 * Math.round(percent * 1000) / 1000;
       }
     }, {
       head: 'Cum. time',
