@@ -17,7 +17,7 @@ var TEXT_OFFSET_Y= 14;
 var ROUND_RADIUS_X = 7;
 var ROUND_RADIUS_Y = 7;
 var HEIGHT_TRANS_STEP = 2;
-var OPACITY_TRANS_START = 0.5
+var OPACITY_TRANS_START = 0.5;
 var OPACITY_TRANS_END = 0.55;
 
 /** Calculates node rendering params. */

@@ -45,7 +45,8 @@ def _fill_stats(curr_node, all_callees, stats):
         'time_per_call': stats[curr_node]['time_per_call'],
         'cum_time': stats[curr_node]['cum_time'],
         'children': [_fill_stats(child, all_callees, stats)
-                     for child in all_callees[curr_node]]
+                     for child in all_callees[curr_node]
+                     if child != curr_node]
     }
 
 
