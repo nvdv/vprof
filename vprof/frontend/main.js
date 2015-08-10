@@ -128,10 +128,14 @@ function renderTreeMap(data) {
 function renderTable(data) {
   var columns = [
     {
-      head: 'Name',
+      head: 'Function name',
       cl: 'title',
-      text: function(row) { return getNodeName(row); }},
-    {
+      text: function(row) { return row.func_name; }
+    }, {
+      head: 'Location',
+      cl: 'title',
+      text: function(row) { return row.module_name + ' @ ' + row.lineno.toString(); }
+    }, {
       head: 'Time %',
       cl: 'num',
       text: function(row) {
