@@ -1,13 +1,14 @@
 /**
- * Main module
+ * Renders front page from provided profiles.
  */
 var d3 = require('d3');
 
 var JSON_URI = "profile";
 
 // Treemap parameters
-var WIDTH = 900;
 var HEIGHT_SCALE = 0.95;
+var HEIGHT = window.innerHeight * HEIGHT_SCALE;
+var WIDTH = window.innerWidth / 2;
 var PAD_TOP = 20;
 var PAD_RIGHT = 3;
 var PAD_BOTTOM = 3;
@@ -76,10 +77,10 @@ function renderTreeMap(data) {
   var canvas = d3.select("body")
     .append("svg")
     .attr("width", WIDTH)
-    .attr("height", HEIGHT_SCALE * window.innerHeight);
+    .attr("height", HEIGHT);
 
   var treemap = d3.layout.treemap()
-    .size([WIDTH, HEIGHT_SCALE * window.innerHeight])
+    .size([WIDTH, HEIGHT])
     .mode('dice')
     .value(function(d) { return d.cum_time; })
     .padding([PAD_TOP, PAD_RIGHT, PAD_BOTTOM, PAD_LEFT])
