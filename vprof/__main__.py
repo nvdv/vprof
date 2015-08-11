@@ -33,8 +33,9 @@ def _annotate_stats(stats):
 
 
 # TODO(nvdv): Make this function iterative.
-def _fill_stats(curr_node, all_callees, stats):
+def _fill_stats(curr_node, all_callees, stats, seen):
     """Recursively populates stats in call order."""
+    seen.add(curr_node)
     module_name, lineno, func_name = curr_node
     return {
         'module_name': module_name,
@@ -44,9 +45,8 @@ def _fill_stats(curr_node, all_callees, stats):
         'num_calls': stats[curr_node]['num_calls'],
         'time_per_call': stats[curr_node]['time_per_call'],
         'cum_time': stats[curr_node]['cum_time'],
-        'children': [_fill_stats(child, all_callees, stats)
-                     for child in all_callees[curr_node]
-                     if child != curr_node]
+        'children': [_fill_stats(child, all_callees, stats, seen)
+                     for child in all_callees[curr_node] if child not in seen]
     }
 
 
@@ -60,15 +60,22 @@ def transform_stats(stats):
     stats.calc_callees()
     changed_stats = _annotate_stats(stats.stats)
     root = max(changed_stats.items(), key=_statcmp)
-    return _fill_stats(root[0], stats.all_callees, changed_stats)
+    return _fill_stats(root[0], stats.all_callees, changed_stats, set())
 
 
 def get_stats(filename):
     """Returns profile statistics for Python program specified by filename."""
+    globs = {
+        '__file__': filename,
+        '__name__': '__main__',
+        '__package__': None,
+    }
+    sys.path.insert(0, os.path.dirname(filename))
     prof = cProfile.Profile()
     try:
-        with open(filename) as srcfile:
-            prof.run(srcfile.read())
+        with open(filename, 'rb') as srcfile:
+            code = compile(srcfile.read(), filename, 'exec')
+        prof.runctx(code, globs, None)
     except SystemExit:
         pass
     prof.create_stats()
@@ -127,6 +134,7 @@ def main():
     parser.add_argument('source', metavar='src', nargs=1,
                         help='Python program to profile.')
     args = parser.parse_args()
+    sys.argv[:] = args.source
 
     print('Collecting profile stats...')
     stats = get_stats(args.source[0])

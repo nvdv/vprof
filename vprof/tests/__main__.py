@@ -76,7 +76,8 @@ class MainUnittest(unittest.TestCase):
     def testFillStats(self):
         root = max(_ANNOTATED_STATS.items(), key=lambda s: s[1]['cum_time'])
         self.assertDictEqual(
-            vp._fill_stats(root[0], _CALLERS, _ANNOTATED_STATS), _CALL_GRAPH)
+            vp._fill_stats(root[0], _CALLERS, _ANNOTATED_STATS, set()),
+            _CALL_GRAPH)
 
     @mock.patch('vprof.__main__._annotate_stats')
     def testTransformStats(self, annotate_mock):
