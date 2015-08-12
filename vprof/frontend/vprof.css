@@ -6,14 +6,17 @@ body {
 
 svg {
   padding: 15px;
+  font-size: 12px;
 }
 
 profile_stats {
   padding: 15px;
+  font-size: 14px;
 }
 
 table {
   border-collapse: collapse;
+  font-size: 12.5px;
 }
 
 th {
