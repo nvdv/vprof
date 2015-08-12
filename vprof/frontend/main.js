@@ -121,7 +121,6 @@ function renderTreeMap(data) {
   cells.append("text")
     .attr("x", function(d) { return d.x + TEXT_OFFSET_X; })
     .attr("y", function(d) { return d.start_y + TEXT_OFFSET_Y; })
-    .style("font-size","13px")
     .text(function(d) { return getNodeName(d); });
 }
 
