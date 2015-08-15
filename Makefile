@@ -11,7 +11,7 @@ devdeps_install:
 
 lint:
 	npm run lint
-	pylint --reports=n vprof/__main__.py
+	pylint --reports=n vprof/*.py
 
 clean:
 	rm -rf vprof/frontend/vprof.js
