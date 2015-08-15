@@ -12,6 +12,7 @@ svg {
 profile_stats {
   padding: 15px;
   font-size: 14px;
+  max-width: 400px;
 }
 
 table {
