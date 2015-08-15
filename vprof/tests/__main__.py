@@ -3,87 +3,62 @@ import vprof.__main__ as vp
 import unittest
 
 _RUN_STATS = {
-    ('baz', 10, 'main'): (10, 10, 0.01, 0.5, ()),
-    ('baz', 11, 'foo'): (5, 5, 0.02, 0.3, ('baz', 10, 'main')),
-    ('baz', 12, 'bar'): (3, 3, 0.01, 0.5, ('baz', 11, 'foo'))}
+    ('testscript.py', 1, 'prod'): (1, 10, 7e-06, 7e-06, {
+        ('testscript.py', 1, '<module>'): (1, 1, 1e-06, 7e-06),
+        ('testscript.py', 1, 'prod'): (9, 1, 6e-06, 6e-06)
+    }),
+    ('testscript.py', 1, '<module>'): (1, 1, 1.49, 2.3e-05, {}),
+    ('~', 0, '<range>'): (1, 1, 1e-06, 1e-06, {
+        ('testscript.py', 1, '<module>'): (1, 1, 1e-06, 1e-06)
+    })
+}
 
-_ANNOTATED_STATS = {
-    ('baz', 10, 'main'): {
-        'cum_calls': 10,
-        'num_calls': 10,
-        'time_per_call': 0.01,
-        'cum_time': 0.5,
-        'callers': ()},
-    ('baz', 11, 'foo'): {
-        'cum_calls': 5,
-        'num_calls': 5,
-        'time_per_call': 0.02,
-        'cum_time': 0.3,
-        'callers': ('baz', 10, 'main')},
-    ('baz', 12, 'bar'): {
-        'cum_calls': 3,
-        'num_calls': 3,
-        'time_per_call': 0.01,
-        'cum_time': 0.5,
-        'callers': ('baz', 11, 'foo')}}
-
-_CALLERS = {
-    ('baz', 10, 'main'): {
-        ('baz', 11, 'foo'): (10, 10, 0.01, 0.5),
-    },
-    ('baz', 11, 'foo'): {
-        ('baz', 12, 'bar'): (3, 3, 0.01, 0.5),
-    },
-    ('baz', 12, 'bar'): {
-        ('baz', 12, 'bar'): (3, 3, 0.01, 0.5),
-    }
+_CALLEES = {
+    ('testscript.py', 1, '<module>'): [
+        ('testscript.py', 1, 'prod'),
+        ('~', 0, '<range>'),
+    ],
+    ('testscript.py', 1, 'prod'): [
+        ('testscript.py', 1, 'prod')
+    ]
 }
 
 _CALL_GRAPH = {
-    'func_name': 'main',
-    'cum_calls': 10,
-    'num_calls': 10,
-    'time_per_call': 0.01,
-    'cum_time': 0.5,
-    'lineno': 10,
-    'module_name': 'baz',
-    'children': [{
-        'func_name': 'foo',
-        'cum_calls': 5,
-        'num_calls': 5,
-        'time_per_call': 0.02,
-        'cum_time': 0.3,
-        'lineno': 11,
-        'module_name': 'baz',
-        'children': [{
-            'func_name': 'bar',
-            'cum_calls': 3,
-            'num_calls': 3,
-            'time_per_call': 0.01,
-            'cum_time': 0.5,
-            'lineno': 12,
-            'module_name': 'baz',
-            'children': [],
-        }]
-    }]
+    'module_name': 'testscript.py',
+    'func_name': '<module>',
+    'total_calls': 1,
+    'prim_calls': 1,
+    'time_per_call': 1.49,
+    'cum_time': 2.3e-05,
+    'lineno': 1,
+    'children': [
+        {'func_name': 'prod',
+         'prim_calls': 1,
+         'total_calls': 10,
+         'time_per_call': 7e-06,
+         'cum_time': 7e-06,
+         'lineno': 1,
+         'module_name': 'testscript.py',
+         'children': []},
+        {'func_name': '<range>',
+         'prim_calls': 1,
+         'total_calls': 1,
+         'time_per_call': 1e-06,
+         'cum_time': 1e-06,
+         'lineno': 0,
+         'module_name': '~',
+         'children': []}
+    ]
 }
 
 
 class MainUnittest(unittest.TestCase):
-    def testAnnotateStats(self):
-        self.assertDictEqual(vp._annotate_stats(_RUN_STATS), _ANNOTATED_STATS)
+    def testBuildCallees(self):
+        self.assertDictEqual(dict(vp._build_callees(_RUN_STATS)), _CALLEES)
 
-    def testFillStats(self):
-        root = max(_ANNOTATED_STATS.items(), key=lambda s: s[1]['cum_time'])
-        self.assertDictEqual(
-            vp._fill_stats(root[0], _CALLERS, _ANNOTATED_STATS, set()),
-            _CALL_GRAPH)
-
-    @mock.patch('vprof.__main__._annotate_stats')
-    def testTransformStats(self, annotate_mock):
-        annotate_mock.return_value = _ANNOTATED_STATS
+    def testTransformStats(self):
         stats = mock.MagicMock()
-        stats.all_callees = _CALLERS
+        stats.stats = _RUN_STATS
         self.assertDictEqual(vp.transform_stats(stats), _CALL_GRAPH)
 
 

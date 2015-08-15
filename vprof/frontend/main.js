@@ -151,13 +151,13 @@ function renderTable(data) {
       cl: 'num',
       text: function(row) { return row.time_per_call; }
     }, {
-      head: 'Num. calls',
+      head: 'Total calls',
       cl: 'num',
-      text: function(row) { return row.num_calls; }
+      text: function(row) { return row.total_calls; }
     }, {
-      head: 'Cum. calls',
+      head: 'Primitive calls',
       cl: 'num',
-      text: function(row) { return row.cum_calls; }},
+      text: function(row) { return row.prim_calls; }},
   ];
 
   var prof_stats = d3.select("body")

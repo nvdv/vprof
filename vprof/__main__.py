@@ -9,6 +9,7 @@ import SimpleHTTPServer
 import SocketServer
 import subprocess
 import sys
+from collections import defaultdict
 
 _MODULE_DESC = 'Python visual profiler.'
 _STATIC_DIR = 'frontend'
@@ -17,50 +18,54 @@ _HOST = 'localhost'
 _PORT = 8000
 
 
-def _annotate_stats(stats):
-    """Adds description to cProfile stats."""
-    result_stats = {}
-    for func_params, stats in stats.items():
-        cum_calls, num_calls, time_per_call, cum_time, callers = stats
-        result_stats[func_params] = {
-            'cum_calls': cum_calls,
-            'num_calls': num_calls,
-            'time_per_call': time_per_call,
-            'cum_time': cum_time,
-            'callers': callers,
-        }
-    return result_stats
+def _build_callees(stats):
+    """Extracts call tree from cProfile stats."""
+    callees = defaultdict(list)
+    for func, (_, _, _, _, callers) in stats.iteritems():
+        for caller in callers:
+            callees[caller].append(func)
+    return callees
 
 
-# TODO(nvdv): Make this function iterative.
-def _fill_stats(curr_node, all_callees, stats, seen):
-    """Recursively populates stats in call order."""
-    seen.add(curr_node)
-    module_name, lineno, func_name = curr_node
+def _build_call_tree(node, callees, stats, seen=set()):
+    """Builds call tree from callees tree and cProfile stats.
+
+    Args:
+        node: Call to build tree from.
+        callees: Calless tree with call dependencies.
+        stats: Profile stats.
+        seen: Set to track previously seen nodes to handle recursion.
+    Returns:
+        A dict representing call tree with all necessary parameters.
+    """
+    seen.add(node)
+    module_name, lineno, func_name = node
+    cum_calls, num_calls, time_per_call, cum_time, _ = stats[node]
     return {
         'module_name': module_name,
         'lineno': lineno,
         'func_name': func_name,
-        'cum_calls': stats[curr_node]['cum_calls'],
-        'num_calls': stats[curr_node]['num_calls'],
-        'time_per_call': stats[curr_node]['time_per_call'],
-        'cum_time': stats[curr_node]['cum_time'],
-        'children': [_fill_stats(child, all_callees, stats, seen)
-                     for child in all_callees[curr_node] if child not in seen]
+        'prim_calls': cum_calls,
+        'total_calls': num_calls,
+        'time_per_call': time_per_call,
+        'cum_time': cum_time,
+        'children': [_build_call_tree(child, callees, stats, seen)
+                     for child in callees[node] if child not in seen]
     }
 
 
 def transform_stats(stats):
-    """Converts start from cProfile format to recusive dict."""
+    """Converts stats from cProfile format to call tree format."""
 
     def _statcmp(stat):
+        """Comparator by cummulative time."""
         _, params = stat
-        return params['cum_time']
+        return params[3]
 
     stats.calc_callees()
-    changed_stats = _annotate_stats(stats.stats)
-    root = max(changed_stats.items(), key=_statcmp)
-    return _fill_stats(root[0], stats.all_callees, changed_stats, set())
+    callees = _build_callees(stats.stats)
+    root, _ = max(stats.stats.iteritems(), key=_statcmp)
+    return _build_call_tree(root, callees, stats.stats)
 
 
 def get_stats(filename):
@@ -87,7 +92,7 @@ class StatsServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
 
 
 class StatsHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
-    """Serves profiles stats."""
+    """Profile stats server."""
     ROOT_URI = '/'
     PROFILE_URI = '/profile'
 
@@ -109,7 +114,8 @@ class StatsHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             output = self._profile_json
             content_type = 'text/json'
         else:
-            res_filename = os.path.dirname(__file__) + '/' + _STATIC_DIR + self.path
+            res_filename = (
+                os.path.dirname(__file__) + '/' + _STATIC_DIR + self.path)
             with open(res_filename) as res_file:
                 output = res_file.read()
             _, extension = os.path.splitext(self.path)
@@ -146,7 +152,6 @@ def main():
         'call_stats': transform_stats(stats),
     }
 
-    print('Serving results...')
     partial_handler = functools.partial(
         StatsHandler, profile_json=json.dumps(program_info))
     subprocess.call(['open', 'http://%s:%s' % (_HOST, _PORT)])
