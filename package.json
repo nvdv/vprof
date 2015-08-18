@@ -3,11 +3,13 @@
   "author": "nvdv",
   "main": "vprof/frontend/main.js",
   "dependencies": {
-    "jshint": "latest"
+    "jshint": "latest",
+    "uglify-js": "latest"
   },
   "scripts": {
     "lint": "jshint vprof/frontend/main.js",
-    "build": "browserify vprof/frontend/main.js -o vprof/frontend/vprof.js"
+    "build": "browserify vprof/frontend/main.js -o vprof/frontend/vprof.js",
+    "compress": "uglifyjs vprof/frontend/vprof.js > vprof/frontend/vprof_min.js"
   },
   "license": "BSD"
 }
