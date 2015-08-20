@@ -4,12 +4,16 @@
   "main": "vprof/frontend/main.js",
   "dependencies": {
     "jshint": "latest",
-    "uglify-js": "latest"
+    "uglify-js": "latest",
+    "karma": "latest",
+    "karma-jasmine": "latest",
+    "karma-phantomjs-launcher": "latest"
   },
   "scripts": {
     "lint": "jshint vprof/frontend/main.js",
     "build": "browserify vprof/frontend/main.js -o vprof/frontend/vprof.js",
-    "compress": "uglifyjs vprof/frontend/vprof.js > vprof/frontend/vprof_min.js"
+    "compress": "uglifyjs vprof/frontend/vprof.js > vprof/frontend/vprof_min.js",
+    "test": "karma start"
   },
   "license": "BSD"
 }

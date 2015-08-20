@@ -1,5 +1,6 @@
 runtests:
 	python -m vprof.tests
+	npm run test
 
 install:
 	npm run build
