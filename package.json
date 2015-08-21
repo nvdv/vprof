@@ -3,11 +3,14 @@
   "author": "nvdv",
   "main": "vprof/frontend/main.js",
   "dependencies": {
+    "d3": "3.5.6",
     "jshint": "latest",
     "uglify-js": "latest",
+    "browserify": "latest",
     "karma": "latest",
     "karma-jasmine": "latest",
-    "karma-phantomjs-launcher": "latest"
+    "karma-phantomjs-launcher": "latest",
+    "karma-browserify": "latest"
   },
   "scripts": {
     "lint": "jshint vprof/frontend/main.js",

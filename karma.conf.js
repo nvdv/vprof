@@ -2,11 +2,14 @@
 
 module.exports = function(config) {
   config.set({
-    basePath: '',
-    frameworks: ['jasmine'],
+    basePath: 'vprof/frontend',
+    frameworks: ['jasmine', 'browserify'],
     files: [
-      'vprof/frontend/*_test.js'
+      '*_test.js',
     ],
+    preprocessors: {
+      '*_test.js': ['browserify']
+    },
     reporters: ['progress'],
     port: 9876,
     colors: true,
