@@ -231,4 +231,10 @@ function renderView() {
   });
 }
 
+module.exports = {
+  'getNodeName': getNodeName,
+  'calculateNode': calculateNode,
+  'flattenStats': flattenStats
+};
+
 renderView();
