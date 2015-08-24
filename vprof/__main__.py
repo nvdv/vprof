@@ -1,10 +1,7 @@
 """Visual profiler for Python."""
 import argparse
-import functools
-import json
 import profile
 import stats_server
-import subprocess
 import sys
 
 _MODULE_DESC = 'Python visual profiler.'
@@ -38,13 +35,8 @@ def main():
     print('Collecting profile stats...')
 
     prof_option = args.profilers[0]
-    profiler = _PROFILE_MAP[prof_option]
-    program_info = profile.CProfile(args.source[0]).run()
-
-    partial_handler = functools.partial(
-        stats_server.StatsHandler, profile_json=json.dumps(program_info))
-    subprocess.call(['open', 'http://%s:%s' % (_HOST, _PORT)])
-    stats_server.start(_HOST, _PORT, partial_handler)
+    program_info = _PROFILE_MAP[prof_option](program_name).run()
+    stats_server.start(_HOST, _PORT, program_info)
 
 
 if __name__ == "__main__":

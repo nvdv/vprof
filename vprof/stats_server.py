@@ -1,7 +1,10 @@
 """Stats server that serves profile stats."""
+import functools
+import json
 import os
 import SimpleHTTPServer
 import SocketServer
+import subprocess
 import sys
 
 _STATIC_DIR = 'frontend'
@@ -17,9 +20,8 @@ class StatsHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     ROOT_URI = '/'
     PROFILE_URI = '/profile'
 
-    def __init__(self, *args, **kwargs):
-        self._profile_json = kwargs['profile_json']
-        del kwargs['profile_json']
+    def __init__(self, profile_json, *args, **kwargs):
+        self._profile_json = profile_json
         # Since this class is old-style - call parent method directly.
         SimpleHTTPServer.SimpleHTTPRequestHandler.__init__(
             self, *args, **kwargs)
@@ -56,16 +58,19 @@ class StatsHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             self.end_headers()
 
 
-def start(host, port, handler):
+def start(host, port, profile_stats):
     """Starts server with specified parameters.
 
     Args:
         host: Hostname of server.
         port: Server port.
-        handler: Specified request handler.
+        profile_stats: Dictionary with collected program info.
     """
+    stats_handler = functools.partial(
+        StatsHandler, json.dumps(profile_stats))
+    subprocess.call(['open', 'http://%s:%s' % (host, port)])
     try:
-        _StatsServer((host, port), handler).serve_forever()
+        _StatsServer((host, port), stats_handler).serve_forever()
     except KeyboardInterrupt:
         print('Stopping...')
         sys.exit(0)
