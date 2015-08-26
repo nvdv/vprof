@@ -1,4 +1,4 @@
-"""Various rofile wrappers"""
+"""Various profile wrappers"""
 import abc
 import cProfile
 import os
