@@ -188,6 +188,12 @@ function renderTable(data) {
     .append('span')
     .attr('class', 'summary_value')
     .text(data.primitive_calls);
+  summary.append('p')
+    .attr('class', 'summary_name')
+    .text('Cummulative time percentage cutoff: ')
+    .append('span')
+    .attr('class', 'summary_value')
+    .text(data.cutoff * 100 + ' %');
 
   var table = prof_stats.append('table');
 

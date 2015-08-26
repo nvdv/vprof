@@ -16,5 +16,5 @@ lint:
 	pylint --reports=n vprof/*.py
 
 clean:
-	rm -rf vprof/frontend/main.js
 	rm -rf vprof/frontend/vprof.js
+	rm -rf vprof/frontend/vprof_min.js

@@ -1,4 +1,4 @@
-"""Classes for various profiles."""
+"""Various rofile wrappers"""
 import abc
 import cProfile
 import os
@@ -17,13 +17,23 @@ class Profile(object):
 
     @abc.abstractmethod
     def run(self):
+        """Runs profile and returns profile stats."""
         pass
 
 
 class CProfile(Profile):
-    """Class that wraps cProfile run and stats processing."""
-    def __init__(self, program_name):
+    """Class that wraps CProfile stats."""
+
+    def __init__(self, program_name, prune_threshold):
+        """Initializes cProfile wrapper.
+
+        Args:
+            program_name: Name of the program to profile.
+            prune_threshold: A threshold for cummulative time fraction to cut
+                call tree nodes below.
+        """
         self._program_name = program_name
+        self._prune_threshold = prune_threshold
 
     def _build_callees(self, stats):
         """Extracts call tree from cProfile stats."""
@@ -70,10 +80,20 @@ class CProfile(Profile):
         stats.calc_callees()
         callees = self._build_callees(stats.stats)
         root, _ = max(stats.stats.iteritems(), key=_statcmp)
-        return self._build_call_tree(root, callees, stats.stats)
+        call_tree = self._build_call_tree(root, callees, stats.stats)
+        self._prune(call_tree, call_tree['cum_time'])
+        return call_tree
+
+    def _prune(self, node, total_cum_time):
+        """Prunes call tree nodes below prune threshold."""
+        node['children'][:] = [
+            child for child in node['children']
+            if child['cum_time'] / total_cum_time >= self._prune_threshold]
+        for child in node['children']:
+            self._prune(child, total_cum_time)
 
     def run(self):
-        """Returns profile statistics for Python program."""
+        """Returns CProfile stats for specified Python program."""
         globs = {
             '__file__': self._program_name,
             '__name__': '__main__',
@@ -95,4 +115,5 @@ class CProfile(Profile):
             'primitive_calls': cprofile_stats.prim_calls,
             'total_calls': cprofile_stats.total_calls,
             'call_stats': self._transform_stats(cprofile_stats),
+            'cutoff': self._prune_threshold
         }
