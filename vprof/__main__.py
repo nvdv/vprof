@@ -2,6 +2,7 @@
 import argparse
 import profile
 import stats_server
+import os
 import sys
 
 _MODULE_DESC = 'Python visual profiler.'
@@ -38,6 +39,7 @@ def main():
     prof_args = (program_name, prune / 100)
     program_info = _PROFILE_MAP[prof_option](*prof_args).run()
     print('Starting stats server...')
+    sys.stderr = open(os.devnull, "w")
     stats_server.start(_HOST, _PORT, program_info)
 
 
