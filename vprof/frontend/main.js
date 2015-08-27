@@ -20,6 +20,7 @@ var ROUND_RADIUS_Y = 7;
 var HEIGHT_TRANS_STEP = 2;
 var OPACITY_TRANS_START = 0.5;
 var OPACITY_TRANS_END = 0.55;
+var TEXT_CUTOFF = 0.05 * HEIGHT;
 
 /** Calculates node rendering params. */
 function calculateNode(d, n) {
@@ -121,7 +122,7 @@ function renderTreeMap(data) {
   cells.append("text")
     .attr("x", function(d) { return d.x + TEXT_OFFSET_X; })
     .attr("y", function(d) { return d.start_y + TEXT_OFFSET_Y; })
-    .text(function(d) { return getNodeName(d); });
+    .text(function(d) { return (d.height > TEXT_CUTOFF) ? getNodeName(d) : ""; });
 }
 
 /** Renders profile stats. */
