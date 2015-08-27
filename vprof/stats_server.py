@@ -1,4 +1,4 @@
-"""Stats server that serves profile stats."""
+"""Profile stats server."""
 import functools
 import json
 import os
@@ -12,11 +12,12 @@ _PROFILE_HTML = '%s/profile.html' % _STATIC_DIR
 
 
 class _StatsServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
+    """Multithreaded HTTP stats server."""
     allow_reuse_address = True
 
 
 class StatsHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
-    """Profile stats server."""
+    """Profile stats request handler."""
     ROOT_URI = '/'
     PROFILE_URI = '/profile'
 
@@ -59,12 +60,12 @@ class StatsHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
 
 def start(host, port, profile_stats):
-    """Starts server with specified parameters.
+    """Starts HTTP server with specified parameters.
 
     Args:
-        host: Hostname of server.
+        host: Server hostname.
         port: Server port.
-        profile_stats: Dictionary with collected program info.
+        profile_stats: Dictionary with progran stats.
     """
     stats_handler = functools.partial(
         StatsHandler, json.dumps(profile_stats))
