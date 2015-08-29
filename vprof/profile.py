@@ -22,7 +22,13 @@ class Profile(object):
 
 
 class CProfile(Profile):
-    """Class that wraps CProfile stats."""
+    """Class that wraps CProfile stats.
+
+    This class contains all logic regarding cProfile run, stats collection and
+    processing. All function call info is contained in stats.Pstats, all
+    we have to do is to run cProfile and build call tree from resulting
+    pstats.Stats.
+    """
 
     def __init__(self, program_name, prune_threshold):
         """Initializes cProfile wrapper.
