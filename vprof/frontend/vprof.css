@@ -56,3 +56,11 @@ rect {
 .summary_value {
   font-weight: normal;
 }
+
+.tooltip-visible {
+  display: block;
+}
+
+.tooltip-invisible {
+  display: none;
+}

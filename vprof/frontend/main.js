@@ -3,7 +3,7 @@
  */
 var d3 = require('d3');
 
-var JSON_URI = "profile";
+var JSON_URI = 'profile';
 
 // Treemap parameters
 var HEIGHT_SCALE = 0.95;
@@ -18,9 +18,10 @@ var TEXT_OFFSET_Y= 14;
 var ROUND_RADIUS_X = 7;
 var ROUND_RADIUS_Y = 7;
 var HEIGHT_TRANS_STEP = 2;
-var OPACITY_TRANS_START = 0.5;
-var OPACITY_TRANS_END = 0.55;
 var TEXT_CUTOFF = 0.05 * HEIGHT;
+var TOOLTIP_X = 10;
+var TOOLTIP_OFFSET = 120;
+var TOOLTIP_DY = 15;
 
 /** Calculates node rendering params. */
 function calculateNode(d, n) {
@@ -74,11 +75,10 @@ function flattenStats(stats) {
 /** Renders treemap. */
 function renderTreeMap(data) {
   var color = d3.scale.category10();
-
-  var canvas = d3.select("body")
-    .append("svg")
-    .attr("width", WIDTH)
-    .attr("height", HEIGHT);
+  var canvas = d3.select('body')
+    .append('svg')
+    .attr('width', WIDTH)
+    .attr('height', HEIGHT);
 
   var treemap = d3.layout.treemap()
     .size([WIDTH, HEIGHT])
@@ -87,42 +87,83 @@ function renderTreeMap(data) {
     .padding([PAD_TOP, PAD_RIGHT, PAD_BOTTOM, PAD_LEFT])
     .nodes(data.call_stats);
 
-  var cells = canvas.selectAll(".cell")
+  var cells = canvas.selectAll('.cell')
     .data(treemap)
     .enter()
-    .append("g")
-    .attr("class", "cell")
+    .append('g')
+    .attr('class', 'cell')
     .each(calculateNode);
 
-  cells.append("rect")
-    .attr("x", function(d) { return d.x; })
-    .attr("y", function(d) { return d.start_y; })
+  // Render node tooltip.
+  var tooltip = cells.append('text')
+    .attr('class', 'tooltip-invisible');
+
+  tooltip.append('tspan')
+    .attr('x', TOOLTIP_X)
+    .attr('dy', TOOLTIP_DY)
+    .text(function(d) { return 'Function name: ' + d.func_name; });
+  tooltip.append('tspan')
+    .attr('x', TOOLTIP_X)
+    .attr('dy', TOOLTIP_DY)
+    .text(function(d) { return 'Location: ' + d.module_name; });
+  tooltip.append('tspan')
+    .attr('x', TOOLTIP_X)
+    .attr('dy', TOOLTIP_DY)
+    .text(function(d) {
+      var percent = 100 * Math.round(d.cum_time / data.run_time * 1000) / 1000;
+      return 'Time percent: ' + percent + ' %';
+    });
+  tooltip.append('tspan')
+    .attr('x', TOOLTIP_X)
+    .attr('dy', TOOLTIP_DY)
+    .text(function(d) { return 'Cum.time: ' + d.cum_time; });
+  tooltip.append('tspan')
+    .attr('x', TOOLTIP_X)
+    .attr('dy', TOOLTIP_DY)
+    .text(function(d) { return 'Time per call: ' + d.time_per_call; });
+  tooltip.append('tspan')
+    .attr('x', TOOLTIP_X)
+    .attr('dy', TOOLTIP_DY)
+    .text(function(d) { return 'Primitive calls: ' + d.prim_calls; });
+
+  // Render tree map.
+  var treeNodes = cells.append('rect')
+    .attr('x', function(d) { return d.x; })
+    .attr('y', function(d) { return d.start_y; })
     .attr('rx', ROUND_RADIUS_X)
     .attr('ry', ROUND_RADIUS_Y)
-    .attr("width", function(d) { return d.dx; })
-    .attr("height", function(d) { return d.height; })
-    .attr("fill", function(d) { return color(getNodeName(d) + d.depth.toString()); })
-    .on("mouseover", function() {
-      d3.select(this)
-        .transition()
-        .attr('width', function(d) { return WIDTH; })
-        .attr('height', function(d) { return d.height + HEIGHT_TRANS_STEP; })
-        .attr('x', 0)
-        .style('opacity', OPACITY_TRANS_END);
-    })
-    .on("mouseout", function() {
-      d3.select(this)
-        .transition()
-        .attr('width', function(d) { return d.dx; })
-        .attr('height', function(d) { return d.height - HEIGHT_TRANS_STEP; })
-        .attr('x', function(d) { return d.x; })
-        .style('opacity', OPACITY_TRANS_START);
+    .attr('width', function(d) { return d.dx; })
+    .attr('height', function(d) { return d.height; })
+    .attr('fill', function(d) { return color(getNodeName(d) + d.depth.toString()); })
+    .on('mousemove', function(d) {
+      d3.select(this.previousElementSibling)
+        .attr('class', 'tooltip-visible')
+        .attr('y', function(d) {
+          return HEIGHT - TOOLTIP_OFFSET;
+        });
+
+        d3.select(this)
+          .transition()
+          .attr('width', function(d) { return WIDTH; })
+          .attr('height', function(d) { return d.height + HEIGHT_TRANS_STEP; })
+          .attr('x', 0);
+      })
+    .on('mouseout', function() {
+        d3.select(this.previousElementSibling)
+          .attr('class', 'tooltip-invisible');
+
+        d3.select(this)
+          .transition()
+          .attr('width', function(d) { return d.dx; })
+          .attr('height', function(d) { return d.height - HEIGHT_TRANS_STEP; })
+          .attr('x', function(d) { return d.x; });
     });
 
-  cells.append("text")
-    .attr("x", function(d) { return d.x + TEXT_OFFSET_X; })
-    .attr("y", function(d) { return d.start_y + TEXT_OFFSET_Y; })
-    .text(function(d) { return (d.height > TEXT_CUTOFF) ? getNodeName(d) : ""; });
+  // Render treemap headers
+  cells.append('text')
+    .attr('x', function(d) { return d.x + TEXT_OFFSET_X; })
+    .attr('y', function(d) { return d.start_y + TEXT_OFFSET_Y; })
+    .text(function(d) { return (d.height > TEXT_CUTOFF) ? getNodeName(d) : ''; });
 }
 
 /** Renders profile stats. */
@@ -161,7 +202,7 @@ function renderTable(data) {
       text: function(row) { return row.prim_calls; }},
   ];
 
-  var prof_stats = d3.select("body")
+  var prof_stats = d3.select('body')
     .append('profile_stats');
 
   var summary = prof_stats.append('summary');
