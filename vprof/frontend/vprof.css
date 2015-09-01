@@ -24,7 +24,7 @@ th {
   text-align: left;
   background: #ccc;
   border: 1px solid #aaa;
-  padding:5px 10px
+  padding: 5px 10px
 }
 
 td {
@@ -40,7 +40,7 @@ tr:nth-child(odd)
 rect {
   stroke: white;
   stroke-width: 2;
-  opacity: 0.5;
+  opacity: 0.75;
 }
 
 .summary-head {

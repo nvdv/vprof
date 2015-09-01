@@ -142,21 +142,21 @@ function renderTreeMap(data) {
           return HEIGHT - TOOLTIP_OFFSET;
         });
 
-        d3.select(this)
-          .transition()
-          .attr('width', function(d) { return WIDTH; })
-          .attr('height', function(d) { return d.height + HEIGHT_TRANS_STEP; })
-          .attr('x', 0);
+      d3.select(this)
+        .transition()
+        .attr('width', function(d) { return WIDTH; })
+        .attr('height', function(d) { return d.height + HEIGHT_TRANS_STEP; })
+        .attr('x', 0);
       })
     .on('mouseout', function() {
-        d3.select(this.previousElementSibling)
-          .attr('class', 'tooltip-invisible');
+      d3.select(this.previousElementSibling)
+        .attr('class', 'tooltip-invisible');
 
-        d3.select(this)
-          .transition()
-          .attr('width', function(d) { return d.dx; })
-          .attr('height', function(d) { return d.height - HEIGHT_TRANS_STEP; })
-          .attr('x', function(d) { return d.x; });
+      d3.select(this)
+        .transition()
+        .attr('width', function(d) { return d.dx; })
+        .attr('height', function(d) { return d.height - HEIGHT_TRANS_STEP; })
+        .attr('x', function(d) { return d.x; });
     });
 
   // Render treemap headers
