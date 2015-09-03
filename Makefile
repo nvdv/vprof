@@ -7,9 +7,13 @@ install:
 	npm run compress
 	pip install .
 
+deps_install:
+	npm install
+	pip install -r requirements
+
 devdeps_install:
 	npm install
-	pip install -r requirements.txt
+	pip install -r dev_requirements.txt
 
 lint:
 	npm run lint
