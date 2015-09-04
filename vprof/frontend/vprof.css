@@ -1,7 +1,22 @@
+html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 body {
   font-family: 'Helvetica Neue', Helvetica;
   display: flex;
   flex-direction: row;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.chart {
+  overflow: auto;
+  height: 100%;
 }
 
 svg {
@@ -12,7 +27,9 @@ svg {
 profile_stats {
   padding: 15px;
   font-size: 14px;
-  max-width: 400px;
+  max-width: 900px;
+  height: 100%;
+  overflow: auto;
 }
 
 table {
