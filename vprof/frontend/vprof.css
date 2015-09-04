@@ -54,9 +54,15 @@ tr:nth-child(odd)
   background-color: #eee;
 }
 
-rect {
+.rect-normal {
   stroke: white;
   stroke-width: 2;
+  opacity: 0.75;
+}
+
+.rect-hightlight {
+  stroke: white;
+  stroke-width: 4;
   opacity: 0.75;
 }
 

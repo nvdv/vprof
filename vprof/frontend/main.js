@@ -1,49 +1,19 @@
 /**
  * Renders front page from provided profiles.
  */
+
+ /* jshint strict: false, browser: true, globalstrict: true */
+ /* global require, module */
+
+'use strict';
 var d3 = require('d3');
 
 var JSON_URI = 'profile';
 
-// Treemap parameters
+// Flame chart parameters
 var HEIGHT_SCALE = 0.95;
 var HEIGHT = window.innerHeight * HEIGHT_SCALE;
 var WIDTH = window.innerWidth / 2;
-var PAD_TOP = 20;
-var PAD_RIGHT = 3;
-var PAD_BOTTOM = 3;
-var PAD_LEFT = 3;
-var TEXT_OFFSET_X = 5;
-var TEXT_OFFSET_Y= 14;
-var ROUND_RADIUS_X = 7;
-var ROUND_RADIUS_Y = 7;
-var HEIGHT_TRANS_STEP = 2;
-var TEXT_CUTOFF = 0.05 * HEIGHT;
-var TOOLTIP_X = 10;
-var TOOLTIP_OFFSET = 120;
-var TOOLTIP_DY = 15;
-
-/** Calculates node rendering params. */
-function calculateNode(d, n) {
-  // Adjusting treemap layout.
-  if (!d.parent) {
-    d.start_y = d.y;
-    d.height = d.dy;
-  }
-  // TODO(nvdv)
-  // In some cases total cummulative run time of children can
-  // be greater than cummulative run time of parent which
-  // affects rendering.
-  if (!d.children) return;
-  var curr_y = d.start_y + PAD_TOP;
-  var usable_height = d.height - (PAD_BOTTOM + PAD_TOP);
-  for (var i = 0; i < d.children.length; i++) {
-    d.children[i].start_y = curr_y;
-    var c = d.children[i].cum_time / d.cum_time;
-    d.children[i].height = usable_height * Math.round(c * 1000) / 1000;
-    curr_y += d.children[i].height;
-  }
-}
 
 /** Returns full node name. */
 function getNodeName(d) {
@@ -70,100 +40,6 @@ function flattenStats(stats) {
   var results = [];
   processNode(stats);
   return results;
-}
-
-/** Renders treemap. */
-function renderTreeMap(data) {
-  var color = d3.scale.category10();
-  var canvas = d3.select('body')
-    .append('svg')
-    .attr('width', WIDTH)
-    .attr('height', HEIGHT);
-
-  var treemap = d3.layout.treemap()
-    .size([WIDTH, HEIGHT])
-    .mode('dice')
-    .value(function(d) { return d.cum_time; })
-    .padding([PAD_TOP, PAD_RIGHT, PAD_BOTTOM, PAD_LEFT])
-    .nodes(data.call_stats);
-
-  var cells = canvas.selectAll('.cell')
-    .data(treemap)
-    .enter()
-    .append('g')
-    .attr('class', 'cell')
-    .each(calculateNode);
-
-  // Render node tooltip.
-  var tooltip = cells.append('text')
-    .attr('class', 'tooltip-invisible');
-
-  tooltip.append('tspan')
-    .attr('x', TOOLTIP_X)
-    .attr('dy', TOOLTIP_DY)
-    .text(function(d) { return 'Function name: ' + d.func_name; });
-  tooltip.append('tspan')
-    .attr('x', TOOLTIP_X)
-    .attr('dy', TOOLTIP_DY)
-    .text(function(d) { return 'Location: ' + d.module_name; });
-  tooltip.append('tspan')
-    .attr('x', TOOLTIP_X)
-    .attr('dy', TOOLTIP_DY)
-    .text(function(d) {
-      var percent = 100 * Math.round(d.cum_time / data.run_time * 1000) / 1000;
-      return 'Time percent: ' + percent + ' %';
-    });
-  tooltip.append('tspan')
-    .attr('x', TOOLTIP_X)
-    .attr('dy', TOOLTIP_DY)
-    .text(function(d) { return 'Cum.time: ' + d.cum_time; });
-  tooltip.append('tspan')
-    .attr('x', TOOLTIP_X)
-    .attr('dy', TOOLTIP_DY)
-    .text(function(d) { return 'Time per call: ' + d.time_per_call; });
-  tooltip.append('tspan')
-    .attr('x', TOOLTIP_X)
-    .attr('dy', TOOLTIP_DY)
-    .text(function(d) { return 'Primitive calls: ' + d.prim_calls; });
-
-  // Render tree map.
-  var treeNodes = cells.append('rect')
-    .attr('x', function(d) { return d.x; })
-    .attr('y', function(d) { return d.start_y; })
-    .attr('rx', ROUND_RADIUS_X)
-    .attr('ry', ROUND_RADIUS_Y)
-    .attr('width', function(d) { return d.dx; })
-    .attr('height', function(d) { return d.height; })
-    .attr('fill', function(d) { return color(getNodeName(d) + d.depth.toString()); })
-    .on('mousemove', function(d) {
-      d3.select(this.previousElementSibling)
-        .attr('class', 'tooltip-visible')
-        .attr('y', function(d) {
-          return HEIGHT - TOOLTIP_OFFSET;
-        });
-
-      d3.select(this)
-        .transition()
-        .attr('width', function(d) { return WIDTH; })
-        .attr('height', function(d) { return d.height + HEIGHT_TRANS_STEP; })
-        .attr('x', 0);
-      })
-    .on('mouseout', function() {
-      d3.select(this.previousElementSibling)
-        .attr('class', 'tooltip-invisible');
-
-      d3.select(this)
-        .transition()
-        .attr('width', function(d) { return d.dx; })
-        .attr('height', function(d) { return d.height - HEIGHT_TRANS_STEP; })
-        .attr('x', function(d) { return d.x; });
-    });
-
-  // Render treemap headers
-  cells.append('text')
-    .attr('x', function(d) { return d.x + TEXT_OFFSET_X; })
-    .attr('y', function(d) { return d.start_y + TEXT_OFFSET_Y; })
-    .text(function(d) { return (d.height > TEXT_CUTOFF) ? getNodeName(d) : ''; });
 }
 
 /** Renders profile stats. */
@@ -271,17 +147,55 @@ function renderTable(data) {
    .attr('class', function(d) { return d.cl; });
 }
 
+function renderFlameChart(data) {
+  var color = d3.scale.category10();
+  var canvas = d3.select('body')
+    .append('div')
+    .attr('class', 'chart')
+    .append('svg')
+    .attr('width', WIDTH)
+    .attr('height', HEIGHT);
+  var x_scale = d3.scale.linear().range([0, WIDTH]);
+  var y_scale = d3.scale.linear().range([0, HEIGHT]);
+
+  var flame_chart = d3.layout.partition()
+    .sort(null)
+    .value(function(d) { return d.cum_time; });
+
+  var call_graph = flame_chart.nodes(data.call_stats);
+  var cells = canvas.selectAll(".cell")
+    .data(call_graph)
+    .enter()
+    .append('g')
+    .attr('class', 'cell');
+
+  var nodes = cells.append('rect')
+    .attr('class', 'rect-normal')
+    .attr('x', function(d) { return x_scale(d.x); })
+    .attr('y', function(d) { return y_scale(1 - d.y - d.dy); })
+    .attr('width', function(d) { return x_scale(d.dx); })
+    .attr('height', function(d) { return y_scale(d.dy); })
+    .style('fill', function(d) { return color(getNodeName(d) + d.depth.toString()); })
+    .on('mouseover', function(d) {
+      d3.select(this)
+        .attr('class', 'rect-highlight');
+    })
+    .on('mouseout', function(d) {
+      d3.select(this)
+        .attr('class', 'rect-normal');
+    });
+}
+
 /** Renders whole page. */
 function renderView() {
   d3.json(JSON_URI, function(data) {
-    renderTreeMap(data);
+    renderFlameChart(data);
     renderTable(data);
   });
 }
 
 module.exports = {
   'getNodeName': getNodeName,
-  'calculateNode': calculateNode,
   'flattenStats': flattenStats
 };
 
