@@ -27,7 +27,7 @@ svg {
 profile_stats {
   padding: 15px;
   font-size: 14px;
-  max-width: 900px;
+  max-width: 50%;
   height: 100%;
   overflow: auto;
 }
