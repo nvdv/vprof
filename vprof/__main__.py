@@ -19,8 +19,6 @@ def main():
                         help='Profilers configuration')
     parser.add_argument('source', metavar='src', nargs=1,
                         help='Python program to profile.')
-    parser.add_argument('-p', '--prune', metavar='prune', type=float, default=0,
-                        help='Cummulative percentage cutoff.')
     args = parser.parse_args()
 
     if len(args.profilers) > len(set(args.profilers)):
@@ -35,9 +33,8 @@ def main():
 
     sys.argv[:] = args.source
     print('Collecting profile stats...')
-    program_name, prune = args.source[0], args.prune
-    prof_args = (program_name, prune / 100)
-    program_info = _PROFILE_MAP[prof_option](*prof_args).run()
+    program_name = args.source[0]
+    program_info = _PROFILE_MAP[prof_option](program_name).run()
     print('Starting stats server...')
     sys.stderr = open(os.devnull, "w")
     stats_server.start(_HOST, _PORT, program_info)
