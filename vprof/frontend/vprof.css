@@ -24,7 +24,7 @@ svg {
   font-size: 12px;
 }
 
-profile_stats {
+.profile-stats {
   padding: 15px;
   font-size: 14px;
   max-width: 50%;
@@ -70,13 +70,13 @@ tr:nth-child(odd)
   font-weight: bold;
 }
 
-.summary_name {
+.summary-name {
   margin: 5px 0;
   font-weight: bold;
   color: #333;
 }
 
-.summary_value {
+.summary-value {
   font-weight: normal;
 }
 

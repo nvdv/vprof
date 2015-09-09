@@ -79,32 +79,33 @@ function renderTable(data) {
   ];
 
   var prof_stats = d3.select('body')
-    .append('profile_stats');
+    .append('div')
+    .attr('class', 'profile-stats');
 
   var summary = prof_stats.append('summary');
   summary.append('p')
-    .attr('class', 'summary_name')
+    .attr('class', 'summary-name')
     .text('Program name: ')
     .append('span')
-    .attr('class', 'summary_value')
+    .attr('class', 'summary-value')
     .text(data.program_name);
   summary.append('p')
-    .attr('class', 'summary_name')
+    .attr('class', 'summary-name')
     .text('Total runtime: ')
     .append('span')
-    .attr('class', 'summary_value')
+    .attr('class', 'summary-value')
     .text(data.run_time + ' s');
   summary.append('p')
-    .attr('class', 'summary_name')
+    .attr('class', 'summary-name')
     .text('Total calls: ')
     .append('span')
-    .attr('class', 'summary_value')
+    .attr('class', 'summary-value')
     .text(data.total_calls);
   summary.append('p')
-    .attr('class', 'summary_name')
+    .attr('class', 'summary-name')
     .text('Primitive calls: ')
     .append('span')
-    .attr('class', 'summary_value')
+    .attr('class', 'summary-value')
     .text(data.primitive_calls);
 
   var table = prof_stats.append('table');
