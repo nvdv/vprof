@@ -13,7 +13,9 @@ var JSON_URI = 'profile';
 // Flame chart parameters
 var HEIGHT_SCALE = 0.95;
 var HEIGHT = window.innerHeight * HEIGHT_SCALE;
+var HEIGHT_OFFSET = 100;
 var WIDTH = window.innerWidth / 2;
+var ZOOM_DURATION = 250;
 
 /** Returns full node name. */
 function getNodeName(d) {
@@ -179,6 +181,17 @@ function renderFlameChart(data) {
       d3.select(this)
         .attr('class', 'rect-normal');
     });
+
+  nodes.on('click', function(d) {
+    x_scale.domain([d.x, d.x + d.dx]);
+    y_scale.domain([0, 1 - d.y]).range([0, d.y ? HEIGHT - HEIGHT_OFFSET : HEIGHT]);
+    nodes.transition()
+      .duration(ZOOM_DURATION)
+      .attr('x', function(d) { return x_scale(d.x); })
+      .attr('y', function(d) { return y_scale(1 - d.y - d.dy); })
+      .attr('width', function(d) { return x_scale(d.x + d.dx) - x_scale(d.x); })
+      .attr('height', function(d) { return y_scale(1 - d.y) - y_scale(1 - d.y - d.dy); });
+  });
 }
 
 /** Renders whole page. */
