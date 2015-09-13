@@ -16,6 +16,10 @@ var HEIGHT = window.innerHeight * HEIGHT_SCALE;
 var HEIGHT_OFFSET = 100;
 var WIDTH = window.innerWidth / 2;
 var ZOOM_DURATION = 250;
+var TOOLTIP_X = 0;
+var TOOLTIP_HEIGHT = 100;
+var TOOLTIP_Y = HEIGHT - TOOLTIP_HEIGHT + 10;
+var TOOLTIP_DY = 15;
 
 /** Returns full node name. */
 function getNodeName(d) {
@@ -144,6 +148,45 @@ function renderTable(data) {
    .attr('class', function(d) { return d.cl; });
 }
 
+/** Renders profile flame chart tooltip. */
+function renderFlameChartTooltip(tooltip_area, d, total_time) {
+  var tooltip_text = tooltip_area.append('text');
+  tooltip_text.append('tspan')
+    .attr('x', TOOLTIP_X)
+    .attr('y', TOOLTIP_Y)
+    .attr('dy', TOOLTIP_DY)
+    .text('Function name: ' + d.func_name);
+  tooltip_text.append('tspan')
+    .attr('x', TOOLTIP_X)
+    .attr('dy', TOOLTIP_DY)
+    .text('Location: ' + d.module_name);
+  tooltip_text.append('tspan')
+    .attr('x', TOOLTIP_X)
+    .attr('dy', TOOLTIP_DY)
+    .text(function() {
+      var percent = 100 * Math.round(d.cum_time / total_time * 1000) / 1000;
+      return 'Time percent: ' + percent + ' %';
+   }());
+  tooltip_text.append('tspan')
+    .attr('x', TOOLTIP_X)
+    .attr('dy', TOOLTIP_DY)
+    .text('Cum.time: ' + d.cum_time + ' s');
+  tooltip_text.append('tspan')
+    .attr('x', TOOLTIP_X)
+    .attr('dy', TOOLTIP_DY)
+    .text('Time per call: ' + d.time_per_call + ' s');
+  tooltip_text.append('tspan')
+    .attr('x', TOOLTIP_X)
+    .attr('dy', TOOLTIP_DY)
+    .text('Primitive calls: ' + d.prim_calls);
+}
+
+/** Removes profile flame chart from tooltip area. */
+function removeFlameChartTooltip(tooltip_area) {
+  tooltip_area.selectAll('text').remove();
+}
+
+/** Renders profile flame chart. */
 function renderFlameChart(data) {
   var color = d3.scale.category10();
   var canvas = d3.select('body')
@@ -153,7 +196,15 @@ function renderFlameChart(data) {
     .attr('width', WIDTH)
     .attr('height', HEIGHT);
   var x_scale = d3.scale.linear().range([0, WIDTH]);
-  var y_scale = d3.scale.linear().range([0, HEIGHT]);
+  var y_scale = d3.scale.linear().range([0, HEIGHT - TOOLTIP_HEIGHT]);
+
+  var tooltip_area = canvas.append('g');
+  tooltip_area.append('rect')
+    .attr('x', TOOLTIP_X)
+    .attr('y', TOOLTIP_Y)
+    .attr('width', WIDTH)
+    .attr('height', TOOLTIP_HEIGHT)
+    .attr('fill', 'white');
 
   var flame_chart = d3.layout.partition()
     .sort(null)
@@ -176,10 +227,12 @@ function renderFlameChart(data) {
     .on('mouseover', function(d) {
       d3.select(this)
         .attr('class', 'rect-highlight');
+      renderFlameChartTooltip(tooltip_area, d, data.run_time);
     })
     .on('mouseout', function(d) {
       d3.select(this)
         .attr('class', 'rect-normal');
+      removeFlameChartTooltip(tooltip_area);
     });
 
   nodes.on('click', function(d) {
