@@ -18,7 +18,7 @@ var WIDTH = window.innerWidth / 2;
 var ZOOM_DURATION = 250;
 var TOOLTIP_X = 0;
 var TOOLTIP_HEIGHT = 100;
-var TOOLTIP_Y = HEIGHT - TOOLTIP_HEIGHT + 10;
+var TOOLTIP_Y = 0;
 var TOOLTIP_DY = 15;
 var TEXT_OFFSET_X = 5;
 var TEXT_OFFSET_Y= 14;
@@ -192,14 +192,19 @@ function removeFlameChartTooltip(tooltip_area) {
 /** Renders profile flame chart. */
 function renderFlameChart(data) {
   var color = d3.scale.category10();
-  var canvas = d3.select('body')
-    .append('div')
-    .attr('class', 'chart')
-    .append('svg')
-    .attr('width', WIDTH)
-    .attr('height', HEIGHT);
 
-  var tooltip_area = canvas.append('g');
+  var chart =  d3.select('body')
+    .append('div')
+    .attr('class', 'chart');
+
+  var canvas = chart.append('svg')
+    .attr('width', WIDTH)
+    .attr('height', HEIGHT - TOOLTIP_HEIGHT);
+
+  var tooltip_area = chart.append('svg')
+    .attr('width', WIDTH)
+    .attr('height', TOOLTIP_HEIGHT);
+
   tooltip_area.append('rect')
     .attr('x', TOOLTIP_X)
     .attr('y', TOOLTIP_Y)
@@ -249,7 +254,8 @@ function renderFlameChart(data) {
   // Zoom in
   nodes.on('click', function(d) {
     x_scale.domain([d.x, d.x + d.dx]);
-    y_scale.domain([0, 1 - d.y]).range([0, d.y ? HEIGHT - HEIGHT_OFFSET : HEIGHT]);
+    y_scale.domain([0, 1 - d.y]).range([0, HEIGHT - TOOLTIP_HEIGHT - 50]);
+
     nodes.transition()
       .duration(ZOOM_DURATION)
       .attr('x', function(d) { return x_scale(d.x); })
