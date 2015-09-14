@@ -20,6 +20,9 @@ var TOOLTIP_X = 0;
 var TOOLTIP_HEIGHT = 100;
 var TOOLTIP_Y = HEIGHT - TOOLTIP_HEIGHT + 10;
 var TOOLTIP_DY = 15;
+var TEXT_OFFSET_X = 5;
+var TEXT_OFFSET_Y= 14;
+var TEXT_CUTOFF = 0.075 * WIDTH;
 
 /** Returns full node name. */
 function getNodeName(d) {
@@ -195,8 +198,6 @@ function renderFlameChart(data) {
     .append('svg')
     .attr('width', WIDTH)
     .attr('height', HEIGHT);
-  var x_scale = d3.scale.linear().range([0, WIDTH]);
-  var y_scale = d3.scale.linear().range([0, HEIGHT - TOOLTIP_HEIGHT]);
 
   var tooltip_area = canvas.append('g');
   tooltip_area.append('rect')
@@ -210,13 +211,14 @@ function renderFlameChart(data) {
     .sort(null)
     .value(function(d) { return d.cum_time; });
 
-  var call_graph = flame_chart.nodes(data.call_stats);
   var cells = canvas.selectAll(".cell")
-    .data(call_graph)
+    .data(flame_chart.nodes(data.call_stats))
     .enter()
     .append('g')
     .attr('class', 'cell');
 
+  var x_scale = d3.scale.linear().range([0, WIDTH]);
+  var y_scale = d3.scale.linear().range([0, HEIGHT - TOOLTIP_HEIGHT]);
   var nodes = cells.append('rect')
     .attr('class', 'rect-normal')
     .attr('x', function(d) { return x_scale(d.x); })
@@ -235,6 +237,16 @@ function renderFlameChart(data) {
       removeFlameChartTooltip(tooltip_area);
     });
 
+  // Render flame chart headers.
+  var titles = cells.append('text')
+    .attr('x', function(d) { return x_scale(d.x) + TEXT_OFFSET_X; })
+    .attr('y', function(d) { return y_scale(1 - d.y - d.dy) + TEXT_OFFSET_Y; })
+    .text(function(d) {
+      var nodeWidth = this.previousElementSibling.getAttribute('width');
+      return (nodeWidth > TEXT_CUTOFF) ? d.func_name : '';
+    });
+
+  // Zoom in
   nodes.on('click', function(d) {
     x_scale.domain([d.x, d.x + d.dx]);
     y_scale.domain([0, 1 - d.y]).range([0, d.y ? HEIGHT - HEIGHT_OFFSET : HEIGHT]);
@@ -244,6 +256,15 @@ function renderFlameChart(data) {
       .attr('y', function(d) { return y_scale(1 - d.y - d.dy); })
       .attr('width', function(d) { return x_scale(d.x + d.dx) - x_scale(d.x); })
       .attr('height', function(d) { return y_scale(1 - d.y) - y_scale(1 - d.y - d.dy); });
+
+    titles.transition()
+      .duration(ZOOM_DURATION)
+      .attr('x', function(d) { return x_scale(d.x) + TEXT_OFFSET_X; })
+      .attr('y', function(d) { return y_scale(1 - d.y - d.dy) + TEXT_OFFSET_Y; })
+      .text(function(d) {
+        var nodeWidth = this.previousElementSibling.getAttribute('width');
+        return (nodeWidth > TEXT_CUTOFF) ? d.func_name : '';
+      });
   });
 }
 
