@@ -262,7 +262,7 @@ function renderFlameChart(data) {
       .attr('x', function(d) { return x_scale(d.x) + TEXT_OFFSET_X; })
       .attr('y', function(d) { return y_scale(1 - d.y - d.dy) + TEXT_OFFSET_Y; })
       .text(function(d) {
-        var nodeWidth = this.previousElementSibling.getAttribute('width');
+        var nodeWidth = x_scale(d.x + d.dx) - x_scale(d.x);
         return (nodeWidth > TEXT_CUTOFF) ? d.func_name : '';
       });
   });
