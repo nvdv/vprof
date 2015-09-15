@@ -251,10 +251,10 @@ function renderFlameChart(data) {
       return (nodeWidth > TEXT_CUTOFF) ? d.func_name : '';
     });
 
-  // Zoom in
+  // Zoom in.
   nodes.on('click', function(d) {
     x_scale.domain([d.x, d.x + d.dx]);
-    y_scale.domain([0, 1 - d.y]).range([0, HEIGHT - TOOLTIP_HEIGHT - 50]);
+    y_scale.domain([0, 1 - d.y]).range([0, HEIGHT - TOOLTIP_HEIGHT]);
 
     nodes.transition()
       .duration(ZOOM_DURATION)
@@ -262,6 +262,27 @@ function renderFlameChart(data) {
       .attr('y', function(d) { return y_scale(1 - d.y - d.dy); })
       .attr('width', function(d) { return x_scale(d.x + d.dx) - x_scale(d.x); })
       .attr('height', function(d) { return y_scale(1 - d.y) - y_scale(1 - d.y - d.dy); });
+
+    titles.transition()
+      .duration(ZOOM_DURATION)
+      .attr('x', function(d) { return x_scale(d.x) + TEXT_OFFSET_X; })
+      .attr('y', function(d) { return y_scale(1 - d.y - d.dy) + TEXT_OFFSET_Y; })
+      .text(function(d) {
+        var nodeWidth = x_scale(d.x + d.dx) - x_scale(d.x);
+        return (nodeWidth > TEXT_CUTOFF) ? d.func_name : '';
+      });
+  });
+
+  // Zoom out.
+  canvas.on('dblclick', function(d) {
+    x_scale.domain([0, 1]);
+    y_scale.domain([0, 1]);
+    nodes.transition()
+      .duration(ZOOM_DURATION)
+    .attr('x', function(d) { return x_scale(d.x); })
+    .attr('y', function(d) { return y_scale(1 - d.y - d.dy); })
+    .attr('width', function(d) { return x_scale(d.dx); })
+    .attr('height', function(d) { return y_scale(d.dy); });
 
     titles.transition()
       .duration(ZOOM_DURATION)
