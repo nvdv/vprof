@@ -215,7 +215,7 @@ function renderFlameChart(data) {
       .attr('y', function(d) { return y_scale(1 - d.y - d.dy) + TEXT_OFFSET_Y; })
       .text(function(d) {
         var nodeWidth = x_scale(d.x + d.dx) - x_scale(d.x);
-        return (nodeWidth > TEXT_CUTOFF) ? d.func_name : '';
+        return (nodeWidth > TEXT_CUTOFF) ? getNodeName(d) : '';
       });
   });
 }
