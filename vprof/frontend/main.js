@@ -34,7 +34,9 @@ var LEGEND_RADIUS_Y = 10;
 
 /** Returns full node name. */
 function getNodeName(d) {
-  return d.module_name + '.' + d.func_name + '@' + d.lineno.toString();
+  var tokens = d.module_name.split('/');
+  var filename = tokens[tokens.length - 1];
+  return filename + ':' + d.lineno + '(' + d.func_name + ')';
 }
 
 /** Renders profile flame chart tooltip. */
@@ -134,7 +136,7 @@ function renderFlameChart(data) {
     .attr('y', function(d) { return y_scale(1 - d.y - d.dy) + TEXT_OFFSET_Y; })
     .text(function(d) {
       var nodeWidth = this.previousElementSibling.getAttribute('width');
-      return (nodeWidth > TEXT_CUTOFF) ? d.func_name : '';
+      return (nodeWidth > TEXT_CUTOFF) ? getNodeName(d) : '';
     });
 
   // Render legend.
@@ -192,7 +194,7 @@ function renderFlameChart(data) {
       .attr('y', function(d) { return y_scale(1 - d.y - d.dy) + TEXT_OFFSET_Y; })
       .text(function(d) {
         var nodeWidth = x_scale(d.x + d.dx) - x_scale(d.x);
-        return (nodeWidth > TEXT_CUTOFF) ? d.func_name : '';
+        return (nodeWidth > TEXT_CUTOFF) ? getNodeName(d) : '';
       });
   });
 
