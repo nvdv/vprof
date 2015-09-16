@@ -14,7 +14,8 @@ var JSON_URI = 'profile';
 var HEIGHT_SCALE = 0.95;
 var HEIGHT = window.innerHeight * HEIGHT_SCALE;
 var HEIGHT_OFFSET = 100;
-var WIDTH = window.innerWidth / 2;
+var WIDTH_SCALE = 0.95;
+var WIDTH = window.innerWidth * WIDTH_SCALE;
 var ZOOM_DURATION = 250;
 var TOOLTIP_X = 0;
 var TOOLTIP_HEIGHT = 100;
@@ -23,132 +24,17 @@ var TOOLTIP_DY = 15;
 var TEXT_OFFSET_X = 5;
 var TEXT_OFFSET_Y= 14;
 var TEXT_CUTOFF = 0.075 * WIDTH;
+var LEGEND_X = WIDTH - 400;
+var LEGEND_Y = 100;
+var LEGEND_HEIGHT = 68;
+var LEGEND_WIDTH = 300;
+var LEGEND_TEXT_OFFSET = 10;
+var LEGEND_RADIUS_X = 10;
+var LEGEND_RADIUS_Y = 10;
 
 /** Returns full node name. */
 function getNodeName(d) {
   return d.module_name + '.' + d.func_name + '@' + d.lineno.toString();
-}
-
-/** Flattens stats object. */
-function flattenStats(stats) {
-
-  function processNode(node) {
-    var curr_node = {};
-    for (var stat in node) {
-      if (node.hasOwnProperty(stat) && stat != 'children') {
-        curr_node[stat] = node[stat];
-      }
-    }
-    results.push(curr_node);
-    if (!node.hasOwnProperty('children')) {
-      return;
-    }
-    node.children.forEach(function(child) { processNode(child); });
-  }
-
-  var results = [];
-  processNode(stats);
-  return results;
-}
-
-/** Renders profile stats. */
-function renderTable(data) {
-  var columns = [
-    {
-      head: 'Function name',
-      cl: 'title',
-      text: function(row) { return row.func_name; }
-    }, {
-      head: 'Location',
-      cl: 'title',
-      text: function(row) { return row.module_name + ' @ ' + row.lineno.toString(); }
-    }, {
-      head: 'Time %',
-      cl: 'num',
-      text: function(row) {
-        var percent = row.cum_time / data.run_time;
-        return 100 * Math.round(percent * 1000) / 1000;
-      }
-    }, {
-      head: 'Cum. time',
-      cl: 'num',
-      text: function(row) { return row.cum_time; }
-    }, {
-      head: 'Time per call',
-      cl: 'num',
-      text: function(row) { return row.time_per_call; }
-    }, {
-      head: 'Total calls',
-      cl: 'num',
-      text: function(row) { return row.total_calls; }
-    }, {
-      head: 'Primitive calls',
-      cl: 'num',
-      text: function(row) { return row.prim_calls; }},
-  ];
-
-  var prof_stats = d3.select('body')
-    .append('div')
-    .attr('class', 'profile-stats');
-
-  var summary = prof_stats.append('summary');
-  summary.append('p')
-    .attr('class', 'summary-name')
-    .text('Program name: ')
-    .append('span')
-    .attr('class', 'summary-value')
-    .text(data.program_name);
-  summary.append('p')
-    .attr('class', 'summary-name')
-    .text('Total runtime: ')
-    .append('span')
-    .attr('class', 'summary-value')
-    .text(data.run_time + ' s');
-  summary.append('p')
-    .attr('class', 'summary-name')
-    .text('Total calls: ')
-    .append('span')
-    .attr('class', 'summary-value')
-    .text(data.total_calls);
-  summary.append('p')
-    .attr('class', 'summary-name')
-    .text('Primitive calls: ')
-    .append('span')
-    .attr('class', 'summary-value')
-    .text(data.primitive_calls);
-
-  var table = prof_stats.append('table');
-
-  table.append('thead')
-   .append('tr')
-   .selectAll('th')
-   .data(columns)
-   .enter()
-   .append('th')
-   .attr('class', function(col) { return col.cl; })
-   .text(function(col) { return col.head; });
-
-  var stats = flattenStats(data.call_stats);
-
-  table.append('tbody')
-   .selectAll('tr')
-   .data(stats)
-   .enter()
-   .append('tr')
-   .selectAll('td')
-   .data(function(row, i) {
-      return columns.map(function(c) {
-        var cell = {};
-        d3.keys(c).forEach(function(k) {
-            cell[k] = typeof c[k] == 'function' ? c[k](row,i) : c[k];
-        });
-        return cell;
-      });
-   })
-   .enter()
-   .append('td')
-   .text(function(d) { return d.text; })
-   .attr('class', function(d) { return d.cl; });
 }
 
 /** Renders profile flame chart tooltip. */
@@ -192,7 +78,6 @@ function removeFlameChartTooltip(tooltip_area) {
 /** Renders profile flame chart. */
 function renderFlameChart(data) {
   var color = d3.scale.category10();
-
   var chart =  d3.select('body')
     .append('div')
     .attr('class', 'chart');
@@ -222,6 +107,7 @@ function renderFlameChart(data) {
     .append('g')
     .attr('class', 'cell');
 
+  // Render flame chart nodes.
   var x_scale = d3.scale.linear().range([0, WIDTH]);
   var y_scale = d3.scale.linear().range([0, HEIGHT - TOOLTIP_HEIGHT]);
   var nodes = cells.append('rect')
@@ -250,6 +136,43 @@ function renderFlameChart(data) {
       var nodeWidth = this.previousElementSibling.getAttribute('width');
       return (nodeWidth > TEXT_CUTOFF) ? d.func_name : '';
     });
+
+  // Render legend.
+  var legend = canvas.append('g')
+    .attr('class', 'legend')
+    .attr('x', LEGEND_X)
+    .attr('y', LEGEND_Y)
+    .attr('height', LEGEND_HEIGHT)
+    .attr('width', LEGEND_WIDTH);
+
+  legend.append('rect')
+    .attr('class', 'tooltip-rect')
+    .attr('x', LEGEND_X)
+    .attr('y', LEGEND_Y)
+    .attr('height', LEGEND_HEIGHT)
+    .attr('width', LEGEND_WIDTH)
+    .attr('rx', LEGEND_RADIUS_X)
+    .attr('ry', LEGEND_RADIUS_Y);
+
+  var legend_text = legend.append('text')
+    .attr("x", LEGEND_X + LEGEND_TEXT_OFFSET)
+    .attr("y", LEGEND_Y);
+  legend_text.append('tspan')
+    .attr('x', LEGEND_X + LEGEND_TEXT_OFFSET)
+    .attr('dy', TOOLTIP_DY)
+    .text('Program name: ' + data.program_name);
+  legend_text.append('tspan')
+    .attr('x', LEGEND_X + LEGEND_TEXT_OFFSET)
+    .attr('dy', TOOLTIP_DY)
+    .text('Total runtime: ' + data.run_time + 's');
+  legend_text.append('tspan')
+    .attr('x', LEGEND_X + LEGEND_TEXT_OFFSET)
+    .attr('dy', TOOLTIP_DY)
+    .text('Total calls: ' + data.total_calls);
+  legend_text.append('tspan')
+    .attr('x', LEGEND_X + LEGEND_TEXT_OFFSET)
+    .attr('dy', TOOLTIP_DY)
+    .text('Primitive calls: ' + data.primitive_calls);
 
   // Zoom in.
   nodes.on('click', function(d) {
@@ -299,13 +222,11 @@ function renderFlameChart(data) {
 function renderView() {
   d3.json(JSON_URI, function(data) {
     renderFlameChart(data);
-    renderTable(data);
   });
 }
 
 module.exports = {
   'getNodeName': getNodeName,
-  'flattenStats': flattenStats
 };
 
 renderView();

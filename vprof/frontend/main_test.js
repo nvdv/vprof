@@ -10,24 +10,4 @@ describe('Main test suite', function() {
     };
     expect(main.getNodeName(node)).toBe('foo.bar@10');
   });
-
-  it('Check flattenStats', function() {
-    var nested = {
-      'attr': 'foo',
-      'children': [{
-          'attr': 'bar',
-          'children': [{
-              'attr': 'baz',
-              'children': []
-          }]
-      }]
-    };
-    var flat = [
-      {'attr': 'foo'},
-      {'attr': 'bar'},
-      {'attr': 'baz'}
-    ]
-    expect(main.flattenStats(nested)).toEqual(flat);
-  });
-
 });

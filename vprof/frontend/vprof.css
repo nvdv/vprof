@@ -6,8 +6,6 @@ html {
 
 body {
   font-family: 'Helvetica Neue', Helvetica;
-  display: flex;
-  flex-direction: row;
   height: 100%;
   margin: 0;
   padding: 0;
@@ -24,36 +22,6 @@ svg {
   font-size: 12px;
 }
 
-.profile-stats {
-  padding: 15px;
-  font-size: 14px;
-  max-width: 50%;
-  height: 100%;
-  overflow: auto;
-}
-
-table {
-  border-collapse: collapse;
-  font-size: 12.5px;
-}
-
-th {
-  text-align: left;
-  background: #ccc;
-  border: 1px solid #aaa;
-  padding: 5px 10px
-}
-
-td {
-  border: solid 1px #CCC;
-  padding: 5px 10px;
-}
-
-tr:nth-child(odd)
-{
-  background-color: #eee;
-}
-
 .rect-normal {
   stroke: white;
   stroke-width: 2;
@@ -65,25 +33,20 @@ tr:nth-child(odd)
   stroke-width: 4;
   opacity: 0.85;
 }
-
-.summary-head {
-  font-weight: bold;
-}
-
-.summary-name {
-  margin: 5px 0;
-  font-weight: bold;
-  color: #333;
-}
-
-.summary-value {
-  font-weight: normal;
-}
-
 .tooltip-visible {
   display: block;
 }
 
 .tooltip-invisible {
   display: none;
+}
+
+.legend {
+  font-size: 15px;
+}
+
+.tooltip-rect {
+  fill: white;
+  stroke: #212121;
+  stroke-width: 2;
 }
