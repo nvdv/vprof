@@ -118,7 +118,7 @@ function renderFlameChart(data) {
     .attr('y', function(d) { return y_scale(1 - d.y - d.dy); })
     .attr('width', function(d) { return x_scale(d.dx); })
     .attr('height', function(d) { return y_scale(d.dy); })
-    .style('fill', function(d) { return color(getNodeName(d) + d.depth.toString()); })
+    .style('fill', function(d) { return color(getNodeName(d) + d.depth); })
     .on('mouseover', function(d) {
       d3.select(this)
         .attr('class', 'rect-highlight');
@@ -186,12 +186,16 @@ function renderFlameChart(data) {
       .attr('x', function(d) { return x_scale(d.x); })
       .attr('y', function(d) { return y_scale(1 - d.y - d.dy); })
       .attr('width', function(d) { return x_scale(d.x + d.dx) - x_scale(d.x); })
-      .attr('height', function(d) { return y_scale(1 - d.y) - y_scale(1 - d.y - d.dy); });
+      .attr('height', function(d) {
+        return y_scale(1 - d.y) - y_scale(1 - d.y - d.dy);
+      });
 
     titles.transition()
       .duration(ZOOM_DURATION)
       .attr('x', function(d) { return x_scale(d.x) + TEXT_OFFSET_X; })
-      .attr('y', function(d) { return y_scale(1 - d.y - d.dy) + TEXT_OFFSET_Y; })
+      .attr('y', function(d) {
+        return y_scale(1 - d.y - d.dy) + TEXT_OFFSET_Y;
+      })
       .text(function(d) {
         var nodeWidth = x_scale(d.x + d.dx) - x_scale(d.x);
         return (nodeWidth > TEXT_CUTOFF) ? getNodeName(d) : '';
@@ -212,7 +216,9 @@ function renderFlameChart(data) {
     titles.transition()
       .duration(ZOOM_DURATION)
       .attr('x', function(d) { return x_scale(d.x) + TEXT_OFFSET_X; })
-      .attr('y', function(d) { return y_scale(1 - d.y - d.dy) + TEXT_OFFSET_Y; })
+      .attr('y', function(d) {
+        return y_scale(1 - d.y - d.dy) + TEXT_OFFSET_Y;
+      })
       .text(function(d) {
         var nodeWidth = x_scale(d.x + d.dx) - x_scale(d.x);
         return (nodeWidth > TEXT_CUTOFF) ? getNodeName(d) : '';
