@@ -246,6 +246,7 @@ function renderView() {
 
 module.exports = {
   'getNodeName': getNodeName,
+  'getTruncatedNodeName': getTruncatedNodeName,
 };
 
 renderView();

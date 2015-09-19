@@ -8,30 +8,30 @@ body {
   font-family: 'Helvetica Neue', Helvetica;
   height: 100%;
   margin: 0;
-  padding: 0;
   overflow: hidden;
+  padding: 0;
 }
 
 .chart {
-  overflow: auto;
   height: 100%;
+  overflow: auto;
 }
 
 svg {
-  padding: 10px;
   font-size: 13px;
+  padding: 10px;
 }
 
 .rect-normal {
+  opacity: 0.85;
   stroke: white;
   stroke-width: 2;
-  opacity: 0.85;
 }
 
 .rect-hightlight {
+  opacity: 0.85;
   stroke: white;
   stroke-width: 4;
-  opacity: 0.85;
 }
 .tooltip-visible {
   display: block;
@@ -41,12 +41,12 @@ svg {
   display: none;
 }
 
-.legend {
-  font-size: 15px;
-}
-
 .tooltip-rect {
   fill: white;
   stroke: #212121;
   stroke-width: 2;
+}
+
+.legend {
+  font-size: 15px;
 }
