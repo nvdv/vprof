@@ -39,6 +39,17 @@ function getNodeName(d) {
   return filename + ':' + d.lineno + '(' + d.func_name + ')';
 }
 
+/** Returns truncated node name */
+function getTruncatedNodeName(d, rect_length) {
+  var fullname = getNodeName(d);
+  var max_symbols = rect_length / 10;  // Approx. 10 pixels per character.
+  if (max_symbols <= 3)
+    return '';
+  if (fullname.length > max_symbols - 3)  // Full name minus ellipsis.
+    return fullname.substr(0, max_symbols) + '...';
+  return fullname;
+}
+
 /** Renders profile flame chart tooltip. */
 function renderFlameChartTooltip(tooltip_area, d, total_time) {
   var tooltip_text = tooltip_area.append('text');
@@ -136,7 +147,7 @@ function renderFlameChart(data) {
     .attr('y', function(d) { return y_scale(1 - d.y - d.dy) + TEXT_OFFSET_Y; })
     .text(function(d) {
       var nodeWidth = this.previousElementSibling.getAttribute('width');
-      return (nodeWidth > TEXT_CUTOFF) ? getNodeName(d) : '';
+      return getTruncatedNodeName(d, nodeWidth);
     });
 
   // Render legend.
@@ -198,7 +209,7 @@ function renderFlameChart(data) {
       })
       .text(function(d) {
         var nodeWidth = x_scale(d.x + d.dx) - x_scale(d.x);
-        return (nodeWidth > TEXT_CUTOFF) ? getNodeName(d) : '';
+        return getTruncatedNodeName(d, nodeWidth);
       });
   });
 
@@ -221,7 +232,7 @@ function renderFlameChart(data) {
       })
       .text(function(d) {
         var nodeWidth = x_scale(d.x + d.dx) - x_scale(d.x);
-        return (nodeWidth > TEXT_CUTOFF) ? getNodeName(d) : '';
+        return getTruncatedNodeName(d, nodeWidth);
       });
   });
 }
