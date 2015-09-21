@@ -40,52 +40,53 @@ function getNodeName(d) {
 }
 
 /** Returns truncated node name */
-function getTruncatedNodeName(d, rect_length) {
+function getTruncatedNodeName(d, rectLength) {
   var fullname = getNodeName(d);
-  var max_symbols = rect_length / 10;  // Approx. 10 pixels per character.
-  if (max_symbols <= 3)
+  var maxSymbols = rectLength / 10;  // Approx. 10 pixels per character.
+  if (maxSymbols <= 3) {
     return '';
-  if (fullname.length > max_symbols - 3)  // Full name minus ellipsis.
-    return fullname.substr(0, max_symbols) + '...';
+  } else if (fullname.length > maxSymbols - 3) { // Full name minus ellipsis.
+    return fullname.substr(0, maxSymbols) + '...';
+  }
   return fullname;
 }
 
 /** Renders profile flame chart tooltip. */
-function renderFlameChartTooltip(tooltip_area, d, total_time) {
-  var tooltip_text = tooltip_area.append('text');
-  tooltip_text.append('tspan')
+function renderFlameChartTooltip(tooltipArea, d, totalTime) {
+  var tooltipText = tooltipArea.append('text');
+  tooltipText.append('tspan')
     .attr('x', TOOLTIP_X)
     .attr('y', TOOLTIP_Y)
     .attr('dy', TOOLTIP_DY)
     .text('Function name: ' + d.func_name);
-  tooltip_text.append('tspan')
+  tooltipText.append('tspan')
     .attr('x', TOOLTIP_X)
     .attr('dy', TOOLTIP_DY)
     .text('Location: ' + d.module_name);
-  tooltip_text.append('tspan')
+  tooltipText.append('tspan')
     .attr('x', TOOLTIP_X)
     .attr('dy', TOOLTIP_DY)
     .text(function() {
-      var percent = 100 * Math.round(d.cum_time / total_time * 1000) / 1000;
+      var percent = 100 * Math.round(d.cum_time / totalTime * 1000) / 1000;
       return 'Time percent: ' + percent + ' %';
    }());
-  tooltip_text.append('tspan')
+  tooltipText.append('tspan')
     .attr('x', TOOLTIP_X)
     .attr('dy', TOOLTIP_DY)
     .text('Cum.time: ' + d.cum_time + ' s');
-  tooltip_text.append('tspan')
+  tooltipText.append('tspan')
     .attr('x', TOOLTIP_X)
     .attr('dy', TOOLTIP_DY)
     .text('Time per call: ' + d.time_per_call + ' s');
-  tooltip_text.append('tspan')
+  tooltipText.append('tspan')
     .attr('x', TOOLTIP_X)
     .attr('dy', TOOLTIP_DY)
     .text('Primitive calls: ' + d.prim_calls);
 }
 
 /** Removes profile flame chart from tooltip area. */
-function removeFlameChartTooltip(tooltip_area) {
-  tooltip_area.selectAll('text').remove();
+function removeFlameChartTooltip(tooltipArea) {
+  tooltipArea.selectAll('text').remove();
 }
 
 /** Renders profile flame chart. */
@@ -99,52 +100,52 @@ function renderFlameChart(data) {
     .attr('width', WIDTH)
     .attr('height', HEIGHT - TOOLTIP_HEIGHT);
 
-  var tooltip_area = chart.append('svg')
+  var tooltipArea = chart.append('svg')
     .attr('width', WIDTH)
     .attr('height', TOOLTIP_HEIGHT);
 
-  tooltip_area.append('rect')
+  tooltipArea.append('rect')
     .attr('x', TOOLTIP_X)
     .attr('y', TOOLTIP_Y)
     .attr('width', WIDTH)
     .attr('height', TOOLTIP_HEIGHT)
     .attr('fill', 'white');
 
-  var flame_chart = d3.layout.partition()
+  var flameChart = d3.layout.partition()
     .sort(null)
     .value(function(d) { return d.cum_time; });
 
   var cells = canvas.selectAll(".cell")
-    .data(flame_chart.nodes(data.call_stats))
+    .data(flameChart.nodes(data.call_stats))
     .enter()
     .append('g')
     .attr('class', 'cell');
 
   // Render flame chart nodes.
-  var x_scale = d3.scale.linear().range([0, WIDTH]);
-  var y_scale = d3.scale.linear().range([0, HEIGHT - TOOLTIP_HEIGHT]);
+  var xScale = d3.scale.linear().range([0, WIDTH]);
+  var yScale = d3.scale.linear().range([0, HEIGHT - TOOLTIP_HEIGHT]);
   var nodes = cells.append('rect')
     .attr('class', 'rect-normal')
-    .attr('x', function(d) { return x_scale(d.x); })
-    .attr('y', function(d) { return y_scale(1 - d.y - d.dy); })
-    .attr('width', function(d) { return x_scale(d.dx); })
-    .attr('height', function(d) { return y_scale(d.dy); })
+    .attr('x', function(d) { return xScale(d.x); })
+    .attr('y', function(d) { return yScale(1 - d.y - d.dy); })
+    .attr('width', function(d) { return xScale(d.dx); })
+    .attr('height', function(d) { return yScale(d.dy); })
     .style('fill', function(d) { return color(getNodeName(d) + d.depth); })
     .on('mouseover', function(d) {
       d3.select(this)
         .attr('class', 'rect-highlight');
-      renderFlameChartTooltip(tooltip_area, d, data.run_time);
+      renderFlameChartTooltip(tooltipArea, d, data.run_time);
     })
     .on('mouseout', function(d) {
       d3.select(this)
         .attr('class', 'rect-normal');
-      removeFlameChartTooltip(tooltip_area);
+      removeFlameChartTooltip(tooltipArea);
     });
 
   // Render flame chart headers.
   var titles = cells.append('text')
-    .attr('x', function(d) { return x_scale(d.x) + TEXT_OFFSET_X; })
-    .attr('y', function(d) { return y_scale(1 - d.y - d.dy) + TEXT_OFFSET_Y; })
+    .attr('x', function(d) { return xScale(d.x) + TEXT_OFFSET_X; })
+    .attr('y', function(d) { return yScale(1 - d.y - d.dy) + TEXT_OFFSET_Y; })
     .text(function(d) {
       var nodeWidth = this.previousElementSibling.getAttribute('width');
       return getTruncatedNodeName(d, nodeWidth);
@@ -167,71 +168,71 @@ function renderFlameChart(data) {
     .attr('rx', LEGEND_RADIUS_X)
     .attr('ry', LEGEND_RADIUS_Y);
 
-  var legend_text = legend.append('text')
+  var legendText = legend.append('text')
     .attr("x", LEGEND_X + LEGEND_TEXT_OFFSET)
     .attr("y", LEGEND_Y);
-  legend_text.append('tspan')
+  legendText.append('tspan')
     .attr('x', LEGEND_X + LEGEND_TEXT_OFFSET)
     .attr('dy', TOOLTIP_DY)
     .text('Program name: ' + data.program_name);
-  legend_text.append('tspan')
+  legendText.append('tspan')
     .attr('x', LEGEND_X + LEGEND_TEXT_OFFSET)
     .attr('dy', TOOLTIP_DY)
     .text('Total runtime: ' + data.run_time + 's');
-  legend_text.append('tspan')
+  legendText.append('tspan')
     .attr('x', LEGEND_X + LEGEND_TEXT_OFFSET)
     .attr('dy', TOOLTIP_DY)
     .text('Total calls: ' + data.total_calls);
-  legend_text.append('tspan')
+  legendText.append('tspan')
     .attr('x', LEGEND_X + LEGEND_TEXT_OFFSET)
     .attr('dy', TOOLTIP_DY)
     .text('Primitive calls: ' + data.primitive_calls);
 
   // Zoom in.
   nodes.on('click', function(d) {
-    x_scale.domain([d.x, d.x + d.dx]);
-    y_scale.domain([0, 1 - d.y]).range([0, HEIGHT - TOOLTIP_HEIGHT]);
+    xScale.domain([d.x, d.x + d.dx]);
+    yScale.domain([0, 1 - d.y]).range([0, HEIGHT - TOOLTIP_HEIGHT]);
 
     nodes.transition()
       .duration(ZOOM_DURATION)
-      .attr('x', function(d) { return x_scale(d.x); })
-      .attr('y', function(d) { return y_scale(1 - d.y - d.dy); })
-      .attr('width', function(d) { return x_scale(d.x + d.dx) - x_scale(d.x); })
+      .attr('x', function(d) { return xScale(d.x); })
+      .attr('y', function(d) { return yScale(1 - d.y - d.dy); })
+      .attr('width', function(d) { return xScale(d.x + d.dx) - xScale(d.x); })
       .attr('height', function(d) {
-        return y_scale(1 - d.y) - y_scale(1 - d.y - d.dy);
+        return yScale(1 - d.y) - yScale(1 - d.y - d.dy);
       });
 
     titles.transition()
       .duration(ZOOM_DURATION)
-      .attr('x', function(d) { return x_scale(d.x) + TEXT_OFFSET_X; })
+      .attr('x', function(d) { return xScale(d.x) + TEXT_OFFSET_X; })
       .attr('y', function(d) {
-        return y_scale(1 - d.y - d.dy) + TEXT_OFFSET_Y;
+        return yScale(1 - d.y - d.dy) + TEXT_OFFSET_Y;
       })
       .text(function(d) {
-        var nodeWidth = x_scale(d.x + d.dx) - x_scale(d.x);
+        var nodeWidth = xScale(d.x + d.dx) - xScale(d.x);
         return getTruncatedNodeName(d, nodeWidth);
       });
   });
 
   // Zoom out.
   canvas.on('dblclick', function(d) {
-    x_scale.domain([0, 1]);
-    y_scale.domain([0, 1]);
+    xScale.domain([0, 1]);
+    yScale.domain([0, 1]);
     nodes.transition()
       .duration(ZOOM_DURATION)
-    .attr('x', function(d) { return x_scale(d.x); })
-    .attr('y', function(d) { return y_scale(1 - d.y - d.dy); })
-    .attr('width', function(d) { return x_scale(d.dx); })
-    .attr('height', function(d) { return y_scale(d.dy); });
+    .attr('x', function(d) { return xScale(d.x); })
+    .attr('y', function(d) { return yScale(1 - d.y - d.dy); })
+    .attr('width', function(d) { return xScale(d.dx); })
+    .attr('height', function(d) { return yScale(d.dy); });
 
     titles.transition()
       .duration(ZOOM_DURATION)
-      .attr('x', function(d) { return x_scale(d.x) + TEXT_OFFSET_X; })
+      .attr('x', function(d) { return xScale(d.x) + TEXT_OFFSET_X; })
       .attr('y', function(d) {
-        return y_scale(1 - d.y - d.dy) + TEXT_OFFSET_Y;
+        return yScale(1 - d.y - d.dy) + TEXT_OFFSET_Y;
       })
       .text(function(d) {
-        var nodeWidth = x_scale(d.x + d.dx) - x_scale(d.x);
+        var nodeWidth = xScale(d.x + d.dx) - xScale(d.x);
         return getTruncatedNodeName(d, nodeWidth);
       });
   });
