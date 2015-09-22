@@ -34,9 +34,9 @@ var LEGEND_RADIUS_Y = 10;
 
 /** Returns full node name. */
 function getNodeName(d) {
-  var tokens = d.module_name.split('/');
+  var tokens = d.moduleName.split('/');
   var filename = tokens[tokens.length - 1];
-  return filename + ':' + d.lineno + '(' + d.func_name + ')';
+  return filename + ':' + d.lineno + '(' + d.funcName + ')';
 }
 
 /** Returns truncated node name */
@@ -58,30 +58,30 @@ function renderFlameChartTooltip(tooltipArea, d, totalTime) {
     .attr('x', TOOLTIP_X)
     .attr('y', TOOLTIP_Y)
     .attr('dy', TOOLTIP_DY)
-    .text('Function name: ' + d.func_name);
+    .text('Function name: ' + d.funcName);
   tooltipText.append('tspan')
     .attr('x', TOOLTIP_X)
     .attr('dy', TOOLTIP_DY)
-    .text('Location: ' + d.module_name);
+    .text('Location: ' + d.moduleName);
   tooltipText.append('tspan')
     .attr('x', TOOLTIP_X)
     .attr('dy', TOOLTIP_DY)
     .text(function() {
-      var percent = 100 * Math.round(d.cum_time / totalTime * 1000) / 1000;
+      var percent = 100 * Math.round(d.cumTime / totalTime * 1000) / 1000;
       return 'Time percent: ' + percent + ' %';
    }());
   tooltipText.append('tspan')
     .attr('x', TOOLTIP_X)
     .attr('dy', TOOLTIP_DY)
-    .text('Cum.time: ' + d.cum_time + ' s');
+    .text('Cum.time: ' + d.cumTime + ' s');
   tooltipText.append('tspan')
     .attr('x', TOOLTIP_X)
     .attr('dy', TOOLTIP_DY)
-    .text('Time per call: ' + d.time_per_call + ' s');
+    .text('Time per call: ' + d.timePerCall + ' s');
   tooltipText.append('tspan')
     .attr('x', TOOLTIP_X)
     .attr('dy', TOOLTIP_DY)
-    .text('Primitive calls: ' + d.prim_calls);
+    .text('Primitive calls: ' + d.primCalls);
 }
 
 /** Removes profile flame chart from tooltip area. */
@@ -113,10 +113,10 @@ function renderFlameChart(data) {
 
   var flameChart = d3.layout.partition()
     .sort(null)
-    .value(function(d) { return d.cum_time; });
+    .value(function(d) { return d.cumTime; });
 
   var cells = canvas.selectAll(".cell")
-    .data(flameChart.nodes(data.call_stats))
+    .data(flameChart.nodes(data.callStats))
     .enter()
     .append('g')
     .attr('class', 'cell');
@@ -134,7 +134,7 @@ function renderFlameChart(data) {
     .on('mouseover', function(d) {
       d3.select(this)
         .attr('class', 'rect-highlight');
-      renderFlameChartTooltip(tooltipArea, d, data.run_time);
+      renderFlameChartTooltip(tooltipArea, d, data.runTime);
     })
     .on('mouseout', function(d) {
       d3.select(this)
@@ -174,19 +174,19 @@ function renderFlameChart(data) {
   legendText.append('tspan')
     .attr('x', LEGEND_X + LEGEND_TEXT_OFFSET)
     .attr('dy', TOOLTIP_DY)
-    .text('Program name: ' + data.program_name);
+    .text('Program name: ' + data.programName);
   legendText.append('tspan')
     .attr('x', LEGEND_X + LEGEND_TEXT_OFFSET)
     .attr('dy', TOOLTIP_DY)
-    .text('Total runtime: ' + data.run_time + 's');
+    .text('Total runtime: ' + data.runTime + 's');
   legendText.append('tspan')
     .attr('x', LEGEND_X + LEGEND_TEXT_OFFSET)
     .attr('dy', TOOLTIP_DY)
-    .text('Total calls: ' + data.total_calls);
+    .text('Total calls: ' + data.totalCalls);
   legendText.append('tspan')
     .attr('x', LEGEND_X + LEGEND_TEXT_OFFSET)
     .attr('dy', TOOLTIP_DY)
-    .text('Primitive calls: ' + data.primitive_calls);
+    .text('Primitive calls: ' + data.primitiveCalls);
 
   // Zoom in.
   nodes.on('click', function(d) {

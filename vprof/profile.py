@@ -65,13 +65,13 @@ class CProfile(Profile):
         module_name, lineno, func_name = node
         cum_calls, num_calls, time_per_call, cum_time, _ = stats[node]
         return {
-            'module_name': module_name,
+            'moduleName': module_name,
             'lineno': lineno,
-            'func_name': func_name,
-            'prim_calls': cum_calls,
-            'total_calls': num_calls,
-            'time_per_call': time_per_call,
-            'cum_time': cum_time,
+            'funcName': func_name,
+            'primCalls': cum_calls,
+            'totalCalls': num_calls,
+            'timeOerCall': time_per_call,
+            'cumTime': cum_time,
             'children': [self._build_call_tree(child, callees, stats, seen)
                          for child in callees[node] if child not in seen]
         }
@@ -107,11 +107,11 @@ class CProfile(Profile):
         prof.create_stats()
         cprofile_stats = pstats.Stats(prof)
         return {
-            'program_name': self._program_name,
-            'run_time': cprofile_stats.total_tt,
-            'primitive_calls': cprofile_stats.prim_calls,
-            'total_calls': cprofile_stats.total_calls,
-            'call_stats': self._transform_stats(cprofile_stats),
+            'programName': self._program_name,
+            'runTime': cprofile_stats.total_tt,
+            'primitiveCalls': cprofile_stats.prim_calls,
+            'totalCalls': cprofile_stats.total_calls,
+            'callStats': self._transform_stats(cprofile_stats),
         }
 
 
@@ -175,6 +175,6 @@ class MemoryProfile(Profile):
         except SystemExit:
             pass
         return {
-            'program_name': self._program_name,
-            'memory_stats': self._transform_stats(prof.code_map),
+            'programName': self._program_name,
+            'memoryStats': self._transform_stats(prof.code_map),
         }
