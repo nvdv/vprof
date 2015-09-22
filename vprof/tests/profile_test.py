@@ -88,3 +88,18 @@ class CProfileUnittest(unittest.TestCase):
         stats.stats = _RUN_STATS
         self.assertDictEqual(
             self._profile._transform_stats(stats), _CALL_GRAPH)
+
+
+class MemoryProfileUnittest(unittest.TestCase):
+    def setUp(self):
+        self._profile = object.__new__(profile.MemoryProfile)
+
+    def testTransformStats(self):
+        code_obj1, code_obj2 = mock.MagicMock(), mock.MagicMock()
+        code_obj1.co_filename, code_obj2.co_filename = 'foo.py', 'bar.py'
+        code_obj1.co_name, code_obj2.co_name = 'baz', 'mno'
+        code_stats = {code_obj1: {10: 20}, code_obj2: {30: 40}}
+        self.assertListEqual(
+            self._profile._transform_stats(code_stats),
+            [('foo.py:10(baz)', 20), ('bar.py:30(mno)', 40)])
+

@@ -1,10 +1,14 @@
 """Various profile wrappers"""
 import abc
 import cProfile
+import inspect
+import memory_profiler
 import os
 import pstats
 import sys
+
 from collections import defaultdict
+from collections import OrderedDict
 
 
 class Profile(object):
@@ -22,10 +26,10 @@ class Profile(object):
 
 
 class CProfile(Profile):
-    """Class that wraps CProfile stats.
+    """Class that contains CProfile stats processing logic.
 
-    This class contains all logic regarding cProfile run, stats collection and
-    processing. All function call info is contained in stats.Pstats, all
+    This class contains all logic related to cProfile run, stats collection
+    and processing. All function call info is contained in stats.Pstats, all
     we have to do is to run cProfile and build call tree from resulting
     pstats.Stats.
     """
@@ -108,4 +112,69 @@ class CProfile(Profile):
             'primitive_calls': cprofile_stats.prim_calls,
             'total_calls': cprofile_stats.total_calls,
             'call_stats': self._transform_stats(cprofile_stats),
+        }
+
+
+class _TracingLineProfiler(memory_profiler.LineProfiler):
+    """Subclass of memory_profiler.LineProfiler.
+
+    Used to track order of code execution by using OrderedDict instead
+    of just Python dictionary.
+    """
+
+    def __init__(self, **kw):
+        super(_TracingLineProfiler, self).__init__(*kw)
+        self.code_map = OrderedDict()
+
+    def add_code(self, code, toplevel_code=None):
+        if code not in self.code_map:
+            self.code_map[code] = OrderedDict()
+            for subcode in filter(inspect.iscode, code.co_consts):
+                self.add_code(subcode)
+
+
+class MemoryProfile(Profile):
+    """Class that contains memory profiler stats processing logic.
+
+    Runs memory profiler and extracts collected info from code_map.
+    """
+
+    def __init__(self, program_name):
+        """Initializes memory profile wrapper.
+
+        Args:
+            program_name: Name of the program to profile.
+        """
+        self._program_name = program_name
+
+    def _transform_stats(self, code_stats):
+        """Converts stats from memory_profiler format."""
+        memory_stats = []
+        for code, lines in code_stats.items():
+            for line, usage in lines.items():
+                line_id = '%s:%s(%s)' % (code.co_filename, line, code.co_name)
+                memory_stats.append((line_id, usage))
+        return memory_stats
+
+    def run(self):
+        """Returns memory stats for specified Python program."""
+        globs = {
+            '__file__': self._program_name,
+            '__name__': '__main__',
+            '__package__': None,
+        }
+        sys.path.insert(0, os.path.dirname(self._program_name))
+        prof = _TracingLineProfiler()
+        try:
+            with open(self._program_name, 'rb') as srcfile:
+                code = compile(srcfile.read(), self._program_name, 'exec')
+            prof.add_code(code)
+            prof.enable()
+            exec(code, globs, None)
+            prof.disable()
+        except SystemExit:
+            pass
+        return {
+            'program_name': self._program_name,
+            'memory_stats': self._transform_stats(prof.code_map),
         }
