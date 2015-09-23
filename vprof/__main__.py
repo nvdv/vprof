@@ -10,7 +10,8 @@ _HOST = 'localhost'
 _PORT = 8000
 
 _PROFILE_MAP = {
-    'c': profile.CProfile
+    'c': profile.CProfile,
+    'm': profile.MemoryProfile,
 }
 
 def main():
@@ -25,19 +26,19 @@ def main():
         print('Profiler configuration is ambiguous. Remove duplicates.')
         sys.exit(1)
 
-    prof_option = args.profilers[0]
-    for prof_option in args.profilers:
-        if prof_option not in _PROFILE_MAP:
-            print('Unrecognized option: %s' % prof_option)
+    for option in args.profilers:
+        if option not in _PROFILE_MAP:
+            print('Unrecognized option: %s' % option)
             sys.exit(2)
 
     sys.argv[:] = args.source
-    print('Collecting profile stats...')
-    program_name = args.source[0]
-    program_info = _PROFILE_MAP[prof_option](program_name).run()
-    print('Starting stats server...')
+    program_name, program_stats = args.source[0], {}
+    for option in args.profilers:
+        program_stats[option] = _PROFILE_MAP[option](program_name).run()
+
     sys.stderr = open(os.devnull, "w")
-    stats_server.start(_HOST, _PORT, program_info)
+    print('Starting stats server...')
+    stats_server.start(_HOST, _PORT, program_stats)
 
 
 if __name__ == "__main__":

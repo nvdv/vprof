@@ -19,7 +19,8 @@ class _StatsServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
 class StatsHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     """Profile stats request handler."""
     ROOT_URI = '/'
-    PROFILE_URI = '/profile'
+    CPROFILE_URI = '/profile'
+    MEMORY_PROFILE_URI = '/memory_profile'
 
     def __init__(self, profile_json, *args, **kwargs):
         self._profile_json = profile_json
@@ -34,8 +35,11 @@ class StatsHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             with open(res_filename) as res_file:
                 output = res_file.read()
             content_type = 'text/html'
-        elif self.path == self.PROFILE_URI:
-            output = self._profile_json
+        elif self.path == self.CPROFILE_URI:
+            output = json.dumps(self._profile_json['c'])
+            content_type = 'text/json'
+        elif self.path == self.MEMORY_PROFILE_URI:
+            output = json.dumps(self._profile_json['m'])
             content_type = 'text/json'
         else:
             res_filename = (
@@ -68,7 +72,7 @@ def start(host, port, profile_stats):
         profile_stats: Dictionary with progran stats.
     """
     stats_handler = functools.partial(
-        StatsHandler, json.dumps(profile_stats))
+        StatsHandler, profile_stats)
     subprocess.call(['open', 'http://%s:%s' % (host, port)])
     try:
         _StatsServer((host, port), stats_handler).serve_forever()
