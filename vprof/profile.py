@@ -70,7 +70,7 @@ class CProfile(Profile):
             'funcName': func_name,
             'primCalls': cum_calls,
             'totalCalls': num_calls,
-            'timeOerCall': time_per_call,
+            'timePerCall': time_per_call,
             'cumTime': cum_time,
             'children': [self._build_call_tree(child, callees, stats, seen)
                          for child in callees[node] if child not in seen]

@@ -4,8 +4,8 @@ describe('Main test suite', function() {
 
   it('Check getNodeName', function() {
     var node = {
-      'module_name': 'bar/foo.py',
-      'func_name': 'bar',
+      'moduleName': 'bar/foo.py',
+      'funcName': 'bar',
       'lineno': 10
     };
     expect(main.getNodeName(node)).toBe('foo.py:10(bar)');
@@ -13,8 +13,8 @@ describe('Main test suite', function() {
 
   it('Check getTruncatedNodeName', function() {
     var node = {
-      'module_name': 'bar/foo.py',
-      'func_name': 'bar',
+      'moduleName': 'bar/foo.py',
+      'funcName': 'bar',
       'lineno': 10
     };
     expect(main.getTruncatedNodeName(node, 1)).toBe('');

@@ -31,42 +31,31 @@ _CALLEES = {
 }
 
 _CALL_GRAPH = {
-    'module_name': 'testscript.py',
-    'func_name': '<module>',
-    'total_calls': 1,
-    'prim_calls': 1,
-    'time_per_call': 1.49,
-    'cum_time': 2.3e-05,
+    'moduleName': 'testscript.py',
+    'funcName': '<module>',
+    'totalCalls': 1,
+    'primCalls': 1,
+    'timePerCall': 1.49,
+    'cumTime': 2.3e-05,
     'lineno': 1,
     'children': [
-        {'func_name': 'prod',
-         'prim_calls': 1,
-         'total_calls': 10,
-         'time_per_call': 7e-06,
-         'cum_time': 7e-06,
+        {'funcName': 'prod',
+         'primCalls': 1,
+         'totalCalls': 10,
+         'timePerCall': 7e-06,
+         'cumTime': 7e-06,
          'lineno': 1,
-         'module_name': 'testscript.py',
+         'moduleName': 'testscript.py',
          'children': []},
-        {'func_name': '<range>',
-         'prim_calls': 1,
-         'total_calls': 1,
-         'time_per_call': 1e-06,
-         'cum_time': 1e-06,
+        {'funcName': '<range>',
+         'primCalls': 1,
+         'totalCalls': 1,
+         'timePerCall': 1e-06,
+         'cumTime': 1e-06,
          'lineno': 0,
-         'module_name': '~',
+         'moduleName': '~',
          'children': []}
     ]
-}
-
-_PRUNED_GRAPH_FLAT = {
-    'module_name': 'testscript.py',
-    'func_name': '<module>',
-    'total_calls': 1,
-    'prim_calls': 1,
-    'time_per_call': 1.49,
-    'cum_time': 2.3e-05,
-    'lineno': 1,
-    'children': [],
 }
 
 

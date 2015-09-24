@@ -51,9 +51,15 @@ function getTruncatedNodeName(d, rectLength) {
   return fullname;
 }
 
+/** Returns percentage of cumTime in totalTime. */
+function getTimePercentage(cumTime, totalTime) {
+  return 100 * Math.round(cumTime / totalTime * 1000) / 1000;
+}
+
 /** Renders profile flame chart tooltip. */
 function renderFlameChartTooltip(tooltipArea, d, totalTime) {
   var tooltipText = tooltipArea.append('text');
+  var timePercentage = getTimePercentage(d.cumTime, totalTime);
   tooltipText.append('tspan')
     .attr('x', TOOLTIP_X)
     .attr('y', TOOLTIP_Y)
@@ -66,10 +72,7 @@ function renderFlameChartTooltip(tooltipArea, d, totalTime) {
   tooltipText.append('tspan')
     .attr('x', TOOLTIP_X)
     .attr('dy', TOOLTIP_DY)
-    .text(function() {
-      var percent = 100 * Math.round(d.cumTime / totalTime * 1000) / 1000;
-      return 'Time percent: ' + percent + ' %';
-   }());
+    .text('Time percentage: ' + timePercentage + ' %');
   tooltipText.append('tspan')
     .attr('x', TOOLTIP_X)
     .attr('dy', TOOLTIP_DY)
