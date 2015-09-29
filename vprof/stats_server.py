@@ -19,8 +19,7 @@ class _StatsServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
 class StatsHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     """Profile stats request handler."""
     ROOT_URI = '/'
-    CPROFILE_URI = '/profile'
-    MEMORY_PROFILE_URI = '/memory_profile'
+    PROFILE_URI = '/profile'
 
     def __init__(self, profile_json, *args, **kwargs):
         self._profile_json = profile_json
@@ -35,11 +34,8 @@ class StatsHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             with open(res_filename) as res_file:
                 output = res_file.read()
             content_type = 'text/html'
-        elif self.path == self.CPROFILE_URI:
-            output = json.dumps(self._profile_json['c'])
-            content_type = 'text/json'
-        elif self.path == self.MEMORY_PROFILE_URI:
-            output = json.dumps(self._profile_json['m'])
+        elif self.path == self.PROFILE_URI:
+            output = json.dumps(self._profile_json)
             content_type = 'text/json'
         else:
             res_filename = (
