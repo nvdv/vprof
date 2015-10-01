@@ -1,19 +1,48 @@
 html {
-  height: 100%;
   margin: 0;
   padding: 0;
 }
 
 body {
   font-family: 'Helvetica Neue', Helvetica;
-  height: 100%;
+}
+
+#profile-chart {
+  display: block;
+}
+
+#memory-chart {
+  display: none;
+}
+
+.tab-content {
+  border: 1px solid black;
+  border-radius: 8px;
+}
+
+.tab-header {
   margin: 0;
-  overflow: hidden;
-  padding: 0;
+}
+
+.tab-header li {
+  border-left: 1px solid black;
+  border-radius: 8px 8px 0px 0px;
+  border-right: 1px solid black;
+  border-top: 1px solid black;
+  cursor: pointer;
+  display: inline-block;
+  padding: 5 50px;
+}
+
+.selected {
+  background: #FFF;
+}
+
+.not-selected {
+  background: #ECECEC;
 }
 
 .chart {
-  height: 100%;
   overflow: auto;
 }
 

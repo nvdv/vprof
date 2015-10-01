@@ -1,6 +1,6 @@
-var main = require('./main.js');
+var profile = require('./profile.js');
 
-describe('Main test suite', function() {
+describe('Profile test suite', function() {
 
   it('Check getNodeName', function() {
     var node = {
@@ -8,7 +8,7 @@ describe('Main test suite', function() {
       'funcName': 'bar',
       'lineno': 10
     };
-    expect(main.getNodeName(node)).toBe('foo.py:10(bar)');
+    expect(profile.getNodeName_(node)).toBe('foo.py:10(bar)');
   });
 
   it('Check getTruncatedNodeName', function() {
@@ -17,8 +17,8 @@ describe('Main test suite', function() {
       'funcName': 'bar',
       'lineno': 10
     };
-    expect(main.getTruncatedNodeName(node, 1)).toBe('');
-    expect(main.getTruncatedNodeName(node, 50)).toBe('foo.p...');
-    expect(main.getTruncatedNodeName(node, 500)).toBe('foo.py:10(bar)');
+    expect(profile.getTruncatedNodeName_(node, 1)).toBe('');
+    expect(profile.getTruncatedNodeName_(node, 50)).toBe('foo.p...');
+    expect(profile.getTruncatedNodeName_(node, 500)).toBe('foo.py:10(bar)');
   });
 });
