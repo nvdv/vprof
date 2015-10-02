@@ -79,3 +79,13 @@ svg {
 .legend {
   font-size: 15px;
 }
+
+.axis {
+  stroke: red;
+  stroke-width: 2;
+}
+
+.memory-line {
+  stroke: black;
+  stroke-width: 2;
+}

@@ -7,6 +7,7 @@
 
 'use strict';
 var d3 = require('d3');
+var memory_stats = require('./memory_stats.js');
 var profile = require('./profile.js');
 
 var JSON_URI = 'profile';
@@ -67,7 +68,7 @@ function renderPage(data) {
       profile.renderProfile(data.c, profileChart);
     } else if (props[i] == 'm') {
       createMemoryChartTab_(tabHeader, status);
-      // TODO(nvdv): Render memory usage.
+      memory_stats.renderMemoryStats(data.m, memoryChart);
     }
   }
 }
