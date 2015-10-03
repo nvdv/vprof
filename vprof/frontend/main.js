@@ -53,22 +53,28 @@ function renderPage(data) {
   var profileChart = d3.select('body')
     .append('div')
     .attr('class', 'profile-chart tab-content')
-    .attr('id', 'profile-chart');
+    .attr('id', 'profile-chart')
+    .attr('style', 'display: none');
 
   var memoryChart = d3.select('body')
     .append('div')
     .attr('class', 'memory-chart tab-content')
-    .attr('id', 'memory-chart');
+    .attr('id', 'memory-chart')
+    .attr('style', 'display: none');
 
+  // TODO(nvdv): Refactor this loop.
   var props = Object.keys(data);
   for (var i = 0; i < props.length; i++) {
     var status = (i === 0) ? 'selected' : 'not-selected';
+    var display = (i === 0) ? 'block' : 'none';
     if (props[i] == 'c') {
       createProfileChartTab_(tabHeader, status);
       profile.renderProfile(data.c, profileChart);
+      profileChart.attr('style', 'display: ' + display);
     } else if (props[i] == 'm') {
       createMemoryChartTab_(tabHeader, status);
       memory_stats.renderMemoryStats(data.m, memoryChart);
+      memoryChart.attr('style', 'display: ' + display);
     }
   }
 }
