@@ -90,6 +90,7 @@ function removeFlameChartTooltip_(tooltipArea) {
   tooltipArea.selectAll('text').remove();
 }
 
+// TODO (nvdv): Split this function.
 /** Renders profile flame chart. */
 function renderProfile(data, parent) {
   var color = d3.scale.category10();

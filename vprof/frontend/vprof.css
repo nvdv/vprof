@@ -7,14 +7,6 @@ body {
   font-family: 'Helvetica Neue', Helvetica;
 }
 
-#profile-chart {
-  display: block;
-}
-
-#memory-chart {
-  display: none;
-}
-
 .tab-content {
   border: 1px solid black;
   border-radius: 8px;
@@ -81,11 +73,13 @@ svg {
 }
 
 .axis {
-  stroke: red;
-  stroke-width: 2;
+  fill: none;
+  stroke: black;
+  stroke-width: 2px;
 }
 
 .memory-line {
-  stroke: black;
-  stroke-width: 2;
+  fill: none;
+  stroke: green;
+  stroke-width: 2px;
 }

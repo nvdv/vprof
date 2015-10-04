@@ -12,6 +12,8 @@ var HEIGHT_SCALE = 0.9;
 var HEIGHT = window.innerHeight * HEIGHT_SCALE;
 var WIDTH_SCALE = 0.95;
 var WIDTH = window.innerWidth * WIDTH_SCALE;
+var MIN_RANGE_C = 0.95;
+var MAX_RANGE_C = 1.05;
 
 /** Renders memory usage graph. */
 function renderMemoryStats(data, parent) {
@@ -22,35 +24,37 @@ function renderMemoryStats(data, parent) {
     .attr('width', WIDTH)
     .attr('height', HEIGHT);
 
-  var xScale = d3.scale.linear()
-    .range([0, WIDTH]);
+  var yRange = d3.extent(data.memoryStats, function(d) { return d[1]; });
+  var srcLines = data.memoryStats.map(function(d) { return d[0]; });
+  var xScale = d3.scale.ordinal()
+    .domain(srcLines)
+    .rangeRoundBands([0, WIDTH]);
   var yScale = d3.scale.linear()
-    .range([0, HEIGHT]);
+    .domain([MIN_RANGE_C * yRange[0], MAX_RANGE_C * yRange[1]])
+    .range([HEIGHT, 0]);
 
   var xAxis = d3.svg.axis()
     .scale(xScale)
-    .orient('bottom');
+    .orient('top');
   var yAxis = d3.svg.axis()
     .scale(yScale)
-    .orient('left');
+    .orient('right');
 
-  var counter = 0;
-  var valueline = d3.svg.line()
-    .x(function(d) {
-      return xScale(counter++);
-    })
-    .y(function(d) { return d[1]; });
+  var line = d3.svg.line()
+    .x(function(d) { return xScale(d[0]); })
+    .y(function(d) { return yScale(d[1]); });
 
   canvas.append('path')
+    .datum(data.memoryStats)
     .attr('class', 'memory-line')
-    .attr('d', valueline(data.memoryStats));
+    .attr('d', line);
 
-  canvas.append('g')
+  canvas.append("g")
     .attr('class', 'axis')
     .attr('transform', 'translate(0,' + HEIGHT + ')')
     .call(xAxis);
 
-  canvas.append("g")
+  canvas.append('g')
     .attr('class', 'axis')
     .call(yAxis);
 }
