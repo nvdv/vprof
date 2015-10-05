@@ -78,8 +78,19 @@ svg {
   stroke-width: 2px;
 }
 
+.axis text {
+  fill: black;
+  stroke: none;
+  text-anchor: end;
+}
+
 .memory-line {
   fill: none;
   stroke: green;
   stroke-width: 2px;
+}
+
+.tick text{
+  fill: black;
+  stroke: none;
 }

@@ -8,12 +8,17 @@
 'use strict';
 var d3 = require('d3');
 
+var MARGIN_LEFT = 50;
+var MARGIN_RIGHT = 20;
+var MARGIN_TOP = 20;
+var MARGIN_BOTTOM  = 50;
 var HEIGHT_SCALE = 0.9;
-var HEIGHT = window.innerHeight * HEIGHT_SCALE;
-var WIDTH_SCALE = 0.95;
-var WIDTH = window.innerWidth * WIDTH_SCALE;
+var HEIGHT = window.innerHeight * HEIGHT_SCALE - MARGIN_LEFT - MARGIN_RIGHT;
+var WIDTH_SCALE = 0.9;
+var WIDTH = window.innerWidth * WIDTH_SCALE - MARGIN_TOP - MARGIN_BOTTOM;
 var MIN_RANGE_C = 0.95;
 var MAX_RANGE_C = 1.05;
+var AXIS_TEXT_Y = 12;
 
 /** Renders memory usage graph. */
 function renderMemoryStats(data, parent) {
@@ -21,8 +26,10 @@ function renderMemoryStats(data, parent) {
     .attr('class', 'chart');
 
   var canvas = chart.append('svg')
-    .attr('width', WIDTH)
-    .attr('height', HEIGHT);
+    .attr('width', WIDTH + MARGIN_LEFT + MARGIN_RIGHT)
+    .attr('height', HEIGHT + MARGIN_TOP + MARGIN_BOTTOM)
+    .append("g")
+    .attr("transform", "translate(" + MARGIN_LEFT + "," + MARGIN_TOP + ")");
 
   var yRange = d3.extent(data.memoryStats, function(d) { return d[1]; });
   var srcLines = data.memoryStats.map(function(d) { return d[0]; });
@@ -35,10 +42,10 @@ function renderMemoryStats(data, parent) {
 
   var xAxis = d3.svg.axis()
     .scale(xScale)
-    .orient('top');
+    .orient('bottom');
   var yAxis = d3.svg.axis()
     .scale(yScale)
-    .orient('right');
+    .orient('left');
 
   var line = d3.svg.line()
     .x(function(d) { return xScale(d[0]); })
@@ -56,7 +63,12 @@ function renderMemoryStats(data, parent) {
 
   canvas.append('g')
     .attr('class', 'axis')
-    .call(yAxis);
+    .call(yAxis)
+    .append('text')
+    .attr('transform', 'rotate(-90)')
+    .attr('y', AXIS_TEXT_Y)
+    .attr('dy', '.71em')
+    .text('Memory usage, MB');
 }
 
 module.exports = {
