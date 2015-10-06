@@ -54,6 +54,7 @@ svg {
   stroke: white;
   stroke-width: 4;
 }
+
 .tooltip-visible {
   display: block;
 }
@@ -84,13 +85,11 @@ svg {
   text-anchor: end;
 }
 
-.memory-line {
-  fill: none;
-  stroke: green;
-  stroke-width: 2px;
-}
-
 .tick text{
   fill: black;
   stroke: none;
+}
+
+.bar {
+  fill: #003399;
 }

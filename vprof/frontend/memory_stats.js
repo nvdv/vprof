@@ -11,7 +11,7 @@ var d3 = require('d3');
 var MARGIN_LEFT = 50;
 var MARGIN_RIGHT = 20;
 var MARGIN_TOP = 20;
-var MARGIN_BOTTOM  = 50;
+var MARGIN_BOTTOM  = 20;
 var HEIGHT_SCALE = 0.9;
 var HEIGHT = window.innerHeight * HEIGHT_SCALE - MARGIN_LEFT - MARGIN_RIGHT;
 var WIDTH_SCALE = 0.9;
@@ -19,6 +19,8 @@ var WIDTH = window.innerWidth * WIDTH_SCALE - MARGIN_TOP - MARGIN_BOTTOM;
 var MIN_RANGE_C = 0.95;
 var MAX_RANGE_C = 1.05;
 var AXIS_TEXT_Y = 12;
+var POINT_RADIUS_MIN= 4;
+var POINT_RADIUS_MAX = 6;
 
 /** Renders memory usage graph. */
 function renderMemoryStats(data, parent) {
@@ -40,26 +42,27 @@ function renderMemoryStats(data, parent) {
     .domain([MIN_RANGE_C * yRange[0], MAX_RANGE_C * yRange[1]])
     .range([HEIGHT, 0]);
 
-  var xAxis = d3.svg.axis()
-    .scale(xScale)
-    .orient('bottom');
   var yAxis = d3.svg.axis()
     .scale(yScale)
     .orient('left');
 
-  var line = d3.svg.line()
-    .x(function(d) { return xScale(d[0]); })
-    .y(function(d) { return yScale(d[1]); });
-
-  canvas.append('path')
-    .datum(data.memoryStats)
-    .attr('class', 'memory-line')
-    .attr('d', line);
-
-  canvas.append("g")
-    .attr('class', 'axis')
-    .attr('transform', 'translate(0,' + HEIGHT + ')')
-    .call(xAxis);
+  canvas.selectAll('.bar')
+    .data(data.memoryStats)
+    .enter()
+    .append('rect')
+    .attr('class', 'bar rect-normal')
+    .attr("x", function(d) { return xScale(d[0]); })
+    .attr("width", xScale.rangeBand())
+    .attr("y", function(d) { return yScale(d[1]); })
+    .attr("height", function(d) { return HEIGHT - yScale(d[1]); })
+    .on('mouseover', function(d) {
+      d3.select(this)
+        .attr('class', 'bar rect-highlight');
+    })
+    .on('mouseout', function(d) {
+      d3.select(this)
+        .attr('class', 'bar rect-normal');
+    });
 
   canvas.append('g')
     .attr('class', 'axis')
