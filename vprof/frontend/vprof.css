@@ -93,3 +93,13 @@ svg {
 .bar {
   fill: #003399;
 }
+
+.tooltip {
+  background: #C8E8D6;
+  border: 0px;
+  font: 12px sans-serif;
+  padding: 5px;
+  pointer-events: none;
+  position: absolute;
+  text-align: center;
+}

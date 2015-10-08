@@ -21,6 +21,8 @@ var MAX_RANGE_C = 1.05;
 var AXIS_TEXT_Y = 12;
 var POINT_RADIUS_MIN= 4;
 var POINT_RADIUS_MAX = 6;
+var TOOLTIP_HEIGHT = 50;
+var TOOLTIP_WIDTH = 100;
 
 /** Renders memory usage graph. */
 function renderMemoryStats(data, parent) {
@@ -46,10 +48,16 @@ function renderMemoryStats(data, parent) {
     .scale(yScale)
     .orient('left');
 
-  canvas.selectAll('.bar')
+  var barGroups = canvas.selectAll('.bar')
     .data(data.memoryStats)
     .enter()
-    .append('rect')
+    .append('g');
+
+  var tooltip = chart.append('div')
+    .attr('class', 'tooltip tooltip-invisible');
+
+  // Draw memory bars.
+  barGroups.append('rect')
     .attr('class', 'bar rect-normal')
     .attr("x", function(d) { return xScale(d[0]); })
     .attr("width", xScale.rangeBand())
@@ -58,10 +66,14 @@ function renderMemoryStats(data, parent) {
     .on('mouseover', function(d) {
       d3.select(this)
         .attr('class', 'bar rect-highlight');
+      tooltip.attr('class', 'tooltip tooltip-visible')
+        .text('Line: ' +  d[0] + ' Usage: ' + d[1] + ' MB')
+        .style('left', d3.event.pageX)
+        .style('top', d3.event.pageY);
     })
     .on('mouseout', function(d) {
-      d3.select(this)
-        .attr('class', 'bar rect-normal');
+      d3.select(this).attr('class', 'bar rect-normal');
+      tooltip.attr('class', 'tooltip tooltip-invisible');
     });
 
   canvas.append('g')
