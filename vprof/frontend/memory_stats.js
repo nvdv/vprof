@@ -66,8 +66,13 @@ function renderMemoryStats(data, parent) {
     .on('mouseover', function(d) {
       d3.select(this)
         .attr('class', 'bar rect-highlight');
+      var functionName = d[0][2].replace('<', '[').replace('>',  ']');
       tooltip.attr('class', 'tooltip tooltip-visible')
-        .text('Line: ' +  d[0] + ' Usage: ' + d[1] + ' MB')
+        .html('<p>Filename: ' + d[0][0] + '</p>' +
+              '<p>Line number: ' + d[0][1] + '</p>' +
+              '<p>Function name: ' + functionName + '</p>' +
+              '<p>Memory usage: ' + d[1] + ' MB</p>'
+              )
         .style('left', d3.event.pageX)
         .style('top', d3.event.pageY);
     })

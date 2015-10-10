@@ -95,11 +95,16 @@ svg {
 }
 
 .tooltip {
-  background: #C8E8D6;
+  background: white;
   border: 0px;
   font: 12px sans-serif;
-  padding: 5px;
+  padding: 3px;
   pointer-events: none;
   position: absolute;
   text-align: center;
+}
+
+p {
+  margin: 0px;
+  text-align: left;
 }

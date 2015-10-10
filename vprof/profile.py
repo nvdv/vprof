@@ -152,7 +152,7 @@ class MemoryProfile(Profile):
         memory_stats = []
         for code, lines in code_stats.items():
             for line, usage in lines.items():
-                line_id = '%s:%s(%s)' % (code.co_filename, line, code.co_name)
+                line_id = (code.co_filename, line, code.co_name)
                 memory_stats.append((line_id, usage))
         return memory_stats
 
