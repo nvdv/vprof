@@ -19,10 +19,6 @@ var WIDTH = window.innerWidth * WIDTH_SCALE - MARGIN_TOP - MARGIN_BOTTOM;
 var MIN_RANGE_C = 0.95;
 var MAX_RANGE_C = 1.05;
 var AXIS_TEXT_Y = 12;
-var POINT_RADIUS_MIN= 4;
-var POINT_RADIUS_MAX = 6;
-var TOOLTIP_HEIGHT = 50;
-var TOOLTIP_WIDTH = 100;
 
 /** Renders memory usage graph. */
 function renderMemoryStats(data, parent) {
@@ -68,7 +64,7 @@ function renderMemoryStats(data, parent) {
         .attr('class', 'bar rect-highlight');
       var functionName = d[0][2].replace('<', '[').replace('>',  ']');
       tooltip.attr('class', 'tooltip tooltip-visible')
-        .html('<p>Filename: ' + d[0][0] + '</p>' +
+        .html('<p>Location: ' + d[0][0] + '</p>' +
               '<p>Line number: ' + d[0][1] + '</p>' +
               '<p>Function name: ' + functionName + '</p>' +
               '<p>Memory usage: ' + d[1] + ' MB</p>'

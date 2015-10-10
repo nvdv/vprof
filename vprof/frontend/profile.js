@@ -8,22 +8,18 @@
 'use strict';
 var d3 = require('d3');
 
-// Flame chart parameters
 var HEIGHT_SCALE = 0.9;
 var HEIGHT = window.innerHeight * HEIGHT_SCALE;
 var HEIGHT_OFFSET = 100;
 var WIDTH_SCALE = 0.95;
 var WIDTH = window.innerWidth * WIDTH_SCALE;
 var ZOOM_DURATION = 250;
-var TOOLTIP_X = 0;
-var TOOLTIP_HEIGHT = 100;
-var TOOLTIP_Y = 0;
-var TOOLTIP_DY = 15;
 var TEXT_OFFSET_X = 5;
 var TEXT_OFFSET_Y= 14;
 var TEXT_CUTOFF = 0.075 * WIDTH;
 var LEGEND_X = WIDTH - 400;
 var LEGEND_Y = 100;
+var LEGEND_DY = 15;
 var LEGEND_HEIGHT = 68;
 var LEGEND_WIDTH = 300;
 var LEGEND_TEXT_OFFSET = 10;
@@ -54,106 +50,9 @@ function getTimePercentage_(cumTime, totalTime) {
   return 100 * Math.round(cumTime / totalTime * 1000) / 1000;
 }
 
-/** Renders profile flame chart tooltip. */
-function renderFlameChartTooltip_(tooltipArea, d, totalTime) {
-  var tooltipText = tooltipArea.append('text');
-  var timePercentage = getTimePercentage_(d.cumTime, totalTime);
-  tooltipText.append('tspan')
-    .attr('x', TOOLTIP_X)
-    .attr('y', TOOLTIP_Y)
-    .attr('dy', TOOLTIP_DY)
-    .text('Function name: ' + d.funcName);
-  tooltipText.append('tspan')
-    .attr('x', TOOLTIP_X)
-    .attr('dy', TOOLTIP_DY)
-    .text('Location: ' + d.moduleName);
-  tooltipText.append('tspan')
-    .attr('x', TOOLTIP_X)
-    .attr('dy', TOOLTIP_DY)
-    .text('Time percentage: ' + timePercentage + ' %');
-  tooltipText.append('tspan')
-    .attr('x', TOOLTIP_X)
-    .attr('dy', TOOLTIP_DY)
-    .text('Cum.time: ' + d.cumTime + ' s');
-  tooltipText.append('tspan')
-    .attr('x', TOOLTIP_X)
-    .attr('dy', TOOLTIP_DY)
-    .text('Time per call: ' + d.timePerCall + ' s');
-  tooltipText.append('tspan')
-    .attr('x', TOOLTIP_X)
-    .attr('dy', TOOLTIP_DY)
-    .text('Primitive calls: ' + d.primCalls);
-}
-
-/** Removes profile flame chart from tooltip area. */
-function removeFlameChartTooltip_(tooltipArea) {
-  tooltipArea.selectAll('text').remove();
-}
-
-// TODO (nvdv): Split this function.
-/** Renders profile flame chart. */
-function renderProfile(data, parent) {
-  var color = d3.scale.category10();
-  var chart =  parent.append('div')
-    .attr('class', 'chart');
-
-  var canvas = chart.append('svg')
-    .attr('width', WIDTH)
-    .attr('height', HEIGHT - TOOLTIP_HEIGHT);
-
-  var tooltipArea = chart.append('svg')
-    .attr('width', WIDTH)
-    .attr('height', TOOLTIP_HEIGHT);
-
-  tooltipArea.append('rect')
-    .attr('x', TOOLTIP_X)
-    .attr('y', TOOLTIP_Y)
-    .attr('width', WIDTH)
-    .attr('height', TOOLTIP_HEIGHT)
-    .attr('fill', 'white');
-
-  var flameChart = d3.layout.partition()
-    .sort(null)
-    .value(function(d) { return d.cumTime; });
-
-  var cells = canvas.selectAll(".cell")
-    .data(flameChart.nodes(data.callStats))
-    .enter()
-    .append('g')
-    .attr('class', 'cell');
-
-  // Render flame chart nodes.
-  var xScale = d3.scale.linear().range([0, WIDTH]);
-  var yScale = d3.scale.linear().range([0, HEIGHT - TOOLTIP_HEIGHT]);
-  var nodes = cells.append('rect')
-    .attr('class', 'rect-normal')
-    .attr('x', function(d) { return xScale(d.x); })
-    .attr('y', function(d) { return yScale(1 - d.y - d.dy); })
-    .attr('width', function(d) { return xScale(d.dx); })
-    .attr('height', function(d) { return yScale(d.dy); })
-    .style('fill', function(d) { return color(getNodeName_(d) + d.depth); })
-    .on('mouseover', function(d) {
-      d3.select(this)
-        .attr('class', 'rect-highlight');
-      renderFlameChartTooltip_(tooltipArea, d, data.runTime);
-    })
-    .on('mouseout', function(d) {
-      d3.select(this)
-        .attr('class', 'rect-normal');
-      removeFlameChartTooltip_(tooltipArea);
-    });
-
-  // Render flame chart headers.
-  var titles = cells.append('text')
-    .attr('x', function(d) { return xScale(d.x) + TEXT_OFFSET_X; })
-    .attr('y', function(d) { return yScale(1 - d.y - d.dy) + TEXT_OFFSET_Y; })
-    .text(function(d) {
-      var nodeWidth = this.previousElementSibling.getAttribute('width');
-      return getTruncatedNodeName_(d, nodeWidth);
-    });
-
-  // Render legend.
-  var legend = canvas.append('g')
+/** Renders profile legend. */
+function renderLegend_(parent, data) {
+  var legend = parent.append('g')
     .attr('class', 'legend')
     .attr('x', LEGEND_X)
     .attr('y', LEGEND_Y)
@@ -174,25 +73,92 @@ function renderProfile(data, parent) {
     .attr("y", LEGEND_Y);
   legendText.append('tspan')
     .attr('x', LEGEND_X + LEGEND_TEXT_OFFSET)
-    .attr('dy', TOOLTIP_DY)
+    .attr('dy', LEGEND_DY)
     .text('Program name: ' + data.programName);
   legendText.append('tspan')
     .attr('x', LEGEND_X + LEGEND_TEXT_OFFSET)
-    .attr('dy', TOOLTIP_DY)
+    .attr('dy', LEGEND_DY)
     .text('Total runtime: ' + data.runTime + 's');
   legendText.append('tspan')
     .attr('x', LEGEND_X + LEGEND_TEXT_OFFSET)
-    .attr('dy', TOOLTIP_DY)
+    .attr('dy', LEGEND_DY)
     .text('Total calls: ' + data.totalCalls);
   legendText.append('tspan')
     .attr('x', LEGEND_X + LEGEND_TEXT_OFFSET)
-    .attr('dy', TOOLTIP_DY)
+    .attr('dy', LEGEND_DY)
     .text('Primitive calls: ' + data.primitiveCalls);
+}
+
+// TODO (nvdv): Split this function.
+/** Renders profile flame chart. */
+function renderProfile(data, parent) {
+  var color = d3.scale.category10();
+  var chart =  parent.append('div')
+    .attr('class', 'chart');
+
+  var canvas = chart.append('svg')
+    .attr('width', WIDTH)
+    .attr('height', HEIGHT);
+
+  var tooltip = chart.append('div')
+    .attr('class', 'tooltip tooltip-invisible');
+
+  renderLegend_(canvas, data);
+
+  var flameChart = d3.layout.partition()
+    .sort(null)
+    .value(function(d) { return d.cumTime; });
+
+  var cells = canvas.selectAll(".cell")
+    .data(flameChart.nodes(data.callStats))
+    .enter()
+    .append('g')
+    .attr('class', 'cell');
+
+  // Render flame chart nodes.
+  var xScale = d3.scale.linear().range([0, WIDTH]);
+  var yScale = d3.scale.linear().range([0, HEIGHT]);
+  var nodes = cells.append('rect')
+    .attr('class', 'rect-normal')
+    .attr('x', function(d) { return xScale(d.x); })
+    .attr('y', function(d) { return yScale(1 - d.y - d.dy); })
+    .attr('width', function(d) { return xScale(d.dx); })
+    .attr('height', function(d) { return yScale(d.dy); })
+    .style('fill', function(d) { return color(getNodeName_(d) + d.depth); })
+    .on('mouseover', function(d) {
+      d3.select(this)
+        .attr('class', 'rect-highlight');
+      var timePercentage = getTimePercentage_(d.cumTime, data.runTime);
+      tooltip.attr('class', 'tooltip tooltip-visible')
+        .html('<p>Function name: ' + d.funcName + '</p>' +
+              '<p>Location: ' + d.moduleName +'</p>' +
+              '<p>Time percentage: ' + timePercentage + ' %</p>' +
+              '<p>Cum.time: ' + d.cumTime + ' s</p>' +
+              '<p>Time per call: ' + d.timePerCall + ' s</p>' +
+              '<p>Primitive calls: ' + d.primCalls + '</p>')
+        .style('left', d3.event.pageX)
+        .style('top', d3.event.pageY);
+    })
+    .on('mouseout', function(d) {
+      d3.select(this)
+        .attr('class', 'rect-normal');
+      tooltip.attr('class', 'tooltip tooltip-invisible');
+    });
+
+  // Render flame chart headers.
+  var titles = cells.append('text')
+    .attr('x', function(d) { return xScale(d.x) + TEXT_OFFSET_X; })
+    .attr('y', function(d) { return yScale(1 - d.y - d.dy) + TEXT_OFFSET_Y; })
+    .text(function(d) {
+      var nodeWidth = this.previousElementSibling.getAttribute('width');
+      return getTruncatedNodeName_(d, nodeWidth);
+    });
+
 
   // Zoom in.
   nodes.on('click', function(d) {
     xScale.domain([d.x, d.x + d.dx]);
-    yScale.domain([0, 1 - d.y]).range([0, HEIGHT - TOOLTIP_HEIGHT]);
+    yScale.domain([0, 1 - d.y]).range([0, HEIGHT]);
 
     nodes.transition()
       .duration(ZOOM_DURATION)
