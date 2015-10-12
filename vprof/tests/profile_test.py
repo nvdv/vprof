@@ -90,5 +90,5 @@ class MemoryProfileUnittest(unittest.TestCase):
         code_stats = {code_obj1: {10: 20}, code_obj2: {30: 40}}
         self.assertListEqual(
             self._profile._transform_stats(code_stats),
-            [('foo.py:10(baz)', 20), ('bar.py:30(mno)', 40)])
+            [(('foo.py', 10, 'baz'), 20), (('bar.py', 30, 'mno'), 40)])
 
