@@ -10,7 +10,6 @@ var d3 = require('d3');
 
 var HEIGHT_SCALE = 0.9;
 var HEIGHT = window.innerHeight * HEIGHT_SCALE;
-var HEIGHT_OFFSET = 100;
 var WIDTH_SCALE = 0.95;
 var WIDTH = window.innerWidth * WIDTH_SCALE;
 var ZOOM_DURATION = 250;
@@ -19,12 +18,6 @@ var TEXT_OFFSET_Y= 14;
 var TEXT_CUTOFF = 0.075 * WIDTH;
 var LEGEND_X = WIDTH - 400;
 var LEGEND_Y = 100;
-var LEGEND_DY = 15;
-var LEGEND_HEIGHT = 68;
-var LEGEND_WIDTH = 300;
-var LEGEND_TEXT_OFFSET = 10;
-var LEGEND_RADIUS_X = 10;
-var LEGEND_RADIUS_Y = 10;
 
 /** Returns full node name. */
 function getNodeName_(d) {
@@ -52,41 +45,14 @@ function getTimePercentage_(cumTime, totalTime) {
 
 /** Renders profile legend. */
 function renderLegend_(parent, data) {
-  var legend = parent.append('g')
+  parent.append('div')
     .attr('class', 'legend')
-    .attr('x', LEGEND_X)
-    .attr('y', LEGEND_Y)
-    .attr('height', LEGEND_HEIGHT)
-    .attr('width', LEGEND_WIDTH);
-
-  legend.append('rect')
-    .attr('class', 'tooltip-rect')
-    .attr('x', LEGEND_X)
-    .attr('y', LEGEND_Y)
-    .attr('height', LEGEND_HEIGHT)
-    .attr('width', LEGEND_WIDTH)
-    .attr('rx', LEGEND_RADIUS_X)
-    .attr('ry', LEGEND_RADIUS_Y);
-
-  var legendText = legend.append('text')
-    .attr("x", LEGEND_X + LEGEND_TEXT_OFFSET)
-    .attr("y", LEGEND_Y);
-  legendText.append('tspan')
-    .attr('x', LEGEND_X + LEGEND_TEXT_OFFSET)
-    .attr('dy', LEGEND_DY)
-    .text('Program name: ' + data.programName);
-  legendText.append('tspan')
-    .attr('x', LEGEND_X + LEGEND_TEXT_OFFSET)
-    .attr('dy', LEGEND_DY)
-    .text('Total runtime: ' + data.runTime + 's');
-  legendText.append('tspan')
-    .attr('x', LEGEND_X + LEGEND_TEXT_OFFSET)
-    .attr('dy', LEGEND_DY)
-    .text('Total calls: ' + data.totalCalls);
-  legendText.append('tspan')
-    .attr('x', LEGEND_X + LEGEND_TEXT_OFFSET)
-    .attr('dy', LEGEND_DY)
-    .text('Primitive calls: ' + data.primitiveCalls);
+    .html('<p>Program name: ' + data.programName + '</p>' +
+          '<p>Total runtime: ' + data.runTime + 's</p>' +
+          '<p>Total calls: ' + data.totalCalls + '</p>' +
+          '<p>Primitive calls: ' + data.primitiveCalls + '</p>')
+    .style('left', LEGEND_X)
+    .style('top', LEGEND_Y);
 }
 
 // TODO (nvdv): Split this function.
@@ -103,7 +69,7 @@ function renderProfile(data, parent) {
   var tooltip = chart.append('div')
     .attr('class', 'tooltip tooltip-invisible');
 
-  renderLegend_(canvas, data);
+  renderLegend_(chart, data);
 
   var flameChart = d3.layout.partition()
     .sort(null)
@@ -129,8 +95,9 @@ function renderProfile(data, parent) {
       d3.select(this)
         .attr('class', 'rect-highlight');
       var timePercentage = getTimePercentage_(d.cumTime, data.runTime);
+      var functionName = d.funcName.replace('<', '[').replace('>',  ']');
       tooltip.attr('class', 'tooltip tooltip-visible')
-        .html('<p>Function name: ' + d.funcName + '</p>' +
+        .html('<p>Function name: ' + functionName + '</p>' +
               '<p>Location: ' + d.moduleName +'</p>' +
               '<p>Time percentage: ' + timePercentage + ' %</p>' +
               '<p>Cum.time: ' + d.cumTime + ' s</p>' +

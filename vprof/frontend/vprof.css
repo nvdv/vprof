@@ -1,15 +1,10 @@
-html {
-  margin: 0;
-  padding: 0;
-}
-
 body {
+  background: #4C4C4C;
   font-family: 'Helvetica Neue', Helvetica;
 }
 
 .tab-content {
-  border: 1px solid black;
-  border-radius: 8px;
+  background: #F1F1F1;
 }
 
 .tab-header {
@@ -17,25 +12,18 @@ body {
 }
 
 .tab-header li {
-  border-left: 1px solid black;
-  border-radius: 8px 8px 0px 0px;
-  border-right: 1px solid black;
-  border-top: 1px solid black;
+  border-radius: 5px 5px 0px 0px;
   cursor: pointer;
   display: inline-block;
   padding: 5 50px;
 }
 
 .selected {
-  background: #FFF;
+  background: #F1F1F1;
 }
 
 .not-selected {
-  background: #ECECEC;
-}
-
-.chart {
-  overflow: auto;
+  background: #BCBCBC;
 }
 
 svg {
@@ -63,14 +51,14 @@ svg {
   display: none;
 }
 
-.tooltip-rect {
-  fill: white;
-  stroke: #212121;
-  stroke-width: 2;
-}
-
 .legend {
-  font-size: 15px;
+  background: #BCBCBC;
+  border: 0px;
+  font: 15px sans-serif;
+  padding: 8px;
+  pointer-events: none;
+  position: absolute;
+  text-align: center;
 }
 
 .axis {
