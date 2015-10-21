@@ -15,6 +15,7 @@ _PROFILE_MAP = {
 }
 
 def main():
+    """Visual profiler main function."""
     parser = argparse.ArgumentParser(description=_MODULE_DESC)
     parser.add_argument('profilers', metavar='opts',
                         help='Profilers configuration')
@@ -35,11 +36,9 @@ def main():
     program_name, program_stats = args.source[0], {}
     for option in args.profilers:
         program_stats[option] = _PROFILE_MAP[option](program_name).run()
-
     sys.stderr = open(os.devnull, "w")
     print('Starting stats server...')
     stats_server.start(_HOST, _PORT, program_stats)
-
 
 if __name__ == "__main__":
     main()

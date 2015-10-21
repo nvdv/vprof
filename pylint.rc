@@ -1,0 +1,9 @@
+[MESSAGES CONTROL]
+# C0325 - Print function parens.
+# WO122 - Use of exec.
+# R0903 - Too few public methods.
+# W0403 - Relative import.
+# R0201 - Method could be a function.
+# W0141 - Bad builtin function.
+# I0011 - Locally disabling super-init-not-called
+disable=C0325, W0122, R0903, W0403, R0201, W0141, I0011

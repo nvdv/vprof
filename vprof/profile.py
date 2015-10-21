@@ -34,7 +34,7 @@ class CProfile(Profile):
     pstats.Stats.
     """
 
-    def __init__(self, program_name):
+    def __init__(self, program_name):  #pylint: disable=W0231
         """Initializes cProfile wrapper.
 
         Args:
@@ -50,7 +50,7 @@ class CProfile(Profile):
                 callees[caller].append(func)
         return callees
 
-    def _build_call_tree(self, node, callees, stats, seen=set()):
+    def _build_call_tree(self, node, callees, stats, seen=set()):  #pylint: disable=W0102
         """Builds call tree from callees tree and cProfile stats.
 
         Args:
@@ -139,7 +139,7 @@ class MemoryProfile(Profile):
     Runs memory profiler and extracts collected info from code_map.
     """
 
-    def __init__(self, program_name):
+    def __init__(self, program_name):  #pylint: disable=W0231
         """Initializes memory profile wrapper.
 
         Args:
