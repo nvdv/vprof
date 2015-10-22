@@ -3,12 +3,12 @@ body {
   font-family: 'Helvetica Neue', Helvetica;
 }
 
-.tab-content {
-  background: #F1F1F1;
-}
-
 .tab-header {
   margin: 0;
+}
+
+.tab-content {
+  background: #F1F1F1;
 }
 
 .tab-header li {

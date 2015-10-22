@@ -58,7 +58,6 @@ function renderLegend_(parent, data) {
 // TODO (nvdv): Split this function.
 /** Renders profile flame chart. */
 function renderProfile(data, parent) {
-  var color = d3.scale.category10();
   var chart =  parent.append('div')
     .attr('class', 'chart');
 
@@ -80,6 +79,8 @@ function renderProfile(data, parent) {
     .enter()
     .append('g')
     .attr('class', 'cell');
+
+  var color = d3.scale.category10();
 
   // Render flame chart nodes.
   var xScale = d3.scale.linear().range([0, WIDTH]);
