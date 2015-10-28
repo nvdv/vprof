@@ -1,6 +1,7 @@
 body {
   background: #4C4C4C;
   font-family: 'Helvetica Neue', Helvetica;
+  height: 95%;
 }
 
 .tab-header {
@@ -9,6 +10,7 @@ body {
 
 .tab-content {
   background: #F1F1F1;
+  height: 100%;
 }
 
 .tab-header li {
