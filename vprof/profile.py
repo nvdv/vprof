@@ -3,6 +3,7 @@ import abc
 import cProfile
 import inspect
 import memory_profiler
+import multiprocessing
 import os
 import pstats
 import sys
@@ -19,10 +20,17 @@ class Profile(object):
     def __init__(self):
         pass
 
-    @abc.abstractmethod
     def run(self):
-        """Runs profile and returns profile stats."""
-        pass
+        """Runs profile and returns profile stats.
+
+        Runs profilers in separate processes to provide independent results.
+        """
+        stats = multiprocessing.Manager().dict()  #pylint: disable=E1101
+        subprocess = multiprocessing.Process(
+            target=self.collect_stats, args=(stats,))  #pylint: disable=E1101
+        subprocess.start()
+        subprocess.join()
+        return dict(stats)
 
 
 class CProfile(Profile):
@@ -89,8 +97,8 @@ class CProfile(Profile):
         root, _ = max(stats.stats.iteritems(), key=_statcmp)
         return self._build_call_tree(root, callees, stats.stats)
 
-    def run(self):
-        """Returns CProfile stats for specified Python program."""
+    def collect_stats(self, run_stats):
+        """Collects CProfile stats for specified Python program."""
         globs = {
             '__file__': self._program_name,
             '__name__': '__main__',
@@ -106,13 +114,11 @@ class CProfile(Profile):
             pass
         prof.create_stats()
         cprofile_stats = pstats.Stats(prof)
-        return {
-            'programName': self._program_name,
-            'runTime': cprofile_stats.total_tt,
-            'primitiveCalls': cprofile_stats.prim_calls,
-            'totalCalls': cprofile_stats.total_calls,
-            'callStats': self._transform_stats(cprofile_stats),
-        }
+        run_stats['programName'] = self._program_name
+        run_stats['runTime'] = cprofile_stats.total_tt
+        run_stats['primitiveCalls'] = cprofile_stats.prim_calls
+        run_stats['totalCalls'] = cprofile_stats.total_calls
+        run_stats['callStats'] = self._transform_stats(cprofile_stats)
 
 
 class _TracingLineProfiler(memory_profiler.LineProfiler):
@@ -156,8 +162,8 @@ class MemoryProfile(Profile):
                 memory_stats.append((line_id, usage))
         return memory_stats
 
-    def run(self):
-        """Returns memory stats for specified Python program."""
+    def collect_stats(self, run_stats):
+        """Collects memory stats for specified Python program."""
         globs = {
             '__file__': self._program_name,
             '__name__': '__main__',
@@ -174,7 +180,5 @@ class MemoryProfile(Profile):
             prof.disable()
         except SystemExit:
             pass
-        return {
-            'programName': self._program_name,
-            'memoryStats': self._transform_stats(prof.code_map),
-        }
+        run_stats['programName'] = self._program_name
+        run_stats['memoryStats'] = self._transform_stats(prof.code_map)

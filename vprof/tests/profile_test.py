@@ -1,3 +1,4 @@
+import collections
 import copy
 import mock
 import vprof.profile as profile
@@ -87,7 +88,8 @@ class MemoryProfileUnittest(unittest.TestCase):
         code_obj1, code_obj2 = mock.MagicMock(), mock.MagicMock()
         code_obj1.co_filename, code_obj2.co_filename = 'foo.py', 'bar.py'
         code_obj1.co_name, code_obj2.co_name = 'baz', 'mno'
-        code_stats = {code_obj1: {10: 20}, code_obj2: {30: 40}}
+        code_stats = collections.OrderedDict(
+            {code_obj1: {10: 20}, code_obj2: {30: 40}})
         self.assertListEqual(
             self._profile._transform_stats(code_stats),
             [(('foo.py', 10, 'baz'), 20), (('bar.py', 30, 'mno'), 40)])
