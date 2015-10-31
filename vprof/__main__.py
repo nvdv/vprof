@@ -35,7 +35,9 @@ def main():
     sys.argv[:] = args.source
     program_name, program_stats = args.source[0], {}
     for option in args.profilers:
-        program_stats[option] = _PROFILE_MAP[option](program_name).run()
+        curr_profiler = _PROFILE_MAP[option](program_name)
+        print('Running %s...' % curr_profiler.__class__.__name__)
+        program_stats[option] = curr_profiler.run()
     sys.stderr = open(os.devnull, "w")
     print('Starting stats server...')
     stats_server.start(_HOST, _PORT, program_stats)
