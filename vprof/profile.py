@@ -1,4 +1,4 @@
-"""Various profile wrappers"""
+"""Module with profile wrappers."""
 import abc
 import cProfile
 import inspect
@@ -13,17 +13,22 @@ from collections import OrderedDict
 
 
 class Profile(object):
-    """Base class for profile processing."""
+    """Base class for profile wrapper."""
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
     def __init__(self):
         pass
 
+    @abc.abstractmethod
+    def collect_stats(self, run_stats):
+        """Collects profile stats and adds them to run_stats dict."""
+        pass
+
     def run(self):
         """Runs profile and returns profile stats.
 
-        Runs profilers in separate processes to provide independent results.
+        Runs profiler in separate process to ensure result independence.
         """
         stats = multiprocessing.Manager().dict()  #pylint: disable=E1101
         subprocess = multiprocessing.Process(
