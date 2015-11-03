@@ -1,5 +1,6 @@
 """Module with profile wrappers."""
 import abc
+import profile
 import cProfile
 import inspect
 import memory_profiler
@@ -12,7 +13,7 @@ from collections import defaultdict
 from collections import OrderedDict
 
 
-class Profile(object):
+class BaseProfile(object):
     """Base class for profile wrapper."""
     __metaclass__ = abc.ABCMeta
 
@@ -30,15 +31,15 @@ class Profile(object):
 
         Runs profiler in separate process to ensure result independence.
         """
-        stats = multiprocessing.Manager().dict()  #pylint: disable=E1101
+        result_stats = multiprocessing.Manager().dict()  #pylint: disable=E1101
         subprocess = multiprocessing.Process(
-            target=self.collect_stats, args=(stats,))  #pylint: disable=E1101
+            target=self.collect_stats, args=(result_stats,))  #pylint: disable=E1101
         subprocess.start()
         subprocess.join()
-        return dict(stats)
+        return dict(result_stats)
 
 
-class CProfile(Profile):
+class RuntimeProfile(BaseProfile):
     """Class that contains CProfile stats processing logic.
 
     This class contains all logic related to cProfile run, stats collection
@@ -144,7 +145,7 @@ class _TracingLineProfiler(memory_profiler.LineProfiler):
                 self.add_code(subcode)
 
 
-class MemoryProfile(Profile):
+class MemoryProfile(BaseProfile):
     """Class that contains memory profiler stats processing logic.
 
     Runs memory profiler and extracts collected info from code_map.

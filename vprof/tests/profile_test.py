@@ -1,13 +1,13 @@
 import collections
 import copy
 import mock
-import vprof.profile as profile
+import vprof.profile_wrappers as profile_wrappers
 import unittest
 
 
 class AbstractProfileUnittest(unittest.TestCase):
     def testAbstractness(self):
-        self.assertRaises(TypeError, profile.Profile)
+        self.assertRaises(TypeError, profile_wrappers.BaseProfile)
 
 
 _RUN_STATS = {
@@ -62,7 +62,7 @@ _CALL_GRAPH = {
 
 class CProfileUnittest(unittest.TestCase):
     def setUp(self):
-        self._profile = object.__new__(profile.CProfile)
+        self._profile = object.__new__(profile_wrappers.RuntimeProfile)
 
     def testInit(self):
         filename = mock.MagicMock()
@@ -82,7 +82,7 @@ class CProfileUnittest(unittest.TestCase):
 
 class MemoryProfileUnittest(unittest.TestCase):
     def setUp(self):
-        self._profile = object.__new__(profile.MemoryProfile)
+        self._profile = object.__new__(profile_wrappers.MemoryProfile)
 
     def testTransformStats(self):
         code_obj1, code_obj2 = mock.MagicMock(), mock.MagicMock()

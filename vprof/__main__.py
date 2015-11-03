@@ -1,6 +1,6 @@
 """Visual profiler for Python."""
 import argparse
-import profile
+import profile_wrappers
 import stats_server
 import os
 import sys
@@ -10,8 +10,8 @@ _HOST = 'localhost'
 _PORT = 8000
 
 _PROFILE_MAP = {
-    'c': profile.CProfile,
-    'm': profile.MemoryProfile,
+    'c': profile_wrappers.RuntimeProfile,
+    'm': profile_wrappers.MemoryProfile,
 }
 
 def main():
