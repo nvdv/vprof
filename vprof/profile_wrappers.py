@@ -1,6 +1,5 @@
 """Module with profile wrappers."""
 import abc
-import profile
 import cProfile
 import inspect
 import memory_profiler
@@ -10,7 +9,7 @@ import pstats
 import sys
 
 from collections import defaultdict
-from collections import OrderedDict
+from collections import deque
 
 
 class BaseProfile(object):
@@ -127,22 +126,37 @@ class RuntimeProfile(BaseProfile):
         run_stats['callStats'] = self._transform_stats(cprofile_stats)
 
 
-class _TracingLineProfiler(memory_profiler.LineProfiler):
-    """Subclass of memory_profiler.LineProfiler.
+class CodeEventsTracker(object):
+    """Tracks specified events during code execution."""
 
-    Used to track order of code execution by using OrderedDict instead
-    of just Python dictionary.
-    """
+    def __init__(self):
+        self._all_code = set()
+        self.events_list = deque()
+        self._original_trace_function = sys.gettrace()
 
-    def __init__(self, **kw):
-        super(_TracingLineProfiler, self).__init__(*kw)
-        self.code_map = OrderedDict()
-
-    def add_code(self, code, toplevel_code=None):
-        if code not in self.code_map:
-            self.code_map[code] = OrderedDict()
+    def add_code(self, code):
+        """Recursively adds all code to be examined."""
+        if code not in self._all_code:
+            self._all_code.add(code)
             for subcode in filter(inspect.iscode, code.co_consts):
                 self.add_code(subcode)
+
+    def __enter__(self):
+        """Sets custom trace function."""
+        sys.settrace(self.trace_memory_usage)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tbf):
+        """Resets original trace function."""
+        sys.settrace(self._original_trace_function)
+
+    def trace_memory_usage(self, frame, event, arg):  #pylint: disable=W0613
+        """Tracks memory usage when certain events occur."""
+        if (event in ('line', 'call', 'return') and
+                frame.f_code in self._all_code):
+            curr_memory = memory_profiler._get_memory(-1)  #pylint: disable=W0212
+            self.events_list.append((frame.f_lineno, event, curr_memory))
+        return self.trace_memory_usage
 
 
 class MemoryProfile(BaseProfile):
@@ -176,15 +190,14 @@ class MemoryProfile(BaseProfile):
             '__package__': None,
         }
         sys.path.insert(0, os.path.dirname(self._program_name))
-        prof = _TracingLineProfiler()
+        prof = CodeEventsTracker()
         try:
-            with open(self._program_name, 'rb') as srcfile:
+            with open(self._program_name, 'rb') as srcfile,\
+                CodeEventsTracker() as prof:
                 code = compile(srcfile.read(), self._program_name, 'exec')
-            prof.add_code(code)
-            prof.enable()
-            exec(code, globs, None)
-            prof.disable()
+                prof.add_code(code)
+                exec(code, globs, None)
         except SystemExit:
             pass
         run_stats['programName'] = self._program_name
-        run_stats['memoryStats'] = self._transform_stats(prof.code_map)
+        run_stats['codeEvents'] = list(prof.events_list)
