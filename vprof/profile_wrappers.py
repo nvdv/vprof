@@ -155,7 +155,8 @@ class CodeEventsTracker(object):
         if (event in ('line', 'call', 'return') and
                 frame.f_code in self._all_code):
             curr_memory = memory_profiler._get_memory(-1)  #pylint: disable=W0212
-            self.events_list.append((frame.f_lineno, event, curr_memory))
+            self.events_list.append(
+                (frame.f_lineno, curr_memory, event, frame.f_code.co_name))
         return self.trace_memory_usage
 
 
@@ -200,4 +201,6 @@ class MemoryProfile(BaseProfile):
         except SystemExit:
             pass
         run_stats['programName'] = self._program_name
-        run_stats['codeEvents'] = list(prof.events_list)
+        run_stats['codeEvents'] = [
+            (i + 1, lineno, memory, event, fname)
+            for i, (lineno, memory, event, fname) in enumerate(prof.events_list)]

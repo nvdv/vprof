@@ -18,6 +18,11 @@ var WIDTH = window.innerWidth * SCALE - MARGIN_TOP - MARGIN_BOTTOM;
 var MIN_RANGE_C = 0.95;
 var MAX_RANGE_C = 1.05;
 var AXIS_TEXT_Y = 12;
+var EVENT_COLOR_MAP = {
+    'return': '#2ca02c',
+    'call': '#d62728',
+    'line': '#1f77b4',
+};
 
 /** Renders memory usage graph. */
 function renderMemoryStats(data, parent) {
@@ -30,8 +35,8 @@ function renderMemoryStats(data, parent) {
     .append("g")
     .attr("transform", "translate(" + MARGIN_LEFT + "," + MARGIN_TOP + ")");
 
-  var yRange = d3.extent(data.memoryStats, function(d) { return d[1]; });
-  var srcLines = data.memoryStats.map(function(d) { return d[0]; });
+  var yRange = d3.extent(data.codeEvents, function(d) { return d[2]; });
+  var srcLines = data.codeEvents.map(function(d) { return d[0]; });
   var xScale = d3.scale.ordinal()
     .domain(srcLines)
     .rangeRoundBands([0, WIDTH]);
@@ -44,7 +49,7 @@ function renderMemoryStats(data, parent) {
     .orient('left');
 
   var barGroups = canvas.selectAll('.bar')
-    .data(data.memoryStats)
+    .data(data.codeEvents)
     .enter()
     .append('g');
 
@@ -53,26 +58,26 @@ function renderMemoryStats(data, parent) {
 
   // Draw memory bars.
   barGroups.append('rect')
-    .attr('class', 'bar rect-normal')
+    .attr('class', 'memory-bar-normal')
     .attr("x", function(d) { return xScale(d[0]); })
     .attr("width", xScale.rangeBand())
-    .attr("y", function(d) { return yScale(d[1]); })
-    .attr("height", function(d) { return HEIGHT - yScale(d[1]); })
+    .attr("y", function(d) { return yScale(d[2]); })
+    .attr("height", function(d) { return HEIGHT - yScale(d[2]); })
+    .attr('fill', function(d) { return EVENT_COLOR_MAP[d[3]]; })
     .on('mouseover', function(d) {
       d3.select(this)
-        .attr('class', 'bar rect-highlight');
-      var functionName = d[0][2].replace('<', '[').replace('>',  ']');
+        .attr('class', 'memory-bar-highlight');
+      var functionName = d[4].replace('<', '[').replace('>',  ']');
       tooltip.attr('class', 'tooltip tooltip-visible')
-        .html('<p>Location: ' + d[0][0] + '</p>' +
-              '<p>Line number: ' + d[0][1] + '</p>' +
+        .html('<p>Line number: ' + d[1] + '</p>' +
+              '<p>Event type: ' + d[3] + '</p>' +
               '<p>Function name: ' + functionName + '</p>' +
-              '<p>Memory usage: ' + d[1] + ' MB</p>'
-              )
+              '<p>Memory usage: ' + d[2] + ' MB</p>')
         .style('left', d3.event.pageX)
         .style('top', d3.event.pageY);
     })
     .on('mouseout', function(d) {
-      d3.select(this).attr('class', 'bar rect-normal');
+      d3.select(this).attr('class', 'memory-bar-normal');
       tooltip.attr('class', 'tooltip tooltip-invisible');
     });
 

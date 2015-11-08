@@ -98,3 +98,11 @@ p {
   margin: 0px;
   text-align: left;
 }
+
+.memory-bar-normal {
+  opacity: 0.85;
+}
+
+.memory-bar-hightlight {
+  opacity: 0.5;
+}
