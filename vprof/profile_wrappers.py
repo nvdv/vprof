@@ -133,6 +133,9 @@ class CodeEventsTracker(object):
         self._all_code = set()
         self.events_list = deque()
         self._original_trace_function = sys.gettrace()
+        self._prev_line = None
+        self._prev_event = None
+        self._prev_memory = None
 
     def add_code(self, code):
         """Recursively adds all code to be examined."""
@@ -155,8 +158,24 @@ class CodeEventsTracker(object):
         if (event in ('line', 'call', 'return') and
                 frame.f_code in self._all_code):
             curr_memory = memory_profiler._get_memory(-1)  #pylint: disable=W0212
-            self.events_list.append(
-                (frame.f_lineno, curr_memory, event, frame.f_code.co_name))
+            if not self.events_list:
+                self.events_list.append(
+                    [frame.f_lineno, curr_memory, event, frame.f_code.co_name])
+            else:
+                if (event == self._prev_event and
+                        frame.f_code.co_name == self._prev_line):
+                    # If memory consumption is greater on the
+                    # same line - update it.
+                    if not curr_memory == self._prev_memory:
+                        curr_memory = max(curr_memory, self._prev_memory)
+                        self.events_list[-1][1] = curr_memory
+                else:
+                    self.events_list.append(
+                        [frame.f_lineno, curr_memory,
+                         event, frame.f_code.co_name])
+            self._prev_line = frame.f_code.co_name
+            self._prev_event = event
+            self._prev_memory = curr_memory
         return self.trace_memory_usage
 
 
