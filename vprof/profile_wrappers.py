@@ -2,14 +2,22 @@
 import abc
 import cProfile
 import inspect
-import memory_profiler
 import multiprocessing
 import os
 import pstats
+import psutil
 import sys
 
 from collections import defaultdict
 from collections import deque
+
+_BYTES_IN_MB = 1024 * 1024
+
+
+def get_memory_usage():
+    """Returns memory usage for current process."""
+    memory_info = psutil.Process(os.getpid()).memory_info()
+    return float(memory_info.rss) / _BYTES_IN_MB
 
 
 class BaseProfile(object):
@@ -157,7 +165,8 @@ class CodeEventsTracker(object):
         """Tracks memory usage when certain events occur."""
         if (event in ('line', 'call', 'return') and
                 frame.f_code in self._all_code):
-            curr_memory = memory_profiler._get_memory(-1)  #pylint: disable=W0212
+            curr_memory = get_memory_usage()
+            # curr_memory = memory_profiler._get_memory(-1)
             if not self.events_list:
                 self.events_list.append(
                     [frame.f_lineno, curr_memory, event, frame.f_code.co_name])

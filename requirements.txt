@@ -1,1 +1,1 @@
-memory_profiler>=0.33
+psutil
