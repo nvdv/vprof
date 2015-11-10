@@ -166,7 +166,6 @@ class CodeEventsTracker(object):
         if (event in ('line', 'call', 'return') and
                 frame.f_code in self._all_code):
             curr_memory = get_memory_usage()
-            # curr_memory = memory_profiler._get_memory(-1)
             if not self.events_list:
                 self.events_list.append(
                     [frame.f_lineno, curr_memory, event, frame.f_code.co_name])
