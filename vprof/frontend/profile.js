@@ -47,7 +47,7 @@ function getTimePercentage_(cumTime, totalTime) {
 function renderLegend_(parent, data) {
   parent.append('div')
     .attr('class', 'legend')
-    .html('<p>Program name: ' + data.programName + '</p>' +
+    .html('<p>Filename: ' + data.programName + '</p>' +
           '<p>Total runtime: ' + data.runTime + 's</p>' +
           '<p>Total calls: ' + data.totalCalls + '</p>' +
           '<p>Primitive calls: ' + data.primitiveCalls + '</p>')

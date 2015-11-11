@@ -231,3 +231,4 @@ class MemoryProfile(BaseProfile):
         run_stats['codeEvents'] = [
             (i + 1, lineno, memory, event, fname)
             for i, (lineno, memory, event, fname) in enumerate(prof.events_list)]
+        run_stats['totalEvents'] = len(prof.events_list)

@@ -18,11 +18,23 @@ var WIDTH = window.innerWidth * SCALE - MARGIN_TOP - MARGIN_BOTTOM;
 var MIN_RANGE_C = 0.95;
 var MAX_RANGE_C = 1.05;
 var AXIS_TEXT_Y = 12;
+var LEGEND_X = WIDTH - 350;
+var LEGEND_Y = 100;
 var EVENT_COLOR_MAP = {
     'return': '#2ca02c',
     'call': '#d62728',
     'line': '#1f77b4',
 };
+
+/** Renders memory stats legend. */
+function renderLegend_(parent, data) {
+  parent.append('div')
+    .attr('class', 'legend')
+    .html('<p>Filename: ' + data.programName + '</p>' +
+          '<p>Total events: ' + data.totaEvents + '</p>')
+    .style('left', LEGEND_X)
+    .style('top', LEGEND_Y);
+}
 
 /** Renders memory usage graph. */
 function renderMemoryStats(data, parent) {
@@ -55,6 +67,8 @@ function renderMemoryStats(data, parent) {
 
   var tooltip = chart.append('div')
     .attr('class', 'tooltip tooltip-invisible');
+
+  renderLegend_(chart, data);
 
   // Draw memory bars.
   barGroups.append('rect')
