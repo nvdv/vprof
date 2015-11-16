@@ -1,6 +1,8 @@
 """Module with profile wrappers."""
 import abc
 import cProfile
+import cStringIO
+import gc
 import inspect
 import multiprocessing
 import os
@@ -12,6 +14,7 @@ from collections import defaultdict
 from collections import deque
 
 _BYTES_IN_MB = 1024 * 1024
+_GC_ID = 'gc'
 
 
 def get_memory_usage():
@@ -144,6 +147,9 @@ class CodeEventsTracker(object):
         self._prev_line = None
         self._prev_event = None
         self._prev_memory = None
+        self._stderr = None
+        self._gc_stats = None
+        self._redirect_file = cStringIO.StringIO()
 
     def add_code(self, code):
         """Recursively adds all code to be examined."""
@@ -152,23 +158,79 @@ class CodeEventsTracker(object):
             for subcode in filter(inspect.iscode, code.co_consts):
                 self.add_code(subcode)
 
+    def _parse_gc_stats(self, lines, gc_line_numbers):
+        """Parses available stderr text lines and returns parsed GC stats.
+
+        GC output has specific structure such as:
+            gc: collecting generation 0...
+            gc: objects in each generation: 699 2064 8470
+            gc: done, 6 unreachable, 0 uncollectable, 0.0002s elapsed.
+        This method parses available stderr lines according to this structure
+        and returns parsed GC stats.
+
+        Args:
+            lines: all available stderr lines.
+            gc_line_numbers: line numbers of gc output in lines.
+        """
+        result_stats = []
+        for i in range(0, len(gc_line_numbers), 3):
+            summary_line = lines[gc_line_numbers[i] + 2].split()
+            unreachable = summary_line[2] if len(summary_line) >= 3 else ''
+            uncollectable = summary_line[4] if len(summary_line) >= 5 else ''
+            time_elapsed = summary_line[-2]
+            result_stats.append({
+                'objInGenerations': lines[i + 1].split()[-3:],
+                'unreachable': unreachable,
+                'uncollectable': uncollectable,
+                'timeElapsed': time_elapsed,
+            })
+        return result_stats
+
+    def _find_gc_line_numbers(self, lines):
+        """Returns numbers of lines with garbage collector output."""
+        return [i for i, line in enumerate(lines) if _GC_ID in line]
+
+    def _process_gc_output(self):
+        """Processes redirected stderr output and returns parsed GC stats."""
+        stderr_output = self._redirect_file.getvalue()
+        gc_output = []
+        if stderr_output:
+            stderr_lines = stderr_output.split('\n')
+            gc_line_numbers = self._find_gc_line_numbers(stderr_lines)
+            if gc_line_numbers:
+                gc_output = self._parse_gc_stats(stderr_lines, gc_line_numbers)
+                self._redirect_file.truncate(0)
+        return gc_output
+
     def __enter__(self):
         """Sets custom trace function."""
-        sys.settrace(self.trace_memory_usage)
+        sys.settrace(self._trace_memory_usage)
+        self._stderr = sys.stderr
+        gc.set_debug(gc.DEBUG_STATS)
+        sys.stderr = self._redirect_file
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tbf):
         """Resets original trace function."""
+        gc.set_debug(0)
         sys.settrace(self._original_trace_function)
+        sys.stderr = self._stderr
 
-    def trace_memory_usage(self, frame, event, arg):  #pylint: disable=W0613
+    def _trace_memory_usage(self, frame, event, arg):  #pylint: disable=W0613
         """Tracks memory usage when certain events occur."""
+        # TODO(nvdv): Refactor this method.
         if (event in ('line', 'call', 'return') and
                 frame.f_code in self._all_code):
             curr_memory = get_memory_usage()
+            gc_stats = self._process_gc_output()
+            # Don't overwrite existing non-written stats with empty stats
+            if gc_stats:
+                self._gc_stats = gc_stats
             if not self.events_list:
                 self.events_list.append(
-                    [frame.f_lineno, curr_memory, event, frame.f_code.co_name])
+                    [frame.f_lineno, curr_memory, event,
+                     frame.f_code.co_name, self._gc_stats])
+                self._gc_stats = None
             else:
                 if (event == self._prev_event and
                         frame.f_code.co_name == self._prev_line):
@@ -180,11 +242,12 @@ class CodeEventsTracker(object):
                 else:
                     self.events_list.append(
                         [frame.f_lineno, curr_memory,
-                         event, frame.f_code.co_name])
+                         event, frame.f_code.co_name, self._gc_stats])
+                    self._gc_stats = None
             self._prev_line = frame.f_code.co_name
             self._prev_event = event
             self._prev_memory = curr_memory
-        return self.trace_memory_usage
+        return self._trace_memory_usage
 
 
 class MemoryProfile(BaseProfile):
@@ -229,6 +292,7 @@ class MemoryProfile(BaseProfile):
             pass
         run_stats['programName'] = self._program_name
         run_stats['codeEvents'] = [
-            (i + 1, lineno, memory, event, fname)
-            for i, (lineno, memory, event, fname) in enumerate(prof.events_list)]
+            (i + 1, lineno, mem, e, fname, gc_stats)
+            for i, (lineno, mem, e, fname, gc_stats)
+            in enumerate(prof.events_list)]
         run_stats['totalEvents'] = len(prof.events_list)
