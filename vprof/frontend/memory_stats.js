@@ -25,15 +25,34 @@ var EVENT_COLOR_MAP = {
     'call': '#d62728',
     'line': '#1f77b4',
 };
+var PATTERN_WIDTH = 5;
+var PATTERN_HEIGHT = 5;
 
 /** Renders memory stats legend. */
 function renderLegend_(parent, data) {
   parent.append('div')
     .attr('class', 'legend')
     .html('<p>Filename: ' + data.programName + '</p>' +
-          '<p>Total events: ' + data.totaEvents + '</p>')
+          '<p>Total events: ' + data.totalEvents + '</p>')
     .style('left', LEGEND_X)
     .style('top', LEGEND_Y);
+}
+
+/** Processes GC stats and returns them as formatted string. */
+function processGCStats_(stats) {
+  var result = '';
+  if (stats) {
+    result += '<p>GC runs: ' + stats.length + '</p>';
+    for (var i = 0; i < stats.length; i++) {
+      result += (
+          '<p>Run:' + (i + 1) + '</p>' +
+          '<p>Objects in generations: ' + stats[i].objInGenerations + '</p>'+
+          '<p>Time elapsed: ' + stats[i].timeElapsed + '</p>' +
+          '<p>Uncollectable: ' + stats[i].uncollectable + '</p>' +
+          '<p>Unreachable: ' + stats[i].unreachable + '</p>');
+    }
+  }
+  return result;
 }
 
 /** Renders memory usage graph. */
@@ -46,6 +65,16 @@ function renderMemoryStats(data, parent) {
     .attr('height', HEIGHT + MARGIN_TOP + MARGIN_BOTTOM)
     .append("g")
     .attr("transform", "translate(" + MARGIN_LEFT + "," + MARGIN_TOP + ")");
+
+  canvas.append('defs')
+    .append('pattern')
+    .attr('id', 'diagFill')
+    .attr('patternUnits', 'userSpaceOnUse')
+    .attr('width', PATTERN_WIDTH)
+    .attr('height', PATTERN_HEIGHT)
+    .append('path')
+    .attr('d', 'M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2')
+    .attr('stroke', '#000000');
 
   var yRange = d3.extent(data.codeEvents, function(d) { return d[2]; });
   var srcLines = data.codeEvents.map(function(d) { return d[0]; });
@@ -77,16 +106,18 @@ function renderMemoryStats(data, parent) {
     .attr("width", xScale.rangeBand())
     .attr("y", function(d) { return yScale(d[2]); })
     .attr("height", function(d) { return HEIGHT - yScale(d[2]); })
-    .attr('fill', function(d) { return EVENT_COLOR_MAP[d[3]]; })
+    .attr('fill', function(d) {
+        return d[5] ? 'url(#diagFill)' : EVENT_COLOR_MAP[d[3]]; })
     .on('mouseover', function(d) {
       d3.select(this)
         .attr('class', 'memory-bar-highlight');
       var functionName = d[4].replace('<', '[').replace('>',  ']');
+      var gcStats = processGCStats_(d[5]);
       tooltip.attr('class', 'tooltip tooltip-visible')
         .html('<p>Line number: ' + d[1] + '</p>' +
               '<p>Event type: ' + d[3] + '</p>' +
               '<p>Function name: ' + functionName + '</p>' +
-              '<p>Memory usage: ' + d[2] + ' MB</p>')
+              '<p>Memory usage: ' + d[2] + ' MB</p>' + gcStats)
         .style('left', d3.event.pageX)
         .style('top', d3.event.pageY);
     })
