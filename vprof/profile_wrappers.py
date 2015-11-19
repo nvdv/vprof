@@ -140,6 +140,8 @@ class RuntimeProfile(BaseProfile):
 class CodeEventsTracker(object):
     """Tracks specified events during code execution."""
 
+    _GC_EVENT = 'gc'
+
     def __init__(self):
         self._all_code = set()
         self.events_list = deque()
@@ -148,7 +150,6 @@ class CodeEventsTracker(object):
         self._prev_event = None
         self._prev_memory = None
         self._stderr = None
-        self._gc_stats = None
         self._redirect_file = cStringIO.StringIO()
 
     def add_code(self, code):
@@ -218,19 +219,16 @@ class CodeEventsTracker(object):
 
     def _trace_memory_usage(self, frame, event, arg):  #pylint: disable=W0613
         """Tracks memory usage when certain events occur."""
-        # TODO(nvdv): Refactor this method.
         if (event in ('line', 'call', 'return') and
                 frame.f_code in self._all_code):
             curr_memory = get_memory_usage()
             gc_stats = self._process_gc_output()
-            # Don't overwrite existing non-written stats with empty stats
             if gc_stats:
-                self._gc_stats = gc_stats
+                self.events_list.append(
+                    [frame.f_lineno, curr_memory, self._GC_EVENT, gc_stats])
             if not self.events_list:
                 self.events_list.append(
-                    [frame.f_lineno, curr_memory, event,
-                     frame.f_code.co_name, self._gc_stats])
-                self._gc_stats = None
+                    [frame.f_lineno, curr_memory, event, frame.f_code.co_name])
             else:
                 if (event == self._prev_event and
                         frame.f_code.co_name == self._prev_line):
@@ -240,10 +238,8 @@ class CodeEventsTracker(object):
                         curr_memory = max(curr_memory, self._prev_memory)
                         self.events_list[-1][1] = curr_memory
                 else:
-                    self.events_list.append(
-                        [frame.f_lineno, curr_memory,
-                         event, frame.f_code.co_name, self._gc_stats])
-                    self._gc_stats = None
+                    self.events_list.append([frame.f_lineno, curr_memory, event,
+                                             frame.f_code.co_name])
             self._prev_line = frame.f_code.co_name
             self._prev_event = event
             self._prev_memory = curr_memory
@@ -292,7 +288,6 @@ class MemoryProfile(BaseProfile):
             pass
         run_stats['programName'] = self._program_name
         run_stats['codeEvents'] = [
-            (i + 1, lineno, mem, e, fname, gc_stats)
-            for i, (lineno, mem, e, fname, gc_stats)
-            in enumerate(prof.events_list)]
+            (i + 1, lineno, mem, e, fname)
+            for i, (lineno, mem, e, fname) in enumerate(prof.events_list)]
         run_stats['totalEvents'] = len(prof.events_list)

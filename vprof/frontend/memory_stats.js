@@ -24,9 +24,9 @@ var EVENT_COLOR_MAP = {
     'return': '#2ca02c',
     'call': '#d62728',
     'line': '#1f77b4',
+    'gc': '#ff7f0e',
 };
-var PATTERN_WIDTH = 5;
-var PATTERN_HEIGHT = 5;
+var GC_EVENT = 'gc';
 
 /** Renders memory stats legend. */
 function renderLegend_(parent, data) {
@@ -55,6 +55,19 @@ function processGCStats_(stats) {
   return result;
 }
 
+/** Processes stats from other events and returns them as formatted string. */
+function processOtherEvents_(stats) {
+  var result = '';
+  if (stats) {
+    var functionName = stats[4].replace('<', '[').replace('>',  ']');
+    result += ('<p>Line number: ' + stats[1] + '</p>' +
+               '<p>Event type: ' + stats[3] + '</p>' +
+               '<p>Function name: ' + functionName + '</p>' +
+               '<p>Memory usage: ' + stats[2] + ' MB</p>');
+  }
+  return result;
+}
+
 /** Renders memory usage graph. */
 function renderMemoryStats(data, parent) {
   var chart =  parent.append('div')
@@ -65,16 +78,6 @@ function renderMemoryStats(data, parent) {
     .attr('height', HEIGHT + MARGIN_TOP + MARGIN_BOTTOM)
     .append("g")
     .attr("transform", "translate(" + MARGIN_LEFT + "," + MARGIN_TOP + ")");
-
-  canvas.append('defs')
-    .append('pattern')
-    .attr('id', 'diagFill')
-    .attr('patternUnits', 'userSpaceOnUse')
-    .attr('width', PATTERN_WIDTH)
-    .attr('height', PATTERN_HEIGHT)
-    .append('path')
-    .attr('d', 'M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2')
-    .attr('stroke', '#000000');
 
   var yRange = d3.extent(data.codeEvents, function(d) { return d[2]; });
   var srcLines = data.codeEvents.map(function(d) { return d[0]; });
@@ -106,18 +109,14 @@ function renderMemoryStats(data, parent) {
     .attr("width", xScale.rangeBand())
     .attr("y", function(d) { return yScale(d[2]); })
     .attr("height", function(d) { return HEIGHT - yScale(d[2]); })
-    .attr('fill', function(d) {
-        return d[5] ? 'url(#diagFill)' : EVENT_COLOR_MAP[d[3]]; })
+    .attr('fill', function(d) { return EVENT_COLOR_MAP[d[3]]; })
     .on('mouseover', function(d) {
       d3.select(this)
         .attr('class', 'memory-bar-highlight');
-      var functionName = d[4].replace('<', '[').replace('>',  ']');
-      var gcStats = processGCStats_(d[5]);
+      var tooltipText = d[3] == GC_EVENT ?
+        processGCStats_(d[4]) : processOtherEvents_(d);
       tooltip.attr('class', 'tooltip tooltip-visible')
-        .html('<p>Line number: ' + d[1] + '</p>' +
-              '<p>Event type: ' + d[3] + '</p>' +
-              '<p>Function name: ' + functionName + '</p>' +
-              '<p>Memory usage: ' + d[2] + ' MB</p>' + gcStats)
+        .html(tooltipText)
         .style('left', d3.event.pageX)
         .style('top', d3.event.pageY);
     })
