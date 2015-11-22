@@ -14,7 +14,6 @@ from collections import defaultdict
 from collections import deque
 
 _BYTES_IN_MB = 1024 * 1024
-_GC_ID = 'gc'
 
 
 def get_memory_usage():
@@ -175,12 +174,13 @@ class CodeEventsTracker(object):
         """
         result_stats = []
         for i in range(0, len(gc_line_numbers), 3):
-            summary_line = lines[gc_line_numbers[i] + 2].split()
-            unreachable = summary_line[2] if len(summary_line) >= 3 else ''
+            line_number = gc_line_numbers[i]
+            summary_line = lines[line_number + 2].split()
+            unreachable = summary_line[2] if len(summary_line) >= 5 else ''
             uncollectable = summary_line[4] if len(summary_line) >= 5 else ''
             time_elapsed = summary_line[-2]
             result_stats.append({
-                'objInGenerations': lines[i + 1].split()[-3:],
+                'objInGenerations': lines[line_number + 1].split()[-3:],
                 'unreachable': unreachable,
                 'uncollectable': uncollectable,
                 'timeElapsed': time_elapsed,
@@ -189,13 +189,14 @@ class CodeEventsTracker(object):
 
     def _find_gc_line_numbers(self, lines):
         """Returns numbers of lines with garbage collector output."""
-        return [i for i, line in enumerate(lines) if _GC_ID in line]
+        return [i for i, line in enumerate(lines) if self._GC_EVENT in line]
 
     def _process_gc_output(self):
         """Processes redirected stderr output and returns parsed GC stats."""
         stderr_output = self._redirect_file.getvalue()
         gc_output = []
         if stderr_output:
+            print(stderr_output)
             stderr_lines = stderr_output.split('\n')
             gc_line_numbers = self._find_gc_line_numbers(stderr_lines)
             if gc_line_numbers:
@@ -225,7 +226,7 @@ class CodeEventsTracker(object):
             gc_stats = self._process_gc_output()
             if gc_stats:
                 self.events_list.append(
-                    [frame.f_lineno, curr_memory, self._GC_EVENT, gc_stats])
+                    [0, curr_memory, self._GC_EVENT, gc_stats])
             if not self.events_list:
                 self.events_list.append(
                     [frame.f_lineno, curr_memory, event, frame.f_code.co_name])
