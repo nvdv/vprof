@@ -196,7 +196,6 @@ class CodeEventsTracker(object):
         stderr_output = self._redirect_file.getvalue()
         gc_output = []
         if stderr_output:
-            print(stderr_output)
             stderr_lines = stderr_output.split('\n')
             gc_line_numbers = self._find_gc_line_numbers(stderr_lines)
             if gc_line_numbers:

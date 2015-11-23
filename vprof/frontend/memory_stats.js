@@ -47,9 +47,13 @@ function processGCStats_(stats) {
       result += (
           '<p>Run:' + (i + 1) + '</p>' +
           '<p>Objects in generations: ' + stats[i].objInGenerations + '</p>'+
-          '<p>Time elapsed: ' + stats[i].timeElapsed + '</p>' +
-          '<p>Uncollectable: ' + stats[i].uncollectable + '</p>' +
-          '<p>Unreachable: ' + stats[i].unreachable + '</p>');
+          '<p>Time elapsed: ' + stats[i].timeElapsed + '</p>');
+      if (stats[i].uncollectable) {
+        result += '<p>Uncollectable: ' + stats[i].uncollectable + '</p>';
+      }
+      if (stats[i].unreachable) {
+        result += '<p>Unreachable: ' + stats[i].unreachable + '</p>';
+      }
     }
   }
   return result;
@@ -83,7 +87,7 @@ function renderMemoryStats(data, parent) {
   var srcLines = data.codeEvents.map(function(d) { return d[0]; });
   var xScale = d3.scale.ordinal()
     .domain(srcLines)
-    .rangeRoundBands([0, WIDTH]);
+    .rangeBands([0, WIDTH]);
   var yScale = d3.scale.linear()
     .domain([MIN_RANGE_C * yRange[0], MAX_RANGE_C * yRange[1]])
     .range([HEIGHT, 0]);
