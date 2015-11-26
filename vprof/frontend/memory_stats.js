@@ -27,6 +27,8 @@ var EVENT_COLOR_MAP = {
     'gc': '#ff7f0e',
 };
 var GC_EVENT = 'gc';
+var ZOOM_DURATION = 250;
+var NUMBARS_ZOOM = 100;
 
 /** Renders memory stats legend. */
 function renderLegend_(parent, data) {
@@ -107,7 +109,7 @@ function renderMemoryStats(data, parent) {
   renderLegend_(chart, data);
 
   // Draw memory bars.
-  barGroups.append('rect')
+  var bars = barGroups.append('rect')
     .attr('class', 'memory-bar-normal')
     .attr("x", function(d) { return xScale(d[0]); })
     .attr("width", xScale.rangeBand())
@@ -128,6 +130,24 @@ function renderMemoryStats(data, parent) {
       d3.select(this).attr('class', 'memory-bar-normal');
       tooltip.attr('class', 'tooltip tooltip-invisible');
     });
+
+  // Zoom in.
+  bars.on('click', function(d, i) {
+    xScale.domain(srcLines.slice(i, i + 1 + NUMBARS_ZOOM));
+    bars.transition()
+      .duration(ZOOM_DURATION)
+      .attr("x", function(d) { return xScale(d[0]); })
+      .attr("width", xScale.rangeBand());
+  });
+
+  // Zoom out.
+  chart.on('dblclick', function(d) {
+    xScale.domain(srcLines);
+    bars.transition()
+      .duration(ZOOM_DURATION)
+    .attr("x", function(d) { return xScale(d[0]); })
+    .attr("width", xScale.rangeBand());
+  });
 
   canvas.append('g')
     .attr('class', 'axis')
