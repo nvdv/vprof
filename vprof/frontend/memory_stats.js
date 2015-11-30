@@ -133,11 +133,14 @@ function renderMemoryStats(data, parent) {
 
   // Zoom in.
   bars.on('click', function(d, i) {
-    xScale.domain(srcLines.slice(i, i + 1 + NUMBARS_ZOOM));
+    var range = srcLines.slice(i, i + 1 + NUMBARS_ZOOM);
+    xScale.domain(range);
     bars.transition()
       .duration(ZOOM_DURATION)
       .attr("x", function(d) { return xScale(d[0]); })
-      .attr("width", xScale.rangeBand());
+      .attr("width", xScale.rangeBand())
+      .style('display', function(d) {
+          return range.indexOf(d[0]) == -1 ? 'none' : 'block'; });
   });
 
   // Zoom out.
@@ -146,7 +149,8 @@ function renderMemoryStats(data, parent) {
     bars.transition()
       .duration(ZOOM_DURATION)
     .attr("x", function(d) { return xScale(d[0]); })
-    .attr("width", xScale.rangeBand());
+    .attr("width", xScale.rangeBand())
+    .attr('display', 'block');
   });
 
   canvas.append('g')
