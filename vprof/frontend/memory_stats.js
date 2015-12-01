@@ -150,7 +150,7 @@ function renderMemoryStats(data, parent) {
       .duration(ZOOM_DURATION)
     .attr("x", function(d) { return xScale(d[0]); })
     .attr("width", xScale.rangeBand())
-    .attr('display', 'block');
+    .style('display', 'block');
   });
 
   canvas.append('g')
