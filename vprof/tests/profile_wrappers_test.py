@@ -60,7 +60,7 @@ _CALL_GRAPH = {
 }
 
 
-class CProfileUnittest(unittest.TestCase):
+class RuntimeProfileUnittest(unittest.TestCase):
     def setUp(self):
         self._profile = object.__new__(profile_wrappers.RuntimeProfile)
 
@@ -99,6 +99,12 @@ class MemoryProfileUnittest(unittest.TestCase):
 class CodeEventsTrackerUnittest(unittest.TestCase):
     def setUp(self):
         self._tracker = object.__new__(profile_wrappers.CodeEventsTracker)
+
+    def testAddCode(self):
+        code = mock.MagicMock()
+        self._tracker._all_code = set()
+        self._tracker.add_code(code)
+        self.assertIn(code, self._tracker._all_code)
 
     def testParseGCStats(self):
         lines = [
@@ -145,3 +151,27 @@ class CodeEventsTrackerUnittest(unittest.TestCase):
         input_lines = ['gc: foo', 'gc: bar', 'baz', 'gc: ooo']
         self.assertListEqual(
             self._tracker._find_gc_line_numbers(input_lines), [0, 1, 3])
+
+    def testProcessGCOutput(self):
+        stderr_text = (
+            'foobar\n'
+            'gc: collecting generation 0...\n'
+            'gc: objects in each generation: 699 2064 8470\n'
+            'gc: done, 6 unreachable, 0 uncollectable, 0.0002s elapsed.\n'
+            'bazbazbazbazbazbazbazbazbaz\n'
+            'gc: collecting generation 1...\n'
+            'gc: objects in each generation: 699 2064 8470\n'
+            'gc: done, 6 unreachable, 0 uncollectable, 0.0002s elapsed.\n')
+        self._tracker._redirect_file = mock.MagicMock()
+        self._tracker._redirect_file.getvalue.return_value = stderr_text
+        result = self._tracker._process_gc_output()
+        self.assertListEqual(result,
+                             [{'objInGenerations': ['699', '2064', '8470'],
+                               'timeElapsed': '0.0002s',
+                               'uncollectable': '0',
+                               'unreachable': '6' },
+                              {'objInGenerations': ['699', '2064', '8470'],
+                               'uncollectable': '0',
+                               'timeElapsed': '0.0002s',
+                               'unreachable': '6',
+                               'timeElapsed': '0.0002s'},])

@@ -1,4 +1,4 @@
-"""Visual profiler for Python."""
+"""Main module for visual profiler."""
 import argparse
 import profile_wrappers
 import stats_server
@@ -39,7 +39,7 @@ def main():
         print('Running %s...' % curr_profiler.__class__.__name__)
         program_stats[option] = curr_profiler.run()
     sys.stderr = open(os.devnull, "w")
-    print('Starting stats server...')
+    print('Starting HTTP server...')
     stats_server.start(_HOST, _PORT, program_stats)
 
 if __name__ == "__main__":

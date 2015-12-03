@@ -1,4 +1,4 @@
-"""Module with profile wrappers."""
+"""Profile wrappers."""
 import abc
 import cProfile
 import cStringIO
@@ -32,13 +32,13 @@ class BaseProfile(object):
 
     @abc.abstractmethod
     def collect_stats(self, run_stats):
-        """Collects profile stats and adds them to run_stats dict."""
+        """Collects stats and inserts them into run_stats dict."""
         pass
 
     def run(self):
-        """Runs profile and returns profile stats.
+        """Runs profile and returns collected stats.
 
-        Runs profiler in separate process to ensure result independence.
+        Runs profiler in separate process to ensure correct stats collection.
         """
         result_stats = multiprocessing.Manager().dict()  #pylint: disable=E1101
         subprocess = multiprocessing.Process(
@@ -49,7 +49,7 @@ class BaseProfile(object):
 
 
 class RuntimeProfile(BaseProfile):
-    """Class that contains CProfile stats processing logic.
+    """CProfile wrapper.
 
     This class contains all logic related to cProfile run, stats collection
     and processing. All function call info is contained in stats.Pstats, all
@@ -58,7 +58,7 @@ class RuntimeProfile(BaseProfile):
     """
 
     def __init__(self, program_name):  #pylint: disable=W0231
-        """Initializes cProfile wrapper.
+        """Initializes wrapper.
 
         Args:
             program_name: Name of the program to profile.
@@ -66,7 +66,7 @@ class RuntimeProfile(BaseProfile):
         self._program_name = program_name
 
     def _build_callees(self, stats):
-        """Extracts call tree from cProfile stats."""
+        """Extracts call tree from pstats.Stats."""
         callees = defaultdict(list)
         for func, (_, _, _, _, callers) in stats.iteritems():
             for caller in callers:
@@ -74,11 +74,11 @@ class RuntimeProfile(BaseProfile):
         return callees
 
     def _build_call_tree(self, node, callees, stats, seen=set()):  #pylint: disable=W0102
-        """Builds call tree from callees tree and cProfile stats.
+        """Builds call tree from callees tree and pstats.Stats.
 
         Args:
-            node: Call to build tree from.
-            callees: Calless tree with call dependencies.
+            node: Current call tree node.
+            callees: Callees tree with call dependencies.
             stats: Profile stats.
             seen: Set to track previously seen nodes to handle recursion.
         Returns:
@@ -100,7 +100,7 @@ class RuntimeProfile(BaseProfile):
         }
 
     def _transform_stats(self, stats):
-        """Converts stats from cProfile format to call tree format."""
+        """Converts stats from pststs.Stats format to call nested dict."""
 
         def _statcmp(stat):
             """Comparator by cummulative time."""
@@ -137,7 +137,11 @@ class RuntimeProfile(BaseProfile):
 
 
 class CodeEventsTracker(object):
-    """Tracks specified events during code execution."""
+    """Tracks specified events during code execution.
+
+    Class that contains all logic related to measuring memory usage after
+    specified events occur during Python program execution.
+    """
 
     _GC_EVENT = 'gc'
 
@@ -152,25 +156,26 @@ class CodeEventsTracker(object):
         self._redirect_file = cStringIO.StringIO()
 
     def add_code(self, code):
-        """Recursively adds all code to be examined."""
+        """Recursively adds code to be examined."""
         if code not in self._all_code:
             self._all_code.add(code)
             for subcode in filter(inspect.iscode, code.co_consts):
                 self.add_code(subcode)
 
     def _parse_gc_stats(self, lines, gc_line_numbers):
-        """Parses available stderr text lines and returns parsed GC stats.
+        """Parses available STDERR text lines and returns parsed GC stats.
 
         GC output has specific structure such as:
             gc: collecting generation 0...
             gc: objects in each generation: 699 2064 8470
             gc: done, 6 unreachable, 0 uncollectable, 0.0002s elapsed.
-        This method parses available stderr lines according to this structure
+
+        This method parses available STDERR lines according to this structure
         and returns parsed GC stats.
 
         Args:
-            lines: all available stderr lines.
-            gc_line_numbers: line numbers of gc output in lines.
+            lines: specified lines from STDERR.
+            gc_line_numbers: line numbers with GC output in lines variable.
         """
         result_stats = []
         for i in range(0, len(gc_line_numbers), 3):
@@ -188,11 +193,11 @@ class CodeEventsTracker(object):
         return result_stats
 
     def _find_gc_line_numbers(self, lines):
-        """Returns numbers of lines with garbage collector output."""
+        """Returns line numbers with GC output."""
         return [i for i, line in enumerate(lines) if self._GC_EVENT in line]
 
     def _process_gc_output(self):
-        """Processes redirected stderr output and returns parsed GC stats."""
+        """Processes redirected STDERR output and returns parsed GC stats."""
         stderr_output = self._redirect_file.getvalue()
         gc_output = []
         if stderr_output:
@@ -204,7 +209,7 @@ class CodeEventsTracker(object):
         return gc_output
 
     def __enter__(self):
-        """Sets custom trace function."""
+        """Enables events tracker."""
         sys.settrace(self._trace_memory_usage)
         self._stderr = sys.stderr
         gc.set_debug(gc.DEBUG_STATS)
@@ -212,13 +217,13 @@ class CodeEventsTracker(object):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tbf):
-        """Resets original trace function."""
+        """Disables events tracker."""
         gc.set_debug(0)
         sys.settrace(self._original_trace_function)
         sys.stderr = self._stderr
 
     def _trace_memory_usage(self, frame, event, arg):  #pylint: disable=W0613
-        """Tracks memory usage when certain events occur."""
+        """Tracks memory usage when specified events occur."""
         if (event in ('line', 'call', 'return') and
                 frame.f_code in self._all_code):
             curr_memory = get_memory_usage()
@@ -232,9 +237,8 @@ class CodeEventsTracker(object):
             else:
                 if (event == self._prev_event and
                         frame.f_code.co_name == self._prev_line):
-                    # If memory consumption is greater on the
-                    # same line - update it.
-                    if not curr_memory == self._prev_memory:
+                    # Update if memory consumption is greater on the same line.
+                    if curr_memory != self._prev_memory:
                         curr_memory = max(curr_memory, self._prev_memory)
                         self.events_list[-1][1] = curr_memory
                 else:
@@ -247,13 +251,13 @@ class CodeEventsTracker(object):
 
 
 class MemoryProfile(BaseProfile):
-    """Class that contains memory profiler stats processing logic.
+    """Memory profiler wrapper.
 
-    Runs memory profiler and extracts collected info from code_map.
+    Runs memory profiler and processes all obtained stats.
     """
 
     def __init__(self, program_name):  #pylint: disable=W0231
-        """Initializes memory profile wrapper.
+        """Initializes wrapper.
 
         Args:
             program_name: Name of the program to profile.
@@ -261,7 +265,6 @@ class MemoryProfile(BaseProfile):
         self._program_name = program_name
 
     def _transform_stats(self, code_stats):
-        """Converts stats from memory_profiler format."""
         memory_stats = []
         for code, lines in code_stats.items():
             for line, usage in lines.items():

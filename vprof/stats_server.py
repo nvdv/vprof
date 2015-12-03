@@ -1,4 +1,4 @@
-"""Profile stats server."""
+"""Program stats server."""
 import functools
 import json
 import os
@@ -12,12 +12,12 @@ _PROFILE_HTML = '%s/profile.html' % _STATIC_DIR
 
 
 class _StatsServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
-    """Multithreaded HTTP stats server."""
+    """Declares Multithreaded HTTP server."""
     allow_reuse_address = True
 
 
 class StatsHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
-    """Profile stats request handler."""
+    """Program stats request handler."""
     ROOT_URI = '/'
     PROFILE_URI = '/profile'
 
@@ -28,7 +28,7 @@ class StatsHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             self, *args, **kwargs)
 
     def do_GET(self):
-        """Handles HTTP GET request."""
+        """Handles HTTP GET requests."""
         if self.path == self.ROOT_URI:
             res_filename = os.path.dirname(__file__) + '/' + _PROFILE_HTML
             with open(res_filename) as res_file:
@@ -65,7 +65,7 @@ def start(host, port, profile_stats):
     Args:
         host: Server hostname.
         port: Server port.
-        profile_stats: Dictionary with progran stats.
+        profile_stats: Dict with collected progran stats.
     """
     stats_handler = functools.partial(
         StatsHandler, profile_stats)
