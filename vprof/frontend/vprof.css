@@ -17,7 +17,7 @@ body {
   border-radius: 5px 5px 0px 0px;
   cursor: pointer;
   display: inline-block;
-  padding: 5 50px;
+  padding: 3 50px;
 }
 
 .selected {
