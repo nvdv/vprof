@@ -1,8 +1,8 @@
 """Main module for visual profiler."""
 import argparse
+import os
 import profile_wrappers
 import stats_server
-import os
 import sys
 
 _MODULE_DESC = 'Python visual profiler.'

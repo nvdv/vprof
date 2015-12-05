@@ -27,7 +27,7 @@ class StatsHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         SimpleHTTPServer.SimpleHTTPRequestHandler.__init__(
             self, *args, **kwargs)
 
-    def do_GET(self):
+    def do_GET(self):   #pylint: disable=C0103
         """Handles HTTP GET requests."""
         if self.path == self.ROOT_URI:
             res_filename = os.path.dirname(__file__) + '/' + _PROFILE_HTML

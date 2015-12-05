@@ -1,5 +1,5 @@
 /**
- * Renders time profile.
+ * Renders flame chart.
  */
 
 /* jshint strict: false, browser: true, globalstrict: true */
@@ -43,7 +43,7 @@ function getTimePercentage_(cumTime, totalTime) {
   return 100 * Math.round(cumTime / totalTime * 1000) / 1000;
 }
 
-/** Renders profile legend. */
+/** Renders flame chart legend. */
 function renderLegend_(parent, data) {
   parent.append('div')
     .attr('class', 'legend')
@@ -56,8 +56,8 @@ function renderLegend_(parent, data) {
 }
 
 // TODO (nvdv): Split this function.
-/** Renders profile flame chart. */
-function renderProfile(data, parent) {
+/** Renders flame chart. */
+function renderFlameChart(data, parent) {
   var chart =  parent.append('div')
     .attr('class', 'chart');
 
@@ -176,5 +176,6 @@ function renderProfile(data, parent) {
 module.exports = {
   'getNodeName_': getNodeName_,
   'getTruncatedNodeName_': getTruncatedNodeName_,
-  'renderProfile': renderProfile,
+  'getTimePercentage_': getTimePercentage_,
+  'renderFlameChart': renderFlameChart,
 };

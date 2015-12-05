@@ -153,6 +153,7 @@ function renderMemoryStats(data, parent) {
     .style('display', 'block');
   });
 
+  // Draw axis.
   canvas.append('g')
     .attr('class', 'axis')
     .call(yAxis)
@@ -165,4 +166,5 @@ function renderMemoryStats(data, parent) {
 
 module.exports = {
   'renderMemoryStats': renderMemoryStats,
+  'processGCStats_': processGCStats_
 };

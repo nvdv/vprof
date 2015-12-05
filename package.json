@@ -10,7 +10,9 @@
     "karma": "latest",
     "karma-jasmine": "latest",
     "karma-phantomjs-launcher": "latest",
-    "karma-browserify": "latest"
+    "karma-browserify": "latest",
+    "phantomjs": "latest",
+    "jasmine-core": "latest"
   },
   "scripts": {
     "lint": "jshint vprof/frontend/*.js",
