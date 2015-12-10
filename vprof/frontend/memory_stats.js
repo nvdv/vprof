@@ -21,8 +21,6 @@ var AXIS_TEXT_Y = 12;
 var LEGEND_X = WIDTH - 350;
 var LEGEND_Y = 100;
 var EVENT_COLOR_MAP = {
-    'return': '#2ca02c',
-    'call': '#d62728',
     'line': '#1f77b4',
     'gc': '#ff7f0e',
 };
@@ -67,7 +65,6 @@ function processOtherEvents_(stats) {
   if (stats) {
     var functionName = stats[4].replace('<', '[').replace('>',  ']');
     result += ('<p>Line number: ' + stats[1] + '</p>' +
-               '<p>Event type: ' + stats[3] + '</p>' +
                '<p>Function name: ' + functionName + '</p>' +
                '<p>Memory usage: ' + stats[2] + ' MB</p>');
   }

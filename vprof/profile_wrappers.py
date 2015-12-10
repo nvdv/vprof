@@ -224,8 +224,7 @@ class CodeEventsTracker(object):
 
     def _trace_memory_usage(self, frame, event, arg):  #pylint: disable=W0613
         """Tracks memory usage when specified events occur."""
-        if (event in ('line', 'call', 'return') and
-                frame.f_code in self._all_code):
+        if event == 'line' and frame.f_code in self._all_code:
             curr_memory = get_memory_usage()
             gc_stats = self._process_gc_output()
             if gc_stats:
