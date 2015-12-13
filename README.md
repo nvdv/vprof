@@ -12,7 +12,6 @@ dev_requirements.txt.
 ## Installation
 To install vprof, clone this repository and execute
 
-
     make install
 
 To install vprof dependencies:
