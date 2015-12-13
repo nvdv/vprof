@@ -6,7 +6,9 @@ addons:
     packages:
       - npm
 
-install: make deps_install
+install:
+  pip install pylint
+  make deps_install
 script: 
   make lint
   make test
