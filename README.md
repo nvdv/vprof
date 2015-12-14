@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/nvdv/vprof.svg?branch=master)](https://travis-ci.org/nvdv/vprof)
+
 # vprof
 
 vprof is a Python package providing rich and interactive visualizations for
