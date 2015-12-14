@@ -7,8 +7,8 @@ addons:
       - npm
 
 install:
-  pip install pylint
-  make deps_install
+  - pip install pylint
+  - make deps_install
 script: 
-  make lint
-  make test
+  - make lint
+  - make test
