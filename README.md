@@ -7,10 +7,16 @@ various Python program characteristics such as running time and memory usage.
 The project is in active development and some of it's features might not work as
 expected. It currently supports Python 2.7 and distributed under BSD license.
 
+## Screenshots
+
+![flame-chart](https://github.com/nvdv/vprof/raw/master/img/flame_chart.png)
+![memory-stats](https://github.com/nvdv/vprof/raw/master/img/memory_stats.png)
+
 ## Dependencies
 The required dependencies to build vprof are npm and Python 2. All Python
 and npm module dependencies are listed in package.json, requirements.txt and
 dev_requirements.txt.
+
 ## Installation
 To install vprof, clone this repository and execute
 
@@ -23,7 +29,6 @@ To install vprof dependencies:
 and
 
     make devdeps_install
-
 
 ## Usage
 Currently vprof supports running time (via flame chart) and memory usage
