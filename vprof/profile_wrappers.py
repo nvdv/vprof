@@ -2,7 +2,6 @@
 import abc
 import cProfile
 import cStringIO
-import gc
 import inspect
 import multiprocessing
 import os
@@ -143,8 +142,6 @@ class CodeEventsTracker(object):
     specified events occur during Python program execution.
     """
 
-    _GC_EVENT = 'gc'
-
     def __init__(self):
         self._all_code = set()
         self.events_list = deque()
@@ -162,63 +159,15 @@ class CodeEventsTracker(object):
             for subcode in filter(inspect.iscode, code.co_consts):
                 self.add_code(subcode)
 
-    def _parse_gc_stats(self, lines, gc_line_numbers):
-        """Parses available STDERR text lines and returns parsed GC stats.
-
-        GC output has specific structure such as:
-            gc: collecting generation 0...
-            gc: objects in each generation: 699 2064 8470
-            gc: done, 6 unreachable, 0 uncollectable, 0.0002s elapsed.
-
-        This method parses available STDERR lines according to this structure
-        and returns parsed GC stats.
-
-        Args:
-            lines: specified lines from STDERR.
-            gc_line_numbers: line numbers with GC output in lines variable.
-        """
-        result_stats = []
-        for i in range(0, len(gc_line_numbers), 3):
-            line_number = gc_line_numbers[i]
-            summary_line = lines[line_number + 2].split()
-            unreachable = summary_line[2] if len(summary_line) >= 5 else ''
-            uncollectable = summary_line[4] if len(summary_line) >= 5 else ''
-            time_elapsed = summary_line[-2]
-            result_stats.append({
-                'objInGenerations': lines[line_number + 1].split()[-3:],
-                'unreachable': unreachable,
-                'uncollectable': uncollectable,
-                'timeElapsed': time_elapsed,
-            })
-        return result_stats
-
-    def _find_gc_line_numbers(self, lines):
-        """Returns line numbers with GC output."""
-        return [i for i, line in enumerate(lines) if self._GC_EVENT in line]
-
-    def _process_gc_output(self):
-        """Processes redirected STDERR output and returns parsed GC stats."""
-        stderr_output = self._redirect_file.getvalue()
-        gc_output = []
-        if stderr_output:
-            stderr_lines = stderr_output.split('\n')
-            gc_line_numbers = self._find_gc_line_numbers(stderr_lines)
-            if gc_line_numbers:
-                gc_output = self._parse_gc_stats(stderr_lines, gc_line_numbers)
-                self._redirect_file.truncate(0)
-        return gc_output
-
     def __enter__(self):
         """Enables events tracker."""
         sys.settrace(self._trace_memory_usage)
         self._stderr = sys.stderr
-        gc.set_debug(gc.DEBUG_STATS)
         sys.stderr = self._redirect_file
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tbf):
         """Disables events tracker."""
-        gc.set_debug(0)
         sys.settrace(self._original_trace_function)
         sys.stderr = self._stderr
 
@@ -226,10 +175,6 @@ class CodeEventsTracker(object):
         """Tracks memory usage when specified events occur."""
         if event == 'line' and frame.f_code in self._all_code:
             curr_memory = get_memory_usage()
-            gc_stats = self._process_gc_output()
-            if gc_stats:
-                self.events_list.append(
-                    [0, curr_memory, self._GC_EVENT, gc_stats])
             if not self.events_list:
                 self.events_list.append(
                     [frame.f_lineno, curr_memory, event, frame.f_code.co_name])

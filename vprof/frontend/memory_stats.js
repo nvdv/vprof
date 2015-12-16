@@ -22,9 +22,7 @@ var LEGEND_X = WIDTH - 350;
 var LEGEND_Y = 100;
 var EVENT_COLOR_MAP = {
     'line': '#1f77b4',
-    'gc': '#ff7f0e',
 };
-var GC_EVENT = 'gc';
 var ZOOM_DURATION = 250;
 var NUMBARS_ZOOM = 100;
 
@@ -36,27 +34,6 @@ function renderLegend_(parent, data) {
           '<p>Total events: ' + data.totalEvents + '</p>')
     .style('left', LEGEND_X)
     .style('top', LEGEND_Y);
-}
-
-/** Processes GC stats and returns them as formatted string. */
-function processGCStats_(stats) {
-  var result = '';
-  if (stats) {
-    result += '<p>GC runs: ' + stats.length + '</p>';
-    for (var i = 0; i < stats.length; i++) {
-      result += (
-          '<p>Run:' + (i + 1) + '</p>' +
-          '<p>Objects in generations: ' + stats[i].objInGenerations + '</p>'+
-          '<p>Time elapsed: ' + stats[i].timeElapsed + '</p>');
-      if (stats[i].uncollectable) {
-        result += '<p>Uncollectable: ' + stats[i].uncollectable + '</p>';
-      }
-      if (stats[i].unreachable) {
-        result += '<p>Unreachable: ' + stats[i].unreachable + '</p>';
-      }
-    }
-  }
-  return result;
 }
 
 /** Processes stats from other events and returns them as formatted string. */
@@ -116,8 +93,7 @@ function renderMemoryStats(data, parent) {
     .on('mouseover', function(d) {
       d3.select(this)
         .attr('class', 'memory-bar-highlight');
-      var tooltipText = d[3] == GC_EVENT ?
-        processGCStats_(d[4]) : processOtherEvents_(d);
+      var tooltipText = processOtherEvents_(d);
       tooltip.attr('class', 'tooltip tooltip-visible')
         .html(tooltipText)
         .style('left', d3.event.pageX)
@@ -163,5 +139,4 @@ function renderMemoryStats(data, parent) {
 
 module.exports = {
   'renderMemoryStats': renderMemoryStats,
-  'processGCStats_': processGCStats_
 };
