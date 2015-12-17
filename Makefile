@@ -1,4 +1,4 @@
-all: lint test deps_install install
+all: lint test deps_install install clean
 
 .PHONY: test
 test:
