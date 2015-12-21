@@ -238,3 +238,12 @@ class MemoryProfile(BaseProfile):
             (i + 1, lineno, mem, e, fname)
             for i, (lineno, mem, e, fname) in enumerate(prof.events_list)]
         run_stats['totalEvents'] = len(prof.events_list)
+
+    def run(self):
+        """Runs profile and returns collected stats.
+
+        Runs memory stats collection in current process to avoid copy-on-write.
+        """
+        memory_stats = {}
+        self.collect_stats(memory_stats)
+        return memory_stats
