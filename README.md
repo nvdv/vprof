@@ -18,7 +18,11 @@ and npm module dependencies are listed in package.json, requirements.txt and
 dev_requirements.txt.
 
 ## Installation
-To install vprof, clone this repository and execute
+vprof can be installed from PyPI
+
+    pip intall vprof
+
+To install current dev version, clone this repository and execute
 
     make install
 
