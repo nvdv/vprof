@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='vprof',
-    version='0.10a',
+    version='0.10.0',
     packages=['vprof'],
     description="Visual profiler for Python",
     url='http://github.com/nvdv/vprof',
