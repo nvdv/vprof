@@ -1,4 +1,6 @@
 from setuptools import setup
+from pip.req import parse_requirements
+from pip.download import PipSession
 
 setup(
     name='vprof',
@@ -23,5 +25,8 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Topic :: Software Development',
+    ],
+    install_requires=[
+        str(req.req) for req in parse_requirements("requirements.txt", session=PipSession())
     ],
 )
