@@ -6,6 +6,7 @@ vprof is a Python package providing rich and interactive visualizations for
 various Python program characteristics such as running time and memory usage.
 The project is in active development and some of it's features might not work as
 expected. It currently supports Python 2.7 and distributed under BSD license.
+Python 3 support is experimental.
 
 ## Screenshots
 

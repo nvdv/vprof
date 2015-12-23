@@ -1,6 +1,7 @@
 """Main test module."""
 import unittest
-import profile_wrappers_test
+
+from vprof.tests import profile_wrappers_test
 
 
 if __name__ == '__main__':

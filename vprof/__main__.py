@@ -1,9 +1,11 @@
 """Main module for visual profiler."""
 import argparse
 import os
-import profile_wrappers
-import stats_server
 import sys
+
+from vprof import profile_wrappers
+from vprof import stats_server
+
 
 _MODULE_DESC = 'Python visual profiler.'
 _HOST = 'localhost'

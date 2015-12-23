@@ -2,21 +2,30 @@
 import functools
 import json
 import os
-import SimpleHTTPServer
-import SocketServer
 import subprocess
 import sys
+
+# For Python 2 and Python 3 compatibility.
+try:
+    import SimpleHTTPServer as http_server
+except ImportError:
+    import http.server as http_server
+
+try:
+    import SocketServer as socketserver
+except ImportError:
+    import socketserver
 
 _STATIC_DIR = 'frontend'
 _PROFILE_HTML = '%s/profile.html' % _STATIC_DIR
 
 
-class _StatsServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
+class _StatsServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     """Declares Multithreaded HTTP server."""
     allow_reuse_address = True
 
 
-class StatsHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
+class StatsHandler(http_server.SimpleHTTPRequestHandler):
     """Program stats request handler."""
     ROOT_URI = '/'
     PROFILE_URI = '/profile'
@@ -24,7 +33,7 @@ class StatsHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     def __init__(self, profile_json, *args, **kwargs):
         self._profile_json = profile_json
         # Since this class is old-style - call parent method directly.
-        SimpleHTTPServer.SimpleHTTPRequestHandler.__init__(
+        http_server.SimpleHTTPRequestHandler.__init__(
             self, *args, **kwargs)
 
     def do_GET(self):   #pylint: disable=C0103
@@ -48,7 +57,11 @@ class StatsHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         self._send_response(
             200, headers=(('Content-type', '%s; charset=utf-8' % content_type),
                           ('Content-Length', len(output))))
-        self.wfile.write(output)
+        # Convert to bytes for Python 3.
+        if sys.version_info[0] >= 3:
+            self.wfile.write(bytes(output, 'utf-8'))
+        else:
+            self.wfile.write(output)
 
     def _send_response(self, http_code, message=None, headers=None):
         """Sends HTTP response code, message and headers."""

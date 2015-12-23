@@ -1,14 +1,13 @@
 import collections
 import copy
-import mock
 import vprof.profile_wrappers as profile_wrappers
 import unittest
 
-
-class AbstractProfileUnittest(unittest.TestCase):
-    def testAbstractness(self):
-        self.assertRaises(TypeError, profile_wrappers.BaseProfile)
-
+# For Python 2 and Python 3 compatibility.
+try:
+    import mock
+except ImportError:
+    from unittest import mock
 
 _RUN_STATS = {
     ('testscript.py', 1, 'prod'): (1, 10, 7e-06, 7e-06, {

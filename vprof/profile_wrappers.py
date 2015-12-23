@@ -1,7 +1,6 @@
 """Profile wrappers."""
 import abc
 import cProfile
-import cStringIO
 import inspect
 import multiprocessing
 import os
@@ -11,6 +10,13 @@ import sys
 
 from collections import defaultdict
 from collections import deque
+
+# For Python 2 and Python 3 compatibility.
+try:
+    import cStringIO as io
+except ImportError:
+    import io
+
 
 _BYTES_IN_MB = 1024 * 1024
 
@@ -67,7 +73,7 @@ class RuntimeProfile(BaseProfile):
     def _build_callees(self, stats):
         """Extracts call tree from pstats.Stats."""
         callees = defaultdict(list)
-        for func, (_, _, _, _, callers) in stats.iteritems():
+        for func, (_, _, _, _, callers) in sorted(stats.items()):
             for caller in callers:
                 callees[caller].append(func)
         return callees
@@ -108,7 +114,7 @@ class RuntimeProfile(BaseProfile):
 
         stats.calc_callees()
         callees = self._build_callees(stats.stats)
-        root, _ = max(stats.stats.iteritems(), key=_statcmp)
+        root, _ = max(stats.stats.items(), key=_statcmp)
         return self._build_call_tree(root, callees, stats.stats)
 
     def collect_stats(self, run_stats):
@@ -150,7 +156,7 @@ class CodeEventsTracker(object):
         self._prev_event = None
         self._prev_memory = None
         self._stderr = None
-        self._redirect_file = cStringIO.StringIO()
+        self._redirect_file = io.StringIO()
 
     def add_code(self, code):
         """Recursively adds code to be examined."""
