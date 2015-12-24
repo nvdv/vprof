@@ -3,6 +3,7 @@ import argparse
 import os
 import sys
 
+from collections import OrderedDict
 from vprof import profile_wrappers
 from vprof import stats_server
 
@@ -36,7 +37,7 @@ def main():
             sys.exit(2)
 
     sys.argv[:] = args.source
-    program_name, program_stats = args.source[0], {}
+    program_name, program_stats = args.source[0], OrderedDict()
     for option in args.profilers:
         curr_profiler = _PROFILE_MAP[option](program_name)
         print('Running %s...' % curr_profiler.__class__.__name__)
