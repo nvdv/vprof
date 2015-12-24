@@ -9,7 +9,6 @@ from vprof import stats_server
 
 _MODULE_DESC = 'Python visual profiler.'
 _HOST = 'localhost'
-_PORT = 8000
 
 _PROFILE_MAP = {
     'c': profile_wrappers.RuntimeProfile,
@@ -23,6 +22,8 @@ def main():
                         help='Profilers configuration')
     parser.add_argument('source', metavar='src', nargs=1,
                         help='Python program to profile.')
+    parser.add_argument('--port', dest='port', default=8000, type=int,
+                        help='Internal webserver port.')
     args = parser.parse_args()
 
     if len(args.profilers) > len(set(args.profilers)):
@@ -42,7 +43,7 @@ def main():
         program_stats[option] = curr_profiler.run()
     sys.stderr = open(os.devnull, "w")
     print('Starting HTTP server...')
-    stats_server.start(_HOST, _PORT, program_stats)
+    stats_server.start(_HOST, args.port, program_stats)
 
 if __name__ == "__main__":
     main()
