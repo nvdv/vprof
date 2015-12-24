@@ -21,7 +21,7 @@ dev_requirements.txt.
 ## Installation
 vprof can be installed from PyPI
 
-    pip intall vprof
+    pip install vprof
 
 To install current dev version, clone this repository and execute
 
