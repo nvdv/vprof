@@ -2,7 +2,7 @@
 
 # vprof
 
-vprof is a Python package providing rich and interactive visualizations for
+```vprof``` is a Python package providing rich and interactive visualizations for
 various Python program characteristics such as running time and memory usage.
 The project is in active development and some of it's features might not work as
 expected. It currently supports Python 2.7 and distributed under BSD license.
@@ -13,21 +13,26 @@ Python 3 support is experimental.
 ![flame-chart](https://github.com/nvdv/vprof/raw/master/img/flame_chart.png)
 ![memory-stats](https://github.com/nvdv/vprof/raw/master/img/memory_stats.png)
 
+## Prerequisites
+The required dependencies to build ```vprof``` from source code:
+ * Python 2.7, Python 3.4 or Python 3.5
+ * ```pip```
+ * ```npm```
+
 ## Dependencies
-The required dependencies to build vprof are npm and Python 2. All Python
-and npm module dependencies are listed in package.json, requirements.txt and
+All Python and ```npm``` module dependencies are listed in package.json, requirements.txt and
 dev_requirements.txt.
 
 ## Installation
-vprof can be installed from PyPI
+```vprof``` can be installed from PyPI
 
-    pip intall vprof
+    pip install vprof
 
 To install current dev version, clone this repository and execute
 
     make install
 
-To install vprof dependencies:
+To install vprof dependencies run
 
     make deps_install
 
@@ -36,13 +41,13 @@ and
     make devdeps_install
 
 ## Usage
-Currently vprof supports running time (via flame chart) and memory usage
+Currently ```vprof``` supports running time (via flame chart) and memory usage
 visualization.
-In order to get flame chart for specified Python program execute
+In order to get flame chart for specified Python program run
 
     vprof c <test_script>
 
-vprof will run test_script and open flame chart in new tab of default web
+```vprof``` will run <test_script> and open flame chart in new tab of default web
 browser.
 
 Memory stats visualization can be obtained by executing
