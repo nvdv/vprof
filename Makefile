@@ -13,9 +13,6 @@ deps_install:
 	npm install
 	pip install -r requirements.txt
 
-devdeps_install:
-	pip install -r dev_requirements.txt
-
 lint:
 	npm run lint
 	pylint --reports=n --rcfile=pylint.rc vprof/*.py

@@ -17,11 +17,10 @@ Python 3 support is experimental.
 The required dependencies to build ```vprof``` from source code:
  * Python 2.7, Python 3.4 or Python 3.5
  * ```pip```
- * ```npm```
+ * ```npm``` >= 3.3.12
 
 ## Dependencies
-All Python and ```npm``` module dependencies are listed in package.json, requirements.txt and
-dev_requirements.txt.
+All Python and ```npm``` module dependencies are listed in package.json and requirements.txt.
 
 ## Installation
 ```vprof``` can be installed from PyPI
@@ -32,13 +31,10 @@ To install current dev version, clone this repository and execute
 
     make install
 
-To install vprof dependencies run
+To install just ```vprof``` dependencies run
 
     make deps_install
 
-and
-
-    make devdeps_install
 
 ## Usage
 Currently ```vprof``` supports running time (via flame chart) and memory usage
