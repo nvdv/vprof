@@ -1,5 +1,4 @@
 """Profile wrappers."""
-import abc
 import cProfile
 import inspect
 import multiprocessing
@@ -29,16 +28,18 @@ def get_memory_usage():
 
 class BaseProfile(object):
     """Base class for profile wrapper."""
-    __metaclass__ = abc.ABCMeta
 
-    @abc.abstractmethod
-    def __init__(self):
-        pass
+    def __init__(self, program_name):  #pylint: disable=W0231
+        """Initializes wrapper.
 
-    @abc.abstractmethod
+        Args:
+            program_name: Name of the program to profile.
+        """
+        self._program_name = program_name
+
     def collect_stats(self, run_stats):
         """Collects stats and inserts them into run_stats dict."""
-        pass
+        raise NotImplementedError
 
     def run(self):
         """Runs profile and returns collected stats.
@@ -61,14 +62,6 @@ class RuntimeProfile(BaseProfile):
     we have to do is to run cProfile and build call tree from resulting
     pstats.Stats.
     """
-
-    def __init__(self, program_name):  #pylint: disable=W0231
-        """Initializes wrapper.
-
-        Args:
-            program_name: Name of the program to profile.
-        """
-        self._program_name = program_name
 
     def _build_callees(self, stats):
         """Extracts call tree from pstats.Stats."""
@@ -206,14 +199,6 @@ class MemoryProfile(BaseProfile):
     Runs memory profiler and processes all obtained stats.
     """
 
-    def __init__(self, program_name):  #pylint: disable=W0231
-        """Initializes wrapper.
-
-        Args:
-            program_name: Name of the program to profile.
-        """
-        self._program_name = program_name
-
     def _transform_stats(self, code_stats):
         memory_stats = []
         for code, lines in code_stats.items():
@@ -230,20 +215,20 @@ class MemoryProfile(BaseProfile):
             '__package__': None,
         }
         sys.path.insert(0, os.path.dirname(self._program_name))
-        prof = CodeEventsTracker()
         try:
             with open(self._program_name, 'rb') as srcfile,\
                 CodeEventsTracker() as prof:
                 code = compile(srcfile.read(), self._program_name, 'exec')
                 prof.add_code(code)
                 exec(code, globs, None)
+                events_list = prof.events_list
         except SystemExit:
             pass
         run_stats['programName'] = self._program_name
         run_stats['codeEvents'] = [
             (i + 1, lineno, mem, e, fname)
-            for i, (lineno, mem, e, fname) in enumerate(prof.events_list)]
-        run_stats['totalEvents'] = len(prof.events_list)
+            for i, (lineno, mem, e, fname) in enumerate(events_list)]
+        run_stats['totalEvents'] = len(events_list)
 
     def run(self):
         """Runs profile and returns collected stats.
@@ -253,3 +238,67 @@ class MemoryProfile(BaseProfile):
         memory_stats = {}
         self.collect_stats(memory_stats)
         return memory_stats
+
+
+class CodeHeatmapCalculator(object):
+    """Calculates Python code heatmap.
+
+    Class that contains all logic related to calculating execution heatmap
+    for Python program.
+    """
+
+    def __init__(self):
+        self._all_code = set()
+        self._original_trace_function = sys.gettrace()
+        self.heatmap = defaultdict(int)
+
+    def add_code(self, code):
+        """Recursively adds code to be examined."""
+        if code not in self._all_code:
+            self._all_code.add(code)
+            for subcode in filter(inspect.iscode, code.co_consts):
+                self.add_code(subcode)
+
+    def __enter__(self):
+        """Enables heatmap calculator."""
+        sys.settrace(self._calc_heatmap)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tbf):
+        """Disables heatmap calculator."""
+        sys.settrace(self._original_trace_function)
+
+    def _calc_heatmap(self, frame, event, arg):  #pylint: disable=W0613
+        """Calculates code heatmap."""
+        if event == 'line' and frame.f_code in self._all_code:
+            self.heatmap[frame.f_lineno] += 1
+        return self._calc_heatmap
+
+
+class CodeHeatmapProfile(BaseProfile):
+    """Code heatmap wrapper.
+
+    Contains all logic related to heatmap calculation and processing.
+    """
+
+    def collect_stats(self, run_stats):
+        """Calculates code heatmap for specified Python program."""
+        globs = {
+            '__file__': self._program_name,
+            '__name__': '__main__',
+            '__package__': None,
+        }
+        sys.path.insert(0, os.path.dirname(self._program_name))
+        try:
+            with open(self._program_name, 'rb') as srcfile,\
+                CodeHeatmapCalculator() as prof:
+                src_code = srcfile.read()
+                code = compile(src_code, self._program_name, 'exec')
+                prof.add_code(code)
+                exec(code, globs, None)
+                heatmap = prof.heatmap
+        except SystemExit:
+            pass
+        run_stats['programName'] = self._program_name
+        run_stats['srcCode'] = src_code
+        run_stats['heatmap'] = list(sorted(heatmap.items()))
