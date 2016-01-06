@@ -7,16 +7,18 @@
     "jshint": "latest",
     "uglify-js": "latest",
     "browserify": "latest",
+    "browserify-css": "latest",
     "karma": "latest",
     "karma-jasmine": "latest",
     "karma-phantomjs-launcher": "latest",
     "karma-browserify": "latest",
     "phantomjs": "latest",
-    "jasmine-core": "latest"
+    "jasmine-core": "latest",
+    "highlight.js": "latest"
   },
   "scripts": {
     "lint": "jshint vprof/frontend/*.js",
-    "build": "browserify vprof/frontend/main.js -o vprof/frontend/vprof.js",
+    "build": "browserify -g browserify-css vprof/frontend/main.js -o vprof/frontend/vprof.js",
     "compress": "uglifyjs vprof/frontend/vprof.js > vprof/frontend/vprof_min.js",
     "test": "karma start"
   },

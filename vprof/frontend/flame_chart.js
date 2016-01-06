@@ -122,7 +122,6 @@ function renderFlameChart(data, parent) {
       return getTruncatedNodeName_(d, nodeWidth);
     });
 
-
   // Zoom in.
   nodes.on('click', function(d) {
     xScale.domain([d.x, d.x + d.dx]);
@@ -155,10 +154,10 @@ function renderFlameChart(data, parent) {
     yScale.domain([0, 1]);
     nodes.transition()
       .duration(ZOOM_DURATION)
-    .attr('x', function(d) { return xScale(d.x); })
-    .attr('y', function(d) { return yScale(1 - d.y - d.dy); })
-    .attr('width', function(d) { return xScale(d.dx); })
-    .attr('height', function(d) { return yScale(d.dy); });
+      .attr('x', function(d) { return xScale(d.x); })
+      .attr('y', function(d) { return yScale(1 - d.y - d.dy); })
+      .attr('width', function(d) { return xScale(d.dx); })
+      .attr('height', function(d) { return yScale(d.dy); });
 
     titles.transition()
       .duration(ZOOM_DURATION)

@@ -9,6 +9,7 @@
 var d3 = require('d3');
 var flame_chart = require('./flame_chart.js');
 var memory_stats = require('./memory_stats.js');
+var code_heatmap = require('./code_heatmap.js');
 
 var JSON_URI = 'profile';
 
@@ -44,6 +45,22 @@ function createMemoryChartTab_(parent, status) {
     });
 }
 
+/** Creates code heatmap tab header with specified status and
+ *  appends it to the parent node.
+ */
+function createCodeHeatmapTab_(parent, status) {
+  parent.append('li')
+    .attr('class', status)
+    .text('Code heatmap')
+    .on('click', function(d) {
+      d3.selectAll('li')
+        .attr('class', 'not-selected');
+      d3.select(this)
+        .attr('class', 'selected');
+      showTab_('code-heatmap');
+    });
+}
+
 /** Renders whole page. */
 function renderPage(data) {
   var tabHeader = d3.select('body')
@@ -62,19 +79,33 @@ function renderPage(data) {
     .attr('id', 'memory-chart')
     .attr('style', 'display: none');
 
+  var codeHeatmap = d3.select('body')
+    .append('div')
+    .attr('class', 'code-heatmap tab-content')
+    .attr('id', 'code-heatmap')
+    .attr('style', 'display: none');
+
   // TODO(nvdv): Refactor this loop.
   var props = Object.keys(data);
   for (var i = 0; i < props.length; i++) {
     var status = (i === 0) ? 'selected' : 'not-selected';
     var display = (i === 0) ? 'block' : 'none';
-    if (props[i] == 'c') {
-      createFlameChartTab_(tabHeader, status);
-      flame_chart.renderFlameChart(data.c, flameChart);
-      flameChart.attr('style', 'display: ' + display);
-    } else if (props[i] == 'm') {
-      createMemoryChartTab_(tabHeader, status);
-      memory_stats.renderMemoryStats(data.m, memoryChart);
-      memoryChart.attr('style', 'display: ' + display);
+    switch (props[i]) {
+      case 'c':
+        createFlameChartTab_(tabHeader, status);
+        flame_chart.renderFlameChart(data.c, flameChart);
+        flameChart.attr('style', 'display: ' + display);
+        break;
+      case 'm':
+        createMemoryChartTab_(tabHeader, status);
+        memory_stats.renderMemoryStats(data.m, memoryChart);
+        memoryChart.attr('style', 'display: ' + display);
+        break;
+      case 'h':
+        createCodeHeatmapTab_(tabHeader, status);
+        code_heatmap.renderCodeHeatmap(data.h, codeHeatmap);
+        codeHeatmap.attr('style', 'display:' + display);
+        break;
     }
   }
 }

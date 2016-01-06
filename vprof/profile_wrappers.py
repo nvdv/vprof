@@ -301,4 +301,4 @@ class CodeHeatmapProfile(BaseProfile):
             pass
         run_stats['programName'] = self._program_name
         run_stats['srcCode'] = src_code
-        run_stats['heatmap'] = list(sorted(heatmap.items()))
+        run_stats['heatmap'] = heatmap

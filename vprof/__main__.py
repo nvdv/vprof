@@ -14,6 +14,7 @@ _HOST = 'localhost'
 _PROFILE_MAP = {
     'c': profile_wrappers.RuntimeProfile,
     'm': profile_wrappers.MemoryProfile,
+    'h': profile_wrappers.CodeHeatmapProfile,
 }
 
 def main():
