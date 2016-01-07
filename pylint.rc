@@ -1,3 +1,4 @@
 [MESSAGES CONTROL]
 disable=locally-disabled, no-self-use, exec-used, too-few-public-methods,
-        too-many-instance-attributes, bad-builtin, wrong-import-order
+        too-many-instance-attributes, bad-builtin, wrong-import-order,
+        superfluous-parens, import-error
