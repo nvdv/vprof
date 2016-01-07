@@ -45,9 +45,9 @@ class BaseProfile(object):
 
         Runs profiler in separate process to ensure correct stats collection.
         """
-        result_stats = multiprocessing.Manager().dict()  #pylint: disable=E1101
+        result_stats = multiprocessing.Manager().dict()
         subprocess = multiprocessing.Process(
-            target=self.collect_stats, args=(result_stats,))  #pylint: disable=E1101
+            target=self.collect_stats, args=(result_stats,))
         subprocess.start()
         subprocess.join()
         return dict(result_stats)
@@ -62,7 +62,7 @@ class RuntimeProfile(BaseProfile):
     pstats.Stats.
     """
 
-    def __init__(self, program_name):  #pylint: disable=W0231
+    def __init__(self, program_name):  #pylint: disable=super-init-not-called
         """Initializes wrapper.
 
         Args:
@@ -78,7 +78,7 @@ class RuntimeProfile(BaseProfile):
                 callees[caller].append(func)
         return callees
 
-    def _build_call_tree(self, node, callees, stats, seen=set()):  #pylint: disable=W0102
+    def _build_call_tree(self, node, callees, stats, seen=set()):  # pylint: disable=dangerous-default-value
         """Builds call tree from callees tree and pstats.Stats.
 
         Args:
@@ -177,7 +177,7 @@ class CodeEventsTracker(object):
         sys.settrace(self._original_trace_function)
         sys.stderr = self._stderr
 
-    def _trace_memory_usage(self, frame, event, arg):  #pylint: disable=W0613
+    def _trace_memory_usage(self, frame, event, arg):  #pylint: disable=unused-argument
         """Tracks memory usage when specified events occur."""
         if event == 'line' and frame.f_code in self._all_code:
             curr_memory = get_memory_usage()
@@ -206,7 +206,7 @@ class MemoryProfile(BaseProfile):
     Runs memory profiler and processes all obtained stats.
     """
 
-    def __init__(self, program_name):  #pylint: disable=W0231
+    def __init__(self, program_name):  #pylint: disable=super-init-not-called
         """Initializes wrapper.
 
         Args:
