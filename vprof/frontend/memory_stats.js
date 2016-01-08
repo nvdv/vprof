@@ -40,10 +40,10 @@ function renderLegend_(parent, data) {
 function processOtherEvents_(stats) {
   var result = '';
   if (stats) {
-    var functionName = stats[4].replace('<', '[').replace('>',  ']');
-    result += ('<p>Line number: ' + stats[1] + '</p>' +
+    var functionName = stats[3].replace('<', '[').replace('>',  ']');
+    result += ('<p>Line number: ' + stats[0] + '</p>' +
                '<p>Function name: ' + functionName + '</p>' +
-               '<p>Memory usage: ' + stats[2] + ' MB</p>');
+               '<p>Memory usage: ' + stats[1] + ' MB</p>');
   }
   return result;
 }
@@ -58,9 +58,8 @@ function renderMemoryStats(data, parent) {
     .attr('height', HEIGHT + MARGIN_TOP + MARGIN_BOTTOM)
     .append("g")
     .attr("transform", "translate(" + MARGIN_LEFT + "," + MARGIN_TOP + ")");
-
-  var yRange = d3.extent(data.codeEvents, function(d) { return d[2]; });
-  var srcLines = data.codeEvents.map(function(d) { return d[0]; });
+  var yRange = d3.extent(data.codeEvents, function(d) { return d[1]; });
+  var srcLines = data.codeEvents.map(function (_, i) { return i + 1; });
   var xScale = d3.scale.ordinal()
     .domain(srcLines)
     .rangeBands([0, WIDTH]);
@@ -85,11 +84,11 @@ function renderMemoryStats(data, parent) {
   // Draw memory bars.
   var bars = barGroups.append('rect')
     .attr('class', 'memory-bar-normal')
-    .attr("x", function(d) { return xScale(d[0]); })
+    .attr("x", function(_, i) { return xScale(i + 1); })
     .attr("width", xScale.rangeBand())
-    .attr("y", function(d) { return yScale(d[2]); })
-    .attr("height", function(d) { return HEIGHT - yScale(d[2]); })
-    .attr('fill', function(d) { return EVENT_COLOR_MAP[d[3]]; })
+    .attr("y", function(d) { return yScale(d[1]); })
+    .attr("height", function(d) { return HEIGHT - yScale(d[1]); })
+    .attr('fill', function(d) { return EVENT_COLOR_MAP[d[2]]; })
     .on('mouseover', function(d) {
       d3.select(this)
         .attr('class', 'memory-bar-highlight');
@@ -99,7 +98,7 @@ function renderMemoryStats(data, parent) {
         .style('left', d3.event.pageX)
         .style('top', d3.event.pageY);
     })
-    .on('mouseout', function(d) {
+    .on('mouseout', function(_) {
       d3.select(this).attr('class', 'memory-bar-normal');
       tooltip.attr('class', 'tooltip tooltip-invisible');
     });
@@ -110,10 +109,10 @@ function renderMemoryStats(data, parent) {
     xScale.domain(range);
     bars.transition()
       .duration(ZOOM_DURATION)
-      .attr("x", function(d) { return xScale(d[0]); })
+      .attr("x", function(_, n) { return xScale(n + 1); })
       .attr("width", xScale.rangeBand())
-      .style('display', function(d) {
-          return range.indexOf(d[0]) == -1 ? 'none' : 'block'; });
+      .style('display', function(_, n) {
+          return range.indexOf(n + 1) == -1 ? 'none' : 'block'; });
   });
 
   // Zoom out.
@@ -121,7 +120,7 @@ function renderMemoryStats(data, parent) {
     xScale.domain(srcLines);
     bars.transition()
       .duration(ZOOM_DURATION)
-    .attr("x", function(d) { return xScale(d[0]); })
+    .attr("x", function(_, n) { return xScale(n + 1); })
     .attr("width", xScale.rangeBand())
     .style('display', 'block');
   });

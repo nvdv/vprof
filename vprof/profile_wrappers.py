@@ -225,10 +225,8 @@ class MemoryProfile(BaseProfile):
         except SystemExit:
             pass
         run_stats['programName'] = self._program_name
-        run_stats['codeEvents'] = [
-            (i + 1, lineno, mem, e, fname)
-            for i, (lineno, mem, e, fname) in enumerate(events_list)]
-        run_stats['totalEvents'] = len(events_list)
+        run_stats['codeEvents'] = list(events_list)
+        run_stats['totalEvents'] = len(prof.events_list)
 
     def run(self):
         """Runs profile and returns collected stats.
