@@ -29,17 +29,24 @@ def get_memory_usage():
 class BaseProfile(object):
     """Base class for profile wrapper."""
 
-    def __init__(self, program_name):  #pylint: disable=W0231
+    def __init__(self, program_name):
         """Initializes wrapper.
 
         Args:
             program_name: Name of the program to profile.
         """
         self._program_name = program_name
+        self._globs = {
+            '__file__': self._program_name,
+            '__name__': '__main__',
+            '__package__': None,
+        }
 
     def collect_stats(self, run_stats):
-        """Collects stats and inserts them into run_stats dict."""
-        raise NotImplementedError
+        """Collects program stats and inserts them into run_stats dict."""
+        sys.path.insert(0, os.path.dirname(self._program_name))
+        stats = self.run_profiler()  # pylint: disable=no-member
+        run_stats.update(stats)
 
     def run(self):
         """Runs profile and returns collected stats.
@@ -110,28 +117,24 @@ class RuntimeProfile(BaseProfile):
         root, _ = max(stats.stats.items(), key=_statcmp)
         return self._build_call_tree(root, callees, stats.stats)
 
-    def collect_stats(self, run_stats):
+    def run_profiler(self):
         """Collects CProfile stats for specified Python program."""
-        globs = {
-            '__file__': self._program_name,
-            '__name__': '__main__',
-            '__package__': None,
-        }
-        sys.path.insert(0, os.path.dirname(self._program_name))
         prof = cProfile.Profile()
         try:
             with open(self._program_name, 'rb') as srcfile:
                 code = compile(srcfile.read(), self._program_name, 'exec')
-            prof.runctx(code, globs, None)
+            prof.runctx(code, self._globs, None)
         except SystemExit:
             pass
         prof.create_stats()
         cprofile_stats = pstats.Stats(prof)
-        run_stats['programName'] = self._program_name
-        run_stats['runTime'] = cprofile_stats.total_tt
-        run_stats['primitiveCalls'] = cprofile_stats.prim_calls
-        run_stats['totalCalls'] = cprofile_stats.total_calls
-        run_stats['callStats'] = self._transform_stats(cprofile_stats)
+        return {
+            'programName': self._program_name,
+            'runTime': cprofile_stats.total_tt,
+            'primitiveCalls': cprofile_stats.prim_calls,
+            'tatalCalls': cprofile_stats.total_calls,
+            'callStats': self._transform_stats(cprofile_stats)
+        }
 
 
 class CodeEventsTracker(object):
@@ -207,26 +210,21 @@ class MemoryProfile(BaseProfile):
                 memory_stats.append((line_id, usage))
         return memory_stats
 
-    def collect_stats(self, run_stats):
+    def run_profiler(self):
         """Collects memory stats for specified Python program."""
-        globs = {
-            '__file__': self._program_name,
-            '__name__': '__main__',
-            '__package__': None,
-        }
-        sys.path.insert(0, os.path.dirname(self._program_name))
         try:
             with open(self._program_name, 'rb') as srcfile,\
                 CodeEventsTracker() as prof:
                 code = compile(srcfile.read(), self._program_name, 'exec')
                 prof.add_code(code)
-                exec(code, globs, None)
-                events_list = prof.events_list
+                exec(code, self._globs, None)
         except SystemExit:
             pass
-        run_stats['programName'] = self._program_name
-        run_stats['codeEvents'] = list(events_list)
-        run_stats['totalEvents'] = len(prof.events_list)
+        return {
+            'programName': self._program_name,
+            'codeEvents': list(prof.events_list),
+            'totalEvents': len(prof.events_list)
+        }
 
     def run(self):
         """Runs profile and returns collected stats.
@@ -266,7 +264,7 @@ class CodeHeatmapCalculator(object):
         """Disables heatmap calculator."""
         sys.settrace(self._original_trace_function)
 
-    def _calc_heatmap(self, frame, event, arg):  #pylint: disable=W0613
+    def _calc_heatmap(self, frame, event, arg):  #pylint: disable=unused-argument
         """Calculates code heatmap."""
         if event == 'line' and frame.f_code in self._all_code:
             self.heatmap[frame.f_lineno] += 1
@@ -279,24 +277,19 @@ class CodeHeatmapProfile(BaseProfile):
     Contains all logic related to heatmap calculation and processing.
     """
 
-    def collect_stats(self, run_stats):
+    def run_profiler(self):
         """Calculates code heatmap for specified Python program."""
-        globs = {
-            '__file__': self._program_name,
-            '__name__': '__main__',
-            '__package__': None,
-        }
-        sys.path.insert(0, os.path.dirname(self._program_name))
         try:
             with open(self._program_name, 'rb') as srcfile,\
                 CodeHeatmapCalculator() as prof:
                 src_code = srcfile.read()
                 code = compile(src_code, self._program_name, 'exec')
                 prof.add_code(code)
-                exec(code, globs, None)
-                heatmap = prof.heatmap
+                exec(code, self._globs, None)
         except SystemExit:
             pass
-        run_stats['programName'] = self._program_name
-        run_stats['srcCode'] = src_code
-        run_stats['heatmap'] = heatmap
+        return {
+            'programName': self._program_name,
+            'srcCode': src_code,
+            'heatmap': prof.heatmap
+        }

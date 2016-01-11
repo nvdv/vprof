@@ -70,11 +70,19 @@ class BaseProfileUnittest(unittest.TestCase):
         filename = mock.MagicMock()
         self._profile.__init__(filename)
         self.assertEqual(self._profile._program_name, filename)
+        self.assertDictEqual(self._profile._globs, {
+            '__file__': filename,
+            '__name__': '__main__',
+            '__package__': None
+        })
 
     def testCollectStats(self):
-        with self.assertRaises(NotImplementedError):
-            run_stats = mock.MagicMock()
-            self._profile.collect_stats(run_stats)
+        result = {'foo': 'bar', 'baz': 'mno'}
+        self._profile._program_name = 'foo.py'
+        self._profile.run_profiler = mock.MagicMock(return_value=result)
+        run_stats = {}
+        self._profile.collect_stats(run_stats)
+        self.assertDictEqual(run_stats, result)
 
 
 class RuntimeProfileUnittest(unittest.TestCase):
