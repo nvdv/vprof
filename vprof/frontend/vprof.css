@@ -108,25 +108,28 @@ p {
 }
 
 .src-code {
-  background: white;
-  font-family: monospace;
-  height: 95%;
+  background: #FBFBFB;
+  font-family: "Lucida Sans Typewriter", "Lucida Console", Monaco;
+  font-size: 12px;
+  height: 100%;
   margin: 0 auto;
-  overflow-x: hidden;
-  overflow-y: scroll;
-  padding: 10px;
-  padding-top: 20px;
+  overflow-x: auto;
+  overflow-y: auto;
   white-space: pre;
   width: 50%;
 }
 
 .src-line-number {
+  background-color: #D2D7D3;
   display: table-cell;
-  width: 35px;
+  padding-right: 8px;
+  text-align: right;
+  width: 28px;
 }
 
 .src-line-code {
   display: table-cell;
+  padding-left: 5px;
 }
 
 .src-line-normal {
@@ -136,5 +139,5 @@ p {
 
 .src-line-highlight {
   display: block;
-  opacity: 0.7;
+  opacity: 0.6;
 }

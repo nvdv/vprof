@@ -11,9 +11,9 @@ var hljs = require('highlight.js');
 require('./highlight.css');  // Includes code highlighter CSS.
 
 var MIN_RUN_COUNT = 0;
-var MAX_RUN_COUNT = 1000;
-var MIN_RUN_COLOR = '#e5ffe5';
-var MAX_RUN_COLOR = '#003300';
+var MAX_RUN_COUNT = 2500;
+var MIN_RUN_COLOR = '#ebfaeb';
+var MAX_RUN_COLOR = '#00cc44';
 
 /** Adds line numbers and additional formatting since highlight.js does not
     support them. */
@@ -22,7 +22,7 @@ function postProcessCode_(srcCode) {
   for (var i = 1; i < lines.length + 1; i++) {
     lines[i - 1] = (
         "<div class='src-line-normal'>" +
-            "<div class='src-line-number'>" + i + "." + "</div>" +
+            "<div class='src-line-number'>" + i + "</div>" +
             "<div class='src-line-code'>" + lines[i - 1] + "</div>" +
         "</div>");
   }
