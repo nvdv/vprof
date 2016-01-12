@@ -15,9 +15,11 @@ body {
 
 .tab-header li {
   border-radius: 5px 5px 0px 0px;
+  font-family: 'Tahoma', Geneva, sans-serif;
+  font-size: 15px;
   cursor: pointer;
   display: inline-block;
-  padding: 3 50px;
+  padding: 3 30px;
 }
 
 .selected {
