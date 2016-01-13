@@ -8,9 +8,9 @@
 'use strict';
 var d3 = require('d3');
 
-var HEIGHT_SCALE = 0.9;
+var HEIGHT_SCALE = 0.93;
 var HEIGHT = window.innerHeight * HEIGHT_SCALE;
-var WIDTH_SCALE = 0.95;
+var WIDTH_SCALE = 0.98;
 var WIDTH = window.innerWidth * WIDTH_SCALE;
 var ZOOM_DURATION = 250;
 var TEXT_OFFSET_X = 5;
@@ -58,17 +58,14 @@ function renderLegend_(parent, data) {
 // TODO (nvdv): Split this function.
 /** Renders flame chart. */
 function renderFlameChart(data, parent) {
-  var chart =  parent.append('div')
-    .attr('class', 'chart');
-
-  var canvas = chart.append('svg')
+  var canvas = parent.append('svg')
     .attr('width', WIDTH)
     .attr('height', HEIGHT);
 
-  var tooltip = chart.append('div')
+  var tooltip = parent.append('div')
     .attr('class', 'tooltip tooltip-invisible');
 
-  renderLegend_(chart, data);
+  renderLegend_(parent, data);
 
   var flameChart = d3.layout.partition()
     .sort(null)

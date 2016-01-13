@@ -8,10 +8,10 @@
 'use strict';
 var d3 = require('d3');
 
-var MARGIN_LEFT = 50;
-var MARGIN_RIGHT = 20;
-var MARGIN_TOP = 20;
-var MARGIN_BOTTOM  = 20;
+var MARGIN_LEFT = 30;
+var MARGIN_RIGHT = 0;
+var MARGIN_TOP = 0;
+var MARGIN_BOTTOM  = 0;
 var SCALE = 0.95;
 var HEIGHT = window.innerHeight * SCALE - MARGIN_LEFT - MARGIN_RIGHT;
 var WIDTH = window.innerWidth * SCALE - MARGIN_TOP - MARGIN_BOTTOM;
@@ -50,14 +50,12 @@ function processOtherEvents_(stats) {
 
 /** Renders memory usage graph. */
 function renderMemoryStats(data, parent) {
-  var chart =  parent.append('div')
-    .attr('class', 'chart');
-
-  var canvas = chart.append('svg')
+  var canvas = parent.append('svg')
     .attr('width', WIDTH + MARGIN_LEFT + MARGIN_RIGHT)
     .attr('height', HEIGHT + MARGIN_TOP + MARGIN_BOTTOM)
     .append("g")
     .attr("transform", "translate(" + MARGIN_LEFT + "," + MARGIN_TOP + ")");
+
   var yRange = d3.extent(data.codeEvents, function(d) { return d[1]; });
   var srcLines = data.codeEvents.map(function (_, i) { return i + 1; });
   var xScale = d3.scale.ordinal()
@@ -76,10 +74,10 @@ function renderMemoryStats(data, parent) {
     .enter()
     .append('g');
 
-  var tooltip = chart.append('div')
+  var tooltip = canvas.append('div')
     .attr('class', 'tooltip tooltip-invisible');
 
-  renderLegend_(chart, data);
+  renderLegend_(canvas, data);
 
   // Draw memory bars.
   var bars = barGroups.append('rect')
@@ -116,7 +114,7 @@ function renderMemoryStats(data, parent) {
   });
 
   // Zoom out.
-  chart.on('dblclick', function(d) {
+  canvas.on('dblclick', function(d) {
     xScale.domain(srcLines);
     bars.transition()
       .duration(ZOOM_DURATION)

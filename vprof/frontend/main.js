@@ -13,6 +13,15 @@ var code_heatmap = require('./code_heatmap.js');
 
 var JSON_URI = 'profile';
 
+/** Creates empty hidden div with specified ID. */
+function createHiddenTabContent_(content_id) {
+  return d3.select('body')
+    .append('div')
+    .attr('class', 'tab-content')
+    .attr('id', content_id)
+    .attr('style', 'display: none');
+}
+
 /** Creates flame chart tab header with specified status and
  *  appends it to the parent node.
  */
@@ -67,25 +76,6 @@ function renderPage(data) {
     .append('ul')
     .attr('class', 'tab-header');
 
-  var flameChart = d3.select('body')
-    .append('div')
-    .attr('class', 'flame-chart tab-content')
-    .attr('id', 'flame-chart')
-    .attr('style', 'display: none');
-
-  var memoryChart = d3.select('body')
-    .append('div')
-    .attr('class', 'memory-chart tab-content')
-    .attr('id', 'memory-chart')
-    .attr('style', 'display: none');
-
-  var codeHeatmap = d3.select('body')
-    .append('div')
-    .attr('class', 'code-heatmap tab-content')
-    .attr('id', 'code-heatmap')
-    .attr('style', 'display: none');
-
-  // TODO(nvdv): Refactor this loop.
   var props = Object.keys(data);
   for (var i = 0; i < props.length; i++) {
     var status = (i === 0) ? 'selected' : 'not-selected';
@@ -93,18 +83,21 @@ function renderPage(data) {
     switch (props[i]) {
       case 'c':
         createFlameChartTab_(tabHeader, status);
+        var flameChart = createHiddenTabContent_('flame-chart');
         flame_chart.renderFlameChart(data.c, flameChart);
         flameChart.attr('style', 'display: ' + display);
         break;
       case 'm':
         createMemoryChartTab_(tabHeader, status);
+        var memoryChart = createHiddenTabContent_('memory-chart');
         memory_stats.renderMemoryStats(data.m, memoryChart);
         memoryChart.attr('style', 'display: ' + display);
         break;
       case 'h':
         createCodeHeatmapTab_(tabHeader, status);
+        var codeHeatmap = createHiddenTabContent_('code-heatmap');
         code_heatmap.renderCodeHeatmap(data.h, codeHeatmap);
-        codeHeatmap.attr('style', 'display:' + display);
+        codeHeatmap.attr('style', 'display: ' + display);
         break;
     }
   }
