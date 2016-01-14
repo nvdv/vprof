@@ -107,6 +107,10 @@ p {
   opacity: 0.5;
 }
 
+#code-container {
+  padding: 8px;
+}
+
 .src-code {
   background: #FBFBFB;
   font-family: "Lucida Sans Typewriter", "Lucida Console", Monaco;

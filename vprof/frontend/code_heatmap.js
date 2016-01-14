@@ -34,7 +34,10 @@ function renderCodeHeatmap(data, parent) {
   var highlightedCode = postProcessCode_(
       hljs.highlight('python', data.srcCode).value);
 
-  var codeContainer = parent.append('div')
+  var codeContainer = parent
+    .append('div')
+    .attr('id', 'code-container')
+    .append('div')
     .attr('class', 'src-code')
     .html(highlightedCode);
 
