@@ -132,7 +132,7 @@ class RuntimeProfile(BaseProfile):
             'programName': self._program_name,
             'runTime': cprofile_stats.total_tt,
             'primitiveCalls': cprofile_stats.prim_calls,
-            'tatalCalls': cprofile_stats.total_calls,
+            'totalCalls': cprofile_stats.total_calls,
             'callStats': self._transform_stats(cprofile_stats)
         }
 

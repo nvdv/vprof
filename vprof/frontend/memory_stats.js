@@ -74,10 +74,10 @@ function renderMemoryStats(data, parent) {
     .enter()
     .append('g');
 
-  var tooltip = canvas.append('div')
+  var tooltip = parent.append('div')
     .attr('class', 'tooltip tooltip-invisible');
 
-  renderLegend_(canvas, data);
+  renderLegend_(parent, data);
 
   // Draw memory bars.
   var bars = barGroups.append('rect')
