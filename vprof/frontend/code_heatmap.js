@@ -67,5 +67,6 @@ function renderCodeHeatmap(data, parent) {
 }
 
 module.exports = {
+  'postProcessCode_': postProcessCode_,
   'renderCodeHeatmap': renderCodeHeatmap,
 };

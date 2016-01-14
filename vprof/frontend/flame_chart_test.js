@@ -27,4 +27,5 @@ describe('Flame chart test suite', function() {
     expect(flame_chart.getTimePercentage_(0, 100)).toBe(0);
     expect(flame_chart.getTimePercentage_(88.8, 88.8)).toBe(100);
   });
+
 });

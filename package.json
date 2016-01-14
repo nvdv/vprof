@@ -22,5 +22,8 @@
     "compress": "uglifyjs vprof/frontend/vprof.js > vprof/frontend/vprof_min.js",
     "test": "karma start"
   },
+  "browserify": {
+      "transform": ["browserify-css"]
+  },
   "license": "BSD"
 }
