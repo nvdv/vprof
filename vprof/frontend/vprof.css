@@ -87,8 +87,10 @@ svg {
 .tooltip {
   background: white;
   border: 0px;
-  font: 12px sans-serif;
-  padding: 3px;
+  border-radius: 5px;
+  font-family: sans-serif;
+  font-size: 12px;
+  padding: 5px;
   pointer-events: none;
   position: absolute;
   text-align: center;
