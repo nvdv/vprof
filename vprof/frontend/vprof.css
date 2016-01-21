@@ -33,6 +33,16 @@ svg {
   padding: 10px;
 }
 
+.memory-graph {
+  fill: #c6dbef;
+  stroke: #6baed6;
+  stroke-width: 2px;
+}
+
+.memory-graph-dot {
+  fill: #3182bd;
+}
+
 .rect-normal {
   opacity: 0.85;
   stroke: white;

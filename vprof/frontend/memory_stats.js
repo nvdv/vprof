@@ -8,40 +8,45 @@
 'use strict';
 var d3 = require('d3');
 
-var MARGIN_LEFT = 30;
+var MARGIN_LEFT = 35;
 var MARGIN_RIGHT = 0;
-var MARGIN_TOP = 0;
-var MARGIN_BOTTOM  = 0;
+var MARGIN_TOP = 5;
+var MARGIN_BOTTOM  = 30;
 var SCALE = 0.95;
-var HEIGHT = window.innerHeight * SCALE - MARGIN_LEFT - MARGIN_RIGHT;
-var WIDTH = window.innerWidth * SCALE - MARGIN_TOP - MARGIN_BOTTOM;
+var FULL_HEIGHT = window.innerHeight * SCALE;
+var FULL_WIDTH = window.innerWidth * SCALE;
+var GRAPH_HEIGHT = FULL_HEIGHT - MARGIN_LEFT - MARGIN_RIGHT;
+var GRAPH_WIDTH = FULL_WIDTH - MARGIN_TOP - MARGIN_BOTTOM;
 var MIN_RANGE_C = 0.95;
 var MAX_RANGE_C = 1.05;
+var AXIS_TEXT_X = GRAPH_WIDTH;
 var AXIS_TEXT_Y = 12;
-var LEGEND_X = WIDTH - 350;
+var AXIS_TEXT_Y_OFFSET = 30;
+var LEGEND_X = GRAPH_WIDTH - 350;
 var LEGEND_Y = 100;
-var EVENT_COLOR_MAP = {
-    'line': '#1f77b4',
-};
 var ZOOM_DURATION = 250;
-var NUMBARS_ZOOM = 100;
+var MOUSE_X_OFFSET = 10;
+var TICKS_NUMBER = 10;
+var CIRCLE_RADIUS = 5;
+var TOOLTIP_OFFSET = 20;
 
 /** Renders memory stats legend. */
 function renderLegend_(parent, data) {
   parent.append('div')
     .attr('class', 'legend')
     .html('<p>Filename: ' + data.programName + '</p>' +
-          '<p>Total events: ' + data.totalEvents + '</p>')
+          '<p>Total lines executed: ' + data.totalEvents + '</p>')
     .style('left', LEGEND_X)
     .style('top', LEGEND_Y);
 }
 
-/** Processes stats from other events and returns them as formatted string. */
-function processOtherEvents_(stats) {
+/** Generates tooltip text from line stats. */
+function generateTooltipText_(executedLine, stats) {
   var result = '';
   if (stats) {
     var functionName = stats[3].replace('<', '[').replace('>',  ']');
-    result += ('<p>Line number: ' + stats[0] + '</p>' +
+    result += ('<p>Executed line: ' + executedLine + '</p>' +
+               '<p>Line number: ' + stats[0] + '</p>' +
                '<p>Function name: ' + functionName + '</p>' +
                '<p>Memory usage: ' + stats[1] + ' MB</p>');
   }
@@ -51,79 +56,80 @@ function processOtherEvents_(stats) {
 /** Renders memory usage graph. */
 function renderMemoryStats(data, parent) {
   var canvas = parent.append('svg')
-    .attr('width', WIDTH + MARGIN_LEFT + MARGIN_RIGHT)
-    .attr('height', HEIGHT + MARGIN_TOP + MARGIN_BOTTOM)
+    .attr('width', FULL_WIDTH)
+    .attr('height', FULL_HEIGHT)
     .append("g")
     .attr("transform", "translate(" + MARGIN_LEFT + "," + MARGIN_TOP + ")");
 
-  var yRange = d3.extent(data.codeEvents, function(d) { return d[1]; });
   var srcLines = data.codeEvents.map(function (_, i) { return i + 1; });
-  var xScale = d3.scale.ordinal()
-    .domain(srcLines)
-    .rangeBands([0, WIDTH]);
+  var xScale = d3.scale.linear()
+    .domain([srcLines[0], srcLines[srcLines.length - 1]])
+    .range([0, GRAPH_WIDTH]);
+
+  var yRange = d3.extent(data.codeEvents, function(d) { return d[1]; });
   var yScale = d3.scale.linear()
     .domain([MIN_RANGE_C * yRange[0], MAX_RANGE_C * yRange[1]])
-    .range([HEIGHT, 0]);
+    .range([GRAPH_HEIGHT, 0]);
+
+  var xAxis = d3.svg.axis()
+    .scale(xScale)
+    .ticks(Math.min(TICKS_NUMBER, srcLines.length))
+    .tickFormat(d3.format(",.0f"))
+    .orient("bottom");
 
   var yAxis = d3.svg.axis()
     .scale(yScale)
     .orient('left');
-
-  var barGroups = canvas.selectAll('.bar')
-    .data(data.codeEvents)
-    .enter()
-    .append('g');
 
   var tooltip = parent.append('div')
     .attr('class', 'tooltip tooltip-invisible');
 
   renderLegend_(parent, data);
 
-  // Draw memory bars.
-  var bars = barGroups.append('rect')
-    .attr('class', 'memory-bar-normal')
-    .attr("x", function(_, i) { return xScale(i + 1); })
-    .attr("width", xScale.rangeBand())
-    .attr("y", function(d) { return yScale(d[1]); })
-    .attr("height", function(d) { return HEIGHT - yScale(d[1]); })
-    .attr('fill', function(d) { return EVENT_COLOR_MAP[d[2]]; })
-    .on('mouseover', function(d) {
-      d3.select(this)
-        .attr('class', 'memory-bar-highlight');
-      var tooltipText = processOtherEvents_(d);
+  var memoryGraph = d3.svg.area()
+    .x(function (_, i) { return xScale(i + 1); })
+    .y0(GRAPH_HEIGHT)
+    .y1(function (d) { return yScale(d[1]); });
+
+  canvas.append('path')
+    .datum(data.codeEvents)
+    .attr('class', 'memory-graph')
+    .attr('d', memoryGraph);
+
+  var circle = canvas.append("circle")
+    .style('display', 'none')
+    .attr('class', 'memory-graph-dot')
+    .attr("r", CIRCLE_RADIUS);
+
+  canvas.style("pointer-events", "all")
+    .on("mouseover", function() { circle.style("display", null); })
+    .on("mouseout", function() { circle.style("display", "none"); })
+    .on("mousemove", function() {
+      var crds = d3.mouse(canvas.node());
+      var closestIndex = Math.round(xScale.invert(crds[0] - MOUSE_X_OFFSET));
+      var closestX = xScale(closestIndex);
+      var closestY = yScale(data.codeEvents[closestIndex - 1][1]);
+      circle.attr('transform', 'translate(' + closestX + ', ' +
+                  closestY + ')');
+      var tooltipText = generateTooltipText_(closestIndex,
+          data.codeEvents[closestIndex - 1]);
       tooltip.attr('class', 'tooltip tooltip-visible')
         .html(tooltipText)
-        .style('left', d3.event.pageX)
-        .style('top', d3.event.pageY);
-    })
-    .on('mouseout', function(_) {
-      d3.select(this).attr('class', 'memory-bar-normal');
-      tooltip.attr('class', 'tooltip tooltip-invisible');
+        .style('left', closestX)
+        .style('top', closestY - TOOLTIP_OFFSET);
     });
 
-  // Zoom in.
-  bars.on('click', function(d, i) {
-    var range = srcLines.slice(i, i + 1 + NUMBARS_ZOOM);
-    xScale.domain(range);
-    bars.transition()
-      .duration(ZOOM_DURATION)
-      .attr("x", function(_, n) { return xScale(n + 1); })
-      .attr("width", xScale.rangeBand())
-      .style('display', function(_, n) {
-          return range.indexOf(n + 1) == -1 ? 'none' : 'block'; });
-  });
+  // Draw axes.
+  canvas.append("g")
+    .attr("class", "axis")
+    .attr("transform", "translate(0," + GRAPH_HEIGHT + ")")
+    .call(xAxis)
+    .append('text')
+    .attr('x', AXIS_TEXT_X)
+    .attr('y', AXIS_TEXT_Y - AXIS_TEXT_Y_OFFSET)
+    .attr('dy', '.71em')
+    .text('Executed lines');
 
-  // Zoom out.
-  canvas.on('dblclick', function(d) {
-    xScale.domain(srcLines);
-    bars.transition()
-      .duration(ZOOM_DURATION)
-    .attr("x", function(_, n) { return xScale(n + 1); })
-    .attr("width", xScale.rangeBand())
-    .style('display', 'block');
-  });
-
-  // Draw axis.
   canvas.append('g')
     .attr('class', 'axis')
     .call(yAxis)
