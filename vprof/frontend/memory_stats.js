@@ -15,8 +15,8 @@ var MARGIN_BOTTOM  = 30;
 var SCALE = 0.95;
 var FULL_HEIGHT = window.innerHeight * SCALE;
 var FULL_WIDTH = window.innerWidth * SCALE;
-var GRAPH_HEIGHT = FULL_HEIGHT - MARGIN_LEFT - MARGIN_RIGHT;
-var GRAPH_WIDTH = FULL_WIDTH - MARGIN_TOP - MARGIN_BOTTOM;
+var GRAPH_HEIGHT = FULL_HEIGHT - (MARGIN_LEFT + MARGIN_RIGHT) * SCALE;
+var GRAPH_WIDTH = FULL_WIDTH - (MARGIN_TOP + MARGIN_BOTTOM) * SCALE;
 var MIN_RANGE_C = 0.95;
 var MAX_RANGE_C = 1.05;
 var AXIS_TEXT_X = GRAPH_WIDTH;
@@ -24,7 +24,6 @@ var AXIS_TEXT_Y = 12;
 var AXIS_TEXT_Y_OFFSET = 30;
 var LEGEND_X = GRAPH_WIDTH - 350;
 var LEGEND_Y = 100;
-var ZOOM_DURATION = 250;
 var MOUSE_X_OFFSET = 10;
 var TICKS_NUMBER = 10;
 var CIRCLE_RADIUS = 5;
@@ -104,7 +103,10 @@ function renderMemoryStats(data, parent) {
 
   canvas.style("pointer-events", "all")
     .on("mouseover", function() { circle.style("display", null); })
-    .on("mouseout", function() { circle.style("display", "none"); })
+    .on("mouseout", function() {
+      circle.style("display", "none");
+      tooltip.attr('class', 'tooltip tooltip-invisible');
+    })
     .on("mousemove", function() {
       var crds = d3.mouse(canvas.node());
       var closestIndex = Math.round(xScale.invert(crds[0] - MOUSE_X_OFFSET));
