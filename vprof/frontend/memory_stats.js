@@ -99,7 +99,8 @@ function renderMemoryStats(data, parent) {
   var circle = canvas.append("circle")
     .style('display', 'none')
     .attr('class', 'memory-graph-dot')
-    .attr("r", CIRCLE_RADIUS);
+    .attr("r", CIRCLE_RADIUS)
+    .attr('transform', 'translate(' + (-100) + ', '  + (-100) + ')');
 
   canvas.style("pointer-events", "all")
     .on("mouseover", function() { circle.style("display", null); })
