@@ -26,8 +26,10 @@ var LEGEND_X = GRAPH_WIDTH - 350;
 var LEGEND_Y = 100;
 var MOUSE_X_OFFSET = 10;
 var TICKS_NUMBER = 10;
-var CIRCLE_RADIUS = 5;
+var FOCUS_RADIUS = 5;
+var DOT_RADIUS = 3;
 var TOOLTIP_OFFSET = 20;
+var MAX_POINTS_MARKS = 80;
 
 /** Renders memory stats legend. */
 function renderLegend_(parent, data) {
@@ -95,10 +97,23 @@ function renderMemoryStats(data, parent) {
     .attr('class', 'memory-graph')
     .attr('d', memoryGraph);
 
+  // Add markers if number of events is less than
+  // MAX_POINTS_MARKS to avoid clutter.
+  if (data.codeEvents.length < MAX_POINTS_MARKS) {
+    canvas.selectAll('circle')
+      .data(data.codeEvents)
+      .enter()
+      .append('circle')
+      .attr('class', 'memory-graph-dot')
+      .attr('cx', function(_, i) { return xScale(i + 1); })
+      .attr('cy', function(d) { return yScale(d[1]); })
+      .attr('r', DOT_RADIUS);
+  }
+
   var focus = canvas.append('circle')
     .style('display', 'none')
     .attr('class', 'memory-graph-focus')
-    .attr('r', CIRCLE_RADIUS)
+    .attr('r', FOCUS_RADIUS)
     .attr('transform', 'translate(' + (-100) + ', '  + (-100) + ')');
 
   var focusXLine = canvas.append('line')
