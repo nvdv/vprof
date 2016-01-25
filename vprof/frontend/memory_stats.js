@@ -57,8 +57,8 @@ function renderMemoryStats(data, parent) {
   var canvas = parent.append('svg')
     .attr('width', FULL_WIDTH)
     .attr('height', FULL_HEIGHT)
-    .append("g")
-    .attr("transform", "translate(" + MARGIN_LEFT + "," + MARGIN_TOP + ")");
+    .append('g')
+    .attr('transform', 'translate(' + MARGIN_LEFT + ',' + MARGIN_TOP + ')');
 
   var srcLines = data.codeEvents.map(function (_, i) { return i + 1; });
   var xScale = d3.scale.linear()
@@ -73,8 +73,8 @@ function renderMemoryStats(data, parent) {
   var xAxis = d3.svg.axis()
     .scale(xScale)
     .ticks(Math.min(TICKS_NUMBER, srcLines.length))
-    .tickFormat(d3.format(",.0f"))
-    .orient("bottom");
+    .tickFormat(d3.format(',.0f'))
+    .orient('bottom');
 
   var yAxis = d3.svg.axis()
     .scale(yScale)
@@ -95,25 +95,45 @@ function renderMemoryStats(data, parent) {
     .attr('class', 'memory-graph')
     .attr('d', memoryGraph);
 
-  var circle = canvas.append("circle")
+  var focus = canvas.append('circle')
     .style('display', 'none')
-    .attr('class', 'memory-graph-dot')
-    .attr("r", CIRCLE_RADIUS)
+    .attr('class', 'memory-graph-focus')
+    .attr('r', CIRCLE_RADIUS)
     .attr('transform', 'translate(' + (-100) + ', '  + (-100) + ')');
 
-  canvas.style("pointer-events", "all")
-    .on("mouseover", function() { circle.style("display", null); })
-    .on("mouseout", function() {
-      circle.style("display", "none");
-      tooltip.attr('class', 'tooltip tooltip-invisible');
+  var focusXLine = canvas.append('line')
+    .attr('class', 'focus-line')
+    .attr('y1', GRAPH_HEIGHT);
+
+  var focusYLine = canvas.append('line')
+    .attr('class', 'focus-line')
+    .attr('x1', 0);
+
+  canvas.style('pointer-events', 'all')
+    .on('mouseover', function() {
+      focus.style('display', null);
+      focusXLine.style('display', null);
+      focusYLine.style('display', null);
     })
-    .on("mousemove", function() {
+    .on('mouseout', function() {
+      focus.style('display', 'none');
+      tooltip.attr('class', 'tooltip tooltip-invisible');
+      focusXLine.style('display', 'none');
+      focusYLine.style('display', 'none');
+    })
+    .on('mousemove', function() {
       var crds = d3.mouse(canvas.node());
       var closestIndex = Math.round(xScale.invert(crds[0] - MOUSE_X_OFFSET));
       var closestX = xScale(closestIndex);
       var closestY = yScale(data.codeEvents[closestIndex - 1][1]);
-      circle.attr('transform', 'translate(' + closestX + ', ' +
+      focus.attr('transform', 'translate(' + closestX + ', ' +
                   closestY + ')');
+      focusXLine.attr('x1', closestX)
+        .attr('x2', closestX)
+        .attr('y2', closestY);
+      focusYLine.attr('y1', closestY)
+        .attr('x2', closestX)
+        .attr('y2', closestY);
       var tooltipText = generateTooltipText_(closestIndex,
           data.codeEvents[closestIndex - 1]);
       tooltip.attr('class', 'tooltip tooltip-visible')
@@ -123,9 +143,9 @@ function renderMemoryStats(data, parent) {
     });
 
   // Draw axes.
-  canvas.append("g")
-    .attr("class", "axis")
-    .attr("transform", "translate(0," + GRAPH_HEIGHT + ")")
+  canvas.append('g')
+    .attr('class', 'axis')
+    .attr('transform', 'translate(0,' + GRAPH_HEIGHT + ')')
     .call(xAxis)
     .append('text')
     .attr('x', AXIS_TEXT_X)

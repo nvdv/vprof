@@ -39,8 +39,13 @@ svg {
   stroke-width: 2px;
 }
 
-.memory-graph-dot {
-  fill: #3182bd;
+.memory-graph-focus {
+  fill: #e6550d;
+}
+
+.focus-line {
+  stroke: #e6550d;
+  stroke-dasharray : 4;
 }
 
 .rect-normal {
