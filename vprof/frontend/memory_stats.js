@@ -10,7 +10,7 @@ var d3 = require('d3');
 
 var MARGIN_LEFT = 35;
 var MARGIN_RIGHT = 0;
-var MARGIN_TOP = 5;
+var MARGIN_TOP = 10;
 var MARGIN_BOTTOM  = 30;
 var SCALE = 0.95;
 var FULL_HEIGHT = window.innerHeight * SCALE;
