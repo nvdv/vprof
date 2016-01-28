@@ -17,8 +17,8 @@ var FULL_HEIGHT = window.innerHeight * SCALE;
 var FULL_WIDTH = window.innerWidth * SCALE;
 var GRAPH_HEIGHT = FULL_HEIGHT - (MARGIN_LEFT + MARGIN_RIGHT) * SCALE;
 var GRAPH_WIDTH = FULL_WIDTH - (MARGIN_TOP + MARGIN_BOTTOM) * SCALE;
-var MIN_RANGE_C = 0.95;
-var MAX_RANGE_C = 1.05;
+var MIN_RANGE_C = 0.98;
+var MAX_RANGE_C = 1.02;
 var AXIS_TEXT_X = GRAPH_WIDTH;
 var AXIS_TEXT_Y = 12;
 var AXIS_TEXT_Y_OFFSET = 30;
@@ -29,7 +29,7 @@ var TICKS_NUMBER = 10;
 var FOCUS_RADIUS = 5;
 var DOT_RADIUS = 3;
 var TOOLTIP_OFFSET = 20;
-var MAX_POINTS_MARKS = 80;
+var SCALE_FACTOR = 3;
 
 /** Renders memory stats legend. */
 function renderLegend_(parent, data) {
@@ -42,14 +42,14 @@ function renderLegend_(parent, data) {
 }
 
 /** Generates tooltip text from line stats. */
-function generateTooltipText_(executedLine, stats) {
+function generateTooltipText_(stats) {
   var result = '';
   if (stats) {
     var functionName = stats[3].replace('<', '[').replace('>',  ']');
-    result += ('<p>Executed line: ' + executedLine + '</p>' +
-               '<p>Line number: ' + stats[0] + '</p>' +
+    result += ('<p>Executed line: ' + stats[0] + '</p>' +
+               '<p>Line number: ' + stats[1] + '</p>' +
                '<p>Function name: ' + functionName + '</p>' +
-               '<p>Memory usage: ' + stats[1] + ' MB</p>');
+               '<p>Memory usage: ' + stats[2] + ' MB</p>');
   }
   return result;
 }
@@ -62,19 +62,18 @@ function renderMemoryStats(data, parent) {
     .append('g')
     .attr('transform', 'translate(' + MARGIN_LEFT + ',' + MARGIN_TOP + ')');
 
-  var srcLines = data.codeEvents.map(function (_, i) { return i + 1; });
   var xScale = d3.scale.linear()
-    .domain([srcLines[0], srcLines[srcLines.length - 1]])
+    .domain(d3.extent(data.codeEvents, function(d) { return d[0]; }))
     .range([0, GRAPH_WIDTH]);
 
-  var yRange = d3.extent(data.codeEvents, function(d) { return d[1]; });
+  var yRange = d3.extent(data.codeEvents, function(d) { return d[2]; });
   var yScale = d3.scale.linear()
     .domain([MIN_RANGE_C * yRange[0], MAX_RANGE_C * yRange[1]])
     .range([GRAPH_HEIGHT, 0]);
 
   var xAxis = d3.svg.axis()
     .scale(xScale)
-    .ticks(Math.min(TICKS_NUMBER, srcLines.length))
+    .ticks(Math.min(TICKS_NUMBER, data.codeEvents.length))
     .tickFormat(d3.format(',.0f'))
     .orient('bottom');
 
@@ -88,27 +87,13 @@ function renderMemoryStats(data, parent) {
   renderLegend_(parent, data);
 
   var memoryGraph = d3.svg.area()
-    .x(function (_, i) { return xScale(i + 1); })
+    .x(function(d) { return xScale(d[0]); })
     .y0(GRAPH_HEIGHT)
-    .y1(function (d) { return yScale(d[1]); });
+    .y1(function(d) { return yScale(d[2]); });
 
-  canvas.append('path')
-    .datum(data.codeEvents)
+  var path = canvas.append('path')
     .attr('class', 'memory-graph')
-    .attr('d', memoryGraph);
-
-  // Add markers if number of events is less than
-  // MAX_POINTS_MARKS to avoid clutter.
-  if (data.codeEvents.length < MAX_POINTS_MARKS) {
-    canvas.selectAll('circle')
-      .data(data.codeEvents)
-      .enter()
-      .append('circle')
-      .attr('class', 'memory-graph-dot')
-      .attr('cx', function(_, i) { return xScale(i + 1); })
-      .attr('cy', function(d) { return yScale(d[1]); })
-      .attr('r', DOT_RADIUS);
-  }
+    .attr('d', memoryGraph(data.codeEvents));
 
   var focus = canvas.append('circle')
     .style('display', 'none')
@@ -138,9 +123,9 @@ function renderMemoryStats(data, parent) {
     })
     .on('mousemove', function() {
       var crds = d3.mouse(canvas.node());
-      var closestIndex = Math.round(xScale.invert(crds[0] - MOUSE_X_OFFSET));
-      var closestX = xScale(closestIndex);
-      var closestY = yScale(data.codeEvents[closestIndex - 1][1]);
+      var closestIndex = Math.round(xScale.invert(crds[0])) - 1;
+      var closestX = xScale(data.codeEvents[closestIndex][0]);
+      var closestY = yScale(data.codeEvents[closestIndex][2]);
       focus.attr('transform', 'translate(' + closestX + ', ' +
                   closestY + ')');
       focusXLine.attr('x1', closestX)
@@ -149,8 +134,7 @@ function renderMemoryStats(data, parent) {
       focusYLine.attr('y1', closestY)
         .attr('x2', closestX)
         .attr('y2', closestY);
-      var tooltipText = generateTooltipText_(closestIndex,
-          data.codeEvents[closestIndex - 1]);
+      var tooltipText = generateTooltipText_(data.codeEvents[closestIndex]);
       tooltip.attr('class', 'tooltip tooltip-visible')
         .html(tooltipText)
         .style('left', closestX)
@@ -159,7 +143,7 @@ function renderMemoryStats(data, parent) {
 
   // Draw axes.
   canvas.append('g')
-    .attr('class', 'axis')
+    .attr('class', 'x axis')
     .attr('transform', 'translate(0,' + GRAPH_HEIGHT + ')')
     .call(xAxis)
     .append('text')
@@ -169,13 +153,62 @@ function renderMemoryStats(data, parent) {
     .text('Executed lines');
 
   canvas.append('g')
-    .attr('class', 'axis')
+    .attr('class', 'y axis')
     .call(yAxis)
     .append('text')
     .attr('transform', 'rotate(-90)')
     .attr('y', AXIS_TEXT_Y)
     .attr('dy', '.71em')
     .text('Memory usage, MB');
+
+  // Zoom in.
+  var currScale = 1;
+  canvas.on('click', function(d) {
+    currScale *= SCALE_FACTOR;
+    var crds = d3.mouse(canvas.node());
+    var midIndex = Math.round(xScale.invert(crds[0])) - 1;
+    var indexRange = data.codeEvents.length / currScale;
+    var startIndex = Math.max(midIndex - Math.floor(indexRange), 0);
+    var endIndex = Math.min(
+      midIndex + Math.floor(indexRange) - 1, data.codeEvents.length - 1);
+    if (startIndex < endIndex) {
+      var numPoints = endIndex - startIndex;
+      if (numPoints < TICKS_NUMBER) {
+        xAxis.ticks(numPoints);
+      }
+      xScale.domain([data.codeEvents[startIndex][0],
+                     data.codeEvents[endIndex][0]]);
+      var eventsSlice = data.codeEvents.slice(startIndex, endIndex + 1);
+      path.attr('d', memoryGraph(eventsSlice));
+      canvas.selectAll('g.x.axis')
+        .call(xAxis);
+
+      // TODO(nvdv): Factor focus redrawing into separate function.
+      var closestX = xScale(data.codeEvents[midIndex][0]);
+      var closestY = yScale(data.codeEvents[midIndex][2]);
+      focus.attr('transform', 'translate(' + closestX + ', ' +
+                  closestY + ')');
+      focusXLine.attr('x1', closestX)
+        .attr('x2', closestX)
+        .attr('y2', closestY);
+      focusYLine.attr('y1', closestY)
+        .attr('x2', closestX)
+        .attr('y2', closestY);
+      var tooltipText = generateTooltipText_(data.codeEvents[midIndex]);
+      tooltip.attr('class', 'tooltip tooltip-visible')
+        .html(tooltipText)
+        .style('left', closestX)
+        .style('top', closestY - TOOLTIP_OFFSET);
+    }
+  });
+
+  // Zoom out.
+  parent.on('dblclick', function(d) {
+    xScale.domain(d3.extent(data.codeEvents, function(d) { return d[0]; }));
+    path.attr('d', memoryGraph(data.codeEvents));
+    canvas.selectAll('g.x.axis')
+      .call(xAxis);
+  });
 }
 
 module.exports = {

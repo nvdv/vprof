@@ -222,7 +222,9 @@ class MemoryProfile(BaseProfile):
             pass
         return {
             'programName': self._program_name,
-            'codeEvents': list(prof.events_list),
+            'codeEvents': [
+                (i + 1, line, mem, event, func)
+                for i, (line, mem, event, func) in enumerate(prof.events_list)],
             'totalEvents': len(prof.events_list)
         }
 
