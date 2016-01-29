@@ -168,9 +168,9 @@ function renderMemoryStats(data, parent) {
     var crds = d3.mouse(canvas.node());
     var midIndex = Math.round(xScale.invert(crds[0])) - 1;
     var indexRange = data.codeEvents.length / currScale;
-    var startIndex = Math.max(midIndex - Math.floor(indexRange), 0);
+    var startIndex = Math.max(midIndex - Math.floor(indexRange / 2), 0);
     var endIndex = Math.min(
-      midIndex + Math.floor(indexRange) - 1, data.codeEvents.length - 1);
+      midIndex + Math.floor(indexRange / 2) - 1, data.codeEvents.length - 1);
     if (startIndex < endIndex) {
       var numPoints = endIndex - startIndex;
       if (numPoints < TICKS_NUMBER) {
@@ -204,8 +204,10 @@ function renderMemoryStats(data, parent) {
 
   // Zoom out.
   parent.on('dblclick', function(d) {
+    currScale = 1;
     xScale.domain(d3.extent(data.codeEvents, function(d) { return d[0]; }));
     path.attr('d', memoryGraph(data.codeEvents));
+    xAxis.ticks(Math.min(TICKS_NUMBER, data.codeEvents.length));
     canvas.selectAll('g.x.axis')
       .call(xAxis);
   });
