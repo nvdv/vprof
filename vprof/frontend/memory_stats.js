@@ -54,6 +54,19 @@ function generateTooltipText_(stats) {
   return result;
 }
 
+/** Calculates params of zoomed region on memory graph. */
+function getZoomRangeParams_(midIndex, indexRange, maxLength) {
+  var startIndex = midIndex - Math.floor(
+      (indexRange / SCALE_FACTOR) * 0.5);
+  var endIndex = midIndex + Math.floor(
+      (indexRange / SCALE_FACTOR) * 0.5);
+  return {
+    'startIndex': Math.max(startIndex, 0),
+    'endIndex': Math.min(endIndex, maxLength),
+    'indexRange': endIndex - startIndex
+  };
+}
+
 /** Renders memory usage graph. */
 function renderMemoryStats(data, parent) {
   var canvas = parent.append('svg')
@@ -162,28 +175,25 @@ function renderMemoryStats(data, parent) {
     .text('Memory usage, MB');
 
   // Zoom in.
-  var currScale = 1;
+  var indexRange = data.codeEvents.length;
   canvas.on('click', function(d) {
-    currScale *= SCALE_FACTOR;
     var crds = d3.mouse(canvas.node());
     var midIndex = Math.round(xScale.invert(crds[0])) - 1;
-    var indexRange = data.codeEvents.length / currScale;
-    var startIndex = Math.max(midIndex - Math.floor(indexRange / 2), 0);
-    var endIndex = Math.min(
-      midIndex + Math.floor(indexRange / 2) - 1, data.codeEvents.length - 1);
-    if (startIndex < endIndex) {
-      var numPoints = endIndex - startIndex;
-      if (numPoints < TICKS_NUMBER) {
-        xAxis.ticks(numPoints);
+    var range = getZoomRangeParams_(
+        midIndex, indexRange, data.codeEvents.length - 1);
+    indexRange = range.indexRange;
+    if (range.startIndex < range.endIndex) {
+      if (indexRange < TICKS_NUMBER) {
+        xAxis.ticks(indexRange);
       }
-      xScale.domain([data.codeEvents[startIndex][0],
-                     data.codeEvents[endIndex][0]]);
-      var eventsSlice = data.codeEvents.slice(startIndex, endIndex + 1);
+      xScale.domain([data.codeEvents[range.startIndex][0],
+                     data.codeEvents[range.endIndex][0]]);
+      var eventsSlice = data.codeEvents.slice(
+          range.startIndex, range.endIndex + 1);
       path.attr('d', memoryGraph(eventsSlice));
       canvas.selectAll('g.x.axis')
         .call(xAxis);
 
-      // TODO(nvdv): Factor focus redrawing into separate function.
       var closestX = xScale(data.codeEvents[midIndex][0]);
       var closestY = yScale(data.codeEvents[midIndex][2]);
       focus.attr('transform', 'translate(' + closestX + ', ' +
@@ -204,7 +214,6 @@ function renderMemoryStats(data, parent) {
 
   // Zoom out.
   parent.on('dblclick', function(d) {
-    currScale = 1;
     xScale.domain(d3.extent(data.codeEvents, function(d) { return d[0]; }));
     path.attr('d', memoryGraph(data.codeEvents));
     xAxis.ticks(Math.min(TICKS_NUMBER, data.codeEvents.length));
