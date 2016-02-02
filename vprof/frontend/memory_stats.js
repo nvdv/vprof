@@ -30,6 +30,7 @@ var FOCUS_RADIUS = 5;
 var DOT_RADIUS = 3;
 var TOOLTIP_OFFSET = 20;
 var SCALE_FACTOR = 3;
+var MAX_ZOOM_POINTS = 20;
 
 /** Renders memory stats legend. */
 function renderLegend_(parent, data) {
@@ -53,20 +54,42 @@ function generateTooltipText_(stats) {
   }
   return result;
 }
-
-/** Calculates params of zoomed region on memory graph. */
-function getZoomRangeParams_(midIndex, indexRange, maxLength) {
+/** Updates highlight zone params based on previous params and mid index.*/
+function updateHighlightRangeParams_(midIndex, rangeParams) {
   var startIndex = midIndex - Math.floor(
-      (indexRange / SCALE_FACTOR) * 0.5);
+      0.5 * rangeParams.zoomIndexRange / SCALE_FACTOR);
   var endIndex = midIndex + Math.floor(
-      (indexRange / SCALE_FACTOR) * 0.5);
-  return {
-    'startIndex': Math.max(startIndex, 0),
-    'endIndex': Math.min(endIndex, maxLength),
-    'indexRange': endIndex - startIndex
-  };
+      0.5 * rangeParams.zoomIndexRange / SCALE_FACTOR);
+  rangeParams.highlightStartIndex = Math.max(
+    startIndex, rangeParams.zoomIndexStart);
+  rangeParams.highlightEndIndex = Math.min(
+    endIndex, rangeParams.zoomIndexEnd);
+  rangeParams.highlightIndexRange = (
+    rangeParams.highlightEndIndex - rangeParams.highlightStartIndex);
 }
 
+/** Updates zoom zone params based on previous params and mid index.*/
+function updateZoomRangeParams_(midIndex, rangeParams, maxLength) {
+  var startIndex = midIndex - Math.floor(
+      0.5 * rangeParams.zoomIndexRange / SCALE_FACTOR);
+  var endIndex = midIndex + Math.floor(
+      0.5 * rangeParams.zoomIndexRange / SCALE_FACTOR);
+  rangeParams.zoomIndexStart = Math.max(startIndex, 0);
+  rangeParams.zoomIndexEnd = Math.min(endIndex, maxLength);
+  rangeParams.zoomIndexRange = (
+    rangeParams.zoomIndexEnd - rangeParams.zoomIndexStart);
+}
+/** Resets zoom range params to initial ones.*/
+function resetZoomRangeParams_(zoomRange, maxLength) {
+  zoomRange.highlightStartIndex = 0;
+  zoomRange.highlightEndIndex = 0;
+  zoomRange.highlightIndexRange =  0;
+  zoomRange.zoomIndexStart = 0;
+  zoomRange.zoomIndexEnd = maxLength;
+  zoomRange.zoomIndexRange = maxLength;
+}
+
+// TODO(nvdv): Factor this function into separate class to improve readability.
 /** Renders memory usage graph. */
 function renderMemoryStats(data, parent) {
   var canvas = parent.append('svg')
@@ -122,17 +145,33 @@ function renderMemoryStats(data, parent) {
     .attr('class', 'focus-line')
     .attr('x1', 0);
 
+  var focusHiglightArc = canvas.append('path')
+    .attr('class', 'focus-line-highlight');
+
+  var zoomRange = {
+    'highlightStartIndex': 0,
+    'highlightEndIndex': 0,
+    'highlightIndexRange': 0,
+    'zoomIndexStart': 0,
+    'zoomIndexEnd': data.codeEvents.length,
+    'zoomIndexRange': data.codeEvents.length,
+  };
+
   canvas.style('pointer-events', 'all')
     .on('mouseover', function() {
       focus.style('display', null);
       focusXLine.style('display', null);
       focusYLine.style('display', null);
+      if (zoomRange.zoomIndexRange > MAX_ZOOM_POINTS) {
+        focusHiglightArc.style('display', null);
+      }
     })
     .on('mouseout', function() {
       focus.style('display', 'none');
       tooltip.attr('class', 'tooltip tooltip-invisible');
       focusXLine.style('display', 'none');
       focusYLine.style('display', 'none');
+      focusHiglightArc.style('display', 'none');
     })
     .on('mousemove', function() {
       var crds = d3.mouse(canvas.node());
@@ -152,6 +191,13 @@ function renderMemoryStats(data, parent) {
         .html(tooltipText)
         .style('left', closestX)
         .style('top', closestY - TOOLTIP_OFFSET);
+
+      if (zoomRange.zoomIndexRange > MAX_ZOOM_POINTS) {
+        updateHighlightRangeParams_(closestIndex, zoomRange);
+        var highlightSlice = data.codeEvents.slice(
+          zoomRange.highlightStartIndex, zoomRange.highlightEndIndex + 1);
+        focusHiglightArc.attr('d', memoryGraph(highlightSlice));
+      }
     });
 
   // Draw axes.
@@ -175,21 +221,18 @@ function renderMemoryStats(data, parent) {
     .text('Memory usage, MB');
 
   // Zoom in.
-  var indexRange = data.codeEvents.length;
   canvas.on('click', function(d) {
     var crds = d3.mouse(canvas.node());
     var midIndex = Math.round(xScale.invert(crds[0])) - 1;
-    var range = getZoomRangeParams_(
-        midIndex, indexRange, data.codeEvents.length - 1);
-    indexRange = range.indexRange;
-    if (range.startIndex < range.endIndex) {
-      if (indexRange < TICKS_NUMBER) {
-        xAxis.ticks(indexRange);
+    updateZoomRangeParams_(midIndex, zoomRange, data.codeEvents.length - 1);
+    if (zoomRange.zoomIndexStart < zoomRange.zoomIndexEnd) {
+      if (zoomRange.zoomIndexRange < TICKS_NUMBER) {
+        xAxis.ticks(zoomRange.zoomIndexRange);
       }
-      xScale.domain([data.codeEvents[range.startIndex][0],
-                     data.codeEvents[range.endIndex][0]]);
+      xScale.domain([data.codeEvents[zoomRange.zoomIndexStart][0],
+                     data.codeEvents[zoomRange.zoomIndexEnd][0]]);
       var eventsSlice = data.codeEvents.slice(
-          range.startIndex, range.endIndex + 1);
+          zoomRange.zoomIndexStart, zoomRange.zoomIndexEnd + 1);
       path.attr('d', memoryGraph(eventsSlice));
       canvas.selectAll('g.x.axis')
         .call(xAxis);
@@ -209,11 +252,21 @@ function renderMemoryStats(data, parent) {
         .html(tooltipText)
         .style('left', closestX)
         .style('top', closestY - TOOLTIP_OFFSET);
+
+      if (zoomRange.zoomIndexRange > MAX_ZOOM_POINTS) {
+        updateHighlightRangeParams_(midIndex, zoomRange);
+        var highlightSlice = data.codeEvents.slice(
+          zoomRange.highlightStartIndex, zoomRange.highlightEndIndex + 1);
+        focusHiglightArc.attr('d', memoryGraph(highlightSlice));
+      } else {
+        focusHiglightArc.style('display', 'none');
+      }
     }
   });
 
   // Zoom out.
   parent.on('dblclick', function(d) {
+    resetZoomRangeParams_(zoomRange, data.codeEvents.length);
     xScale.domain(d3.extent(data.codeEvents, function(d) { return d[0]; }));
     path.attr('d', memoryGraph(data.codeEvents));
     xAxis.ticks(Math.min(TICKS_NUMBER, data.codeEvents.length));

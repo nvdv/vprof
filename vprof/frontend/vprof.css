@@ -52,6 +52,13 @@ svg {
   stroke-dasharray: 4;
 }
 
+.focus-line-highlight {
+  fill: #fd8d3c;
+  opacity: 0.3;
+  stroke: #e6550d;
+  stroke-width: 2px;
+}
+
 .rect-normal {
   opacity: 0.85;
   stroke: white;
