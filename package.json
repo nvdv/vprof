@@ -6,7 +6,7 @@
     "d3": "3.5.6",
     "jshint": "latest",
     "uglify-js": "latest",
-    "browserify": "13",
+    "browserify": "12",
     "browserify-css": "latest",
     "karma": "latest",
     "karma-jasmine": "latest",
