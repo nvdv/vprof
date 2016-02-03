@@ -11,7 +11,7 @@
     "karma": "latest",
     "karma-jasmine": "latest",
     "karma-phantomjs-launcher": "latest",
-    "karma-browserify": "latest",
+    "karma-browserify": "5.0.0",
     "phantomjs-prebuilt": "2.1.3",
     "jasmine-core": "latest",
     "highlight.js": "latest",
