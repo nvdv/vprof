@@ -284,7 +284,7 @@ class CodeHeatmapProfile(BaseProfile):
         try:
             with open(self._program_name, 'rb') as srcfile,\
                 CodeHeatmapCalculator() as prof:
-                src_code = srcfile.read()
+                src_code = srcfile.read().decode('utf-8')
                 code = compile(src_code, self._program_name, 'exec')
                 prof.add_code(code)
                 exec(code, self._globs, None)
