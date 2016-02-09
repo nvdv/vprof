@@ -11,8 +11,9 @@ expected.
 
 ## Screenshots
 
-![flame-chart](https://github.com/nvdv/vprof/raw/master/img/flame_chart.png)
-![memory-stats](https://github.com/nvdv/vprof/raw/master/img/memory_stats.png)
+![flame-chart](http://i.imgur.com/mbszOETh.png?1)
+![memory-stats](http://i.imgur.com/jTJGu2th.png?1)
+![code-heatmap](http://i.imgur.com/0FNdQHNh.png?1)
 
 ## Prerequisites
 The required dependencies to build ```vprof``` from source code:
