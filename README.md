@@ -11,9 +11,9 @@ expected.
 
 ## Screenshots
 
-![flame-chart](http://i.imgur.com/mbszOETh.png?1)
-![memory-stats](http://i.imgur.com/jTJGu2th.png?1)
-![code-heatmap](http://i.imgur.com/0FNdQHNh.png?1)
+![flame-chart](http://i.imgur.com/mbszOET.png?1)
+![memory-stats](http://i.imgur.com/jTJGu2t.png?1)
+![code-heatmap](http://i.imgur.com/0FNdQHN.png?1)
 
 ## Prerequisites
 The required dependencies to build ```vprof``` from source code:
