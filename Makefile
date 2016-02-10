@@ -11,6 +11,7 @@ install:
 
 deps_install:
 	npm install
+	pip install -r requirements.txt
 	pip install -r dev_requirements.txt
 
 lint:
