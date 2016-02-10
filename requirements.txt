@@ -1,3 +1,1 @@
 psutil
-mock>=1.0.0
-pylint>=1.4
