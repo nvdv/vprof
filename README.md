@@ -4,7 +4,7 @@
 
 vprof is a Python package providing rich and interactive visualizations for
 various Python program characteristics such as running time and memory usage.
-It supports Python 2.7, Python 3.x and distributed under BSD license.
+It supports Python 2.7, Python 3.4, Python 3.5 and distributed under BSD license.
 
 The project is in active development and some of it's features might not work as
 expected.
@@ -33,42 +33,29 @@ To install current dev version, clone this repository and execute
 
     make install
 
-To install just ```vprof``` dependencies run
+To install just ```vprof``` dependencies, run
 
     make deps_install
 
 
 ## Usage
-Currently ```vprof``` supports running time, memory usage and code heatmap
-visualization.
-In order to get running time visualization for specified Python program, run
 
-    vprof c <test_script>
+    vprof <modes> <test_script>
 
-```vprof``` will run <test_script> and open flame chart in new tab of default web
-browser.
+Supported modes:
 
-Memory stats visualization can be obtained by executing
+* ```c``` - flame chart. Renders running time visualization for ```<test_script>```.
+* ```m``` - memory graph. Shows memory usage during execution of each line of ```<test_script>```.
+* ```h``` - code heatmap. Shows number of executions of each line of code.
 
-    vprof m <test_script>
+Modes can be combined:
 
-Resulting graph will show memory usage during execution of each line of
-Python program.
-
-To get code heatmap for Python script execute
-
-    vprof h <test_script>
-
-Code heatmap will show number of executions of each line of code of ```<test_script>```.
-
-Options can be combined
-
-    vprof cm <test_script>
+    vprof cm testscript.py
 
 Check ```vprof -h``` for full list of supported parameters.
 
 ## Testing
-To run test suite enter
+Just run
 
     make test
 
