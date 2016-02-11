@@ -98,7 +98,7 @@ function renderFlameChart(data, parent) {
         .html('<p>Function name: ' + functionName + '</p>' +
               '<p>Location: ' + d.moduleName +'</p>' +
               '<p>Time percentage: ' + timePercentage + ' %</p>' +
-              '<p>Cum.time: ' + d.cumTime + ' s</p>' +
+              '<p>Cumulative time: ' + d.cumTime + ' s</p>' +
               '<p>Time per call: ' + d.timePerCall + ' s</p>' +
               '<p>Primitive calls: ' + d.primCalls + '</p>')
         .style('left', d3.event.pageX)
