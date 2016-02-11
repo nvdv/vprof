@@ -8,7 +8,7 @@ from vprof import profile_wrappers
 from vprof import stats_server
 
 
-_MODULE_DESC = 'Python visual profiler.'
+_MODULE_DESC = 'Python visual profiler'
 _HOST = 'localhost'
 
 _PROFILE_MAP = {
@@ -23,9 +23,12 @@ def main():
     parser.add_argument('profilers', metavar='opts',
                         help='Profilers configuration')
     parser.add_argument('source', metavar='src', nargs=1,
-                        help='Python program to profile.')
+                        help='Python program to profile')
     parser.add_argument('--port', dest='port', default=8000, type=int,
-                        help='Internal webserver port.')
+                        help='Internal webserver port')
+    parser.add_argument('--debug', dest='debug_mode',
+                        action='store_true', default=False,
+                        help="Don't suppress error messages")
     args = parser.parse_args()
 
     if len(args.profilers) > len(set(args.profilers)):
@@ -43,7 +46,8 @@ def main():
         curr_profiler = _PROFILE_MAP[option](program_name)
         print('Running %s...' % curr_profiler.__class__.__name__)
         program_stats[option] = curr_profiler.run()
-    sys.stderr = open(os.devnull, "w")
+    if not args.debug_mode:
+        sys.stderr = open(os.devnull, "w")
     print('Starting HTTP server...')
     stats_server.start(_HOST, args.port, program_stats)
 
