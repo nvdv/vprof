@@ -1,5 +1,6 @@
 """Program stats server."""
 import functools
+import io
 import json
 import os
 import sys
@@ -41,7 +42,7 @@ class StatsHandler(http_server.SimpleHTTPRequestHandler):
         if self.path == self.ROOT_URI:
             res_filename = os.path.join(
                 os.path.dirname(__file__), _PROFILE_HTML)
-            with open(res_filename) as res_file:
+            with io.open(res_filename, 'rb') as res_file:
                 output = res_file.read()
             content_type = 'text/html'
         elif self.path == self.PROFILE_URI:
@@ -51,7 +52,7 @@ class StatsHandler(http_server.SimpleHTTPRequestHandler):
             res_filename = os.path.join(
                 os.path.dirname(__file__), _STATIC_DIR,
                 os.path.basename(self.path))
-            with open(res_filename) as res_file:
+            with io.open(res_filename, 'rb') as res_file:
                 output = res_file.read()
             _, extension = os.path.splitext(self.path)
             content_type = 'text/%s' % extension
@@ -60,7 +61,7 @@ class StatsHandler(http_server.SimpleHTTPRequestHandler):
             200, headers=(('Content-type', '%s; charset=utf-8' % content_type),
                           ('Content-Length', len(output))))
         # Convert to bytes for Python 3.
-        if sys.version_info[0] >= 3:
+        if (sys.version_info[0] >= 3) and isinstance(output, str):
             self.wfile.write(bytes(output, 'utf-8'))
         else:
             self.wfile.write(output)
