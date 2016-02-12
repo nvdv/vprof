@@ -6,7 +6,7 @@ test:
 	npm run test
 
 install:
-	npm run build && npm run compress
+	npm run build
 	pip install .
 
 deps_install:
@@ -19,5 +19,4 @@ lint:
 	pylint --reports=n --rcfile=pylint.rc vprof/*.py
 
 clean:
-	rm -rf vprof/frontend/vprof.js
 	rm -rf vprof/frontend/vprof_min.js

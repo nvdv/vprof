@@ -19,8 +19,7 @@
   },
   "scripts": {
     "lint": "jshint vprof/frontend/*.js",
-    "build": "browserify -g browserify-css vprof/frontend/main.js -o vprof/frontend/vprof.js",
-    "compress": "uglifyjs vprof/frontend/vprof.js > vprof/frontend/vprof_min.js",
+    "build": "browserify -g browserify-css vprof/frontend/main.js | uglifyjs > vprof/frontend/vprof_min.js",
     "test": "karma start"
   },
   "browserify": {
