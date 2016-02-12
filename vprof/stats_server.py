@@ -39,7 +39,8 @@ class StatsHandler(http_server.SimpleHTTPRequestHandler):
     def do_GET(self):
         """Handles HTTP GET requests."""
         if self.path == self.ROOT_URI:
-            res_filename = os.path.dirname(__file__) + '/' + _PROFILE_HTML
+            res_filename = os.path.join(
+                os.path.dirname(__file__), _PROFILE_HTML)
             with open(res_filename) as res_file:
                 output = res_file.read()
             content_type = 'text/html'
@@ -47,8 +48,9 @@ class StatsHandler(http_server.SimpleHTTPRequestHandler):
             output = json.dumps(self._profile_json)
             content_type = 'text/json'
         else:
-            res_filename = (
-                os.path.dirname(__file__) + '/' + _STATIC_DIR + self.path)
+            res_filename = os.path.join(
+                os.path.dirname(__file__), _STATIC_DIR,
+                os.path.basename(self.path))
             with open(res_filename) as res_file:
                 output = res_file.read()
             _, extension = os.path.splitext(self.path)
