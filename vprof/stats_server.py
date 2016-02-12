@@ -2,8 +2,8 @@
 import functools
 import json
 import os
-import subprocess
 import sys
+import webbrowser
 
 # For Python 2 and Python 3 compatibility.
 try:
@@ -84,7 +84,7 @@ def start(host, port, profile_stats):
     """
     stats_handler = functools.partial(
         StatsHandler, profile_stats)
-    subprocess.call(['open', 'http://%s:%s' % (host, port)])
+    webbrowser.open('http://{}:{}/'.format(host, port))
     try:
         _StatsServer((host, port), stats_handler).serve_forever()
     except KeyboardInterrupt:
