@@ -38,27 +38,35 @@ CodeHeatmap.prototype.render = function() {
   var tooltip = codeContainer.append('div')
     .attr('class', 'tooltip tooltip-invisible');
 
-  var data = this.data_;
-  var scale = this.heatmapScale_;
+  var self = this;
   d3.selectAll('.src-line-normal')
-    .style('background-color', function(_, i) {
-      var runCount = data.heatmap[i + 1];
-      return runCount ? scale(runCount) : '';
-    })
-    .on('mouseover', function(_, i) {
-      var runCount = data.heatmap[i + 1];
-      if (runCount) {
-        d3.select(this).attr('class', 'src-line-highlight');
-        tooltip.attr('class', 'tooltip tooltip-visible')
-          .html('Execution count: ' + runCount)
-          .style('left', d3.event.pageX)
-          .style('top', d3.event.pageY);
-      }
-    })
-    .on('mouseout', function() {
-      d3.select(this).attr('class', 'src-line-normal');
-      tooltip.attr('class', 'tooltip tooltip-invisible');
-    });
+    .style('background-color', this.changeBackgroundColor_.bind(this))
+    .on('mouseover', function(_, i) { self.showTooltip_(this, tooltip, i); })
+    .on('mouseout', function() { self.hideTooltip_(this, tooltip); });
+};
+
+/** Changes line background color based on execution count. */
+CodeHeatmap.prototype.changeBackgroundColor_ = function(_, i) {
+  var runCount = this.data_.heatmap[i + 1];
+  return runCount ? this.heatmapScale_(runCount) : '';
+};
+
+/** Shows line execution count inside tooltip and adds line highlighting. */
+CodeHeatmap.prototype.showTooltip_ = function(element, tooltip, index) {
+  var runCount = this.data_.heatmap[index + 1];
+  if (runCount) {
+    d3.select(element).attr('class', 'src-line-highlight');
+    tooltip.attr('class', 'tooltip tooltip-visible')
+      .html('Execution count: ' + runCount)
+      .style('left', d3.event.pageX)
+      .style('top', d3.event.pageY);
+  }
+};
+
+/** Hides provided tooltip and removes line highlighting. */
+CodeHeatmap.prototype.hideTooltip_ = function(element, tooltip) {
+  d3.select(element).attr('class', 'src-line-normal');
+  tooltip.attr('class', 'tooltip tooltip-invisible');
 };
 
 /** Adds line numbers and additional formatting since highlight.js does not

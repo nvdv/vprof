@@ -76,7 +76,7 @@ class BaseProfileUnittest(unittest.TestCase):
             '__name__': '__main__',
             '__package__': None
         })
-    #
+
     def testCollectStats(self):
         result = {'foo': 'bar', 'baz': 'mno'}
         self._profile._program_name = 'foo.py'
