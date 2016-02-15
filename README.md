@@ -48,6 +48,10 @@ Supported modes:
 * ```m``` - memory graph. Shows memory usage during execution of each line of ```<test_script>```.
 * ```h``` - code heatmap. Shows number of executions of each line of code.
 
+Use double quotes to run scripts with arguments:
+
+    vprof cmh "testscript.py --foo --bar"
+
 Modes can be combined:
 
     vprof cm testscript.py

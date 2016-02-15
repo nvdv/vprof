@@ -29,13 +29,14 @@ def get_memory_usage():
 class BaseProfile(object):
     """Base class for profile wrapper."""
 
-    def __init__(self, program_name):
+    def __init__(self, program_cmd):
         """Initializes wrapper.
 
         Args:
-            program_name: Name of the program to profile.
+            program_cmd: Name and arguments of the program to profile.
         """
-        self._program_name = program_name
+        fullcmd = program_cmd.split()
+        self._program_name, self._program_args = fullcmd[0], fullcmd
         self._globs = {
             '__file__': self._program_name,
             '__name__': '__main__',
@@ -45,6 +46,7 @@ class BaseProfile(object):
     def collect_stats(self, run_stats):
         """Collects program stats and inserts them into run_stats dict."""
         sys.path.insert(0, os.path.dirname(self._program_name))
+        sys.argv[:] = self._program_args
         stats = self.run_profiler()  # pylint: disable=no-member
         run_stats.update(stats)
 
