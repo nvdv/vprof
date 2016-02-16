@@ -10,13 +10,6 @@ import sys
 from collections import defaultdict
 from collections import deque
 
-# For Python 2 and Python 3 compatibility.
-try:
-    import cStringIO as io
-except ImportError:
-    import io
-
-
 _BYTES_IN_MB = 1024 * 1024
 
 
@@ -150,11 +143,6 @@ class CodeEventsTracker(object):
         self._all_code = set()
         self.events_list = deque()
         self._original_trace_function = sys.gettrace()
-        self._prev_line = None
-        self._prev_event = None
-        self._prev_memory = None
-        self._stderr = None
-        self._redirect_file = io.StringIO()
 
     def add_code(self, code):
         """Recursively adds code to be examined."""
@@ -166,35 +154,25 @@ class CodeEventsTracker(object):
     def __enter__(self):
         """Enables events tracker."""
         sys.settrace(self._trace_memory_usage)
-        self._stderr = sys.stderr
-        sys.stderr = self._redirect_file
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tbf):
         """Disables events tracker."""
         sys.settrace(self._original_trace_function)
-        sys.stderr = self._stderr
 
     def _trace_memory_usage(self, frame, event, arg):  #pylint: disable=unused-argument
         """Tracks memory usage when specified events occur."""
         if event == 'line' and frame.f_code in self._all_code:
             curr_memory = get_memory_usage()
-            if not self.events_list:
+            if (self.events_list and self.events_list[-1][2] == event and
+                    self.events_list[-1][0] == frame.f_lineno and
+                    self.events_list[-1][1] != curr_memory):
+                # Update previous if memory usage is greater on the same line.
+                self.events_list[-1][1] = max(
+                    curr_memory, self.events_list[-1][1])
+            else:
                 self.events_list.append(
                     [frame.f_lineno, curr_memory, event, frame.f_code.co_name])
-            else:
-                if (event == self._prev_event and
-                        frame.f_code.co_name == self._prev_line):
-                    # Update if memory consumption is greater on the same line.
-                    if curr_memory != self._prev_memory:
-                        curr_memory = max(curr_memory, self._prev_memory)
-                        self.events_list[-1][1] = curr_memory
-                else:
-                    self.events_list.append([frame.f_lineno, curr_memory, event,
-                                             frame.f_code.co_name])
-            self._prev_line = frame.f_code.co_name
-            self._prev_event = event
-            self._prev_memory = curr_memory
         return self._trace_memory_usage
 
 
