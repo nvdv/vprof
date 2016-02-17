@@ -1,5 +1,5 @@
 /**
- * Renders all stats.
+ * @file Page rendering module.
  */
 
 /* jshint strict: false, browser: true, globalstrict: true */
@@ -13,17 +13,23 @@ var code_heatmap = require('./code_heatmap.js');
 
 var JSON_URI = 'profile';
 
-/** Creates empty hidden div with specified ID. */
-function createHiddenTabContent_(content_id) {
+/**
+ * Creates empty hidden div with specified ID.
+ * @param {string} content_id - div ID.
+ */
+function createHiddenTabContent_(id) {
   return d3.select('body')
     .append('div')
     .attr('class', 'tab-content')
-    .attr('id', content_id)
+    .attr('id', id)
     .attr('style', 'display: none');
 }
 
-/** Creates flame chart tab header with specified status and
+/**
+ *  Creates flame chart tab header with specified status and
  *  appends it to the parent node.
+ *  @param {Object} parent - Parent element to append tab to.
+ *  @param {status} status - Specified tab status.
  */
 function createFlameChartTab_(parent, status) {
   parent.append('li')
@@ -38,8 +44,11 @@ function createFlameChartTab_(parent, status) {
     });
 }
 
-/** Creates memory stats tab header with specified status and
+/**
+ *  Creates memory stats tab header with specified status and
  *  appends it to the parent node.
+ *  @param {Object} parent - Parent element to append tab to.
+ *  @param {status} status - Specified tab status.
  */
 function createMemoryChartTab_(parent, status) {
   parent.append('li')
@@ -54,8 +63,11 @@ function createMemoryChartTab_(parent, status) {
     });
 }
 
-/** Creates code heatmap tab header with specified status and
+/**
+ *  Creates code heatmap tab header with specified status and
  *  appends it to the parent node.
+ *  @param {Object} parent - Parent element to append tab to.
+ *  @param {status} status - Specified tab status.
  */
 function createCodeHeatmapTab_(parent, status) {
   parent.append('li')
@@ -70,7 +82,10 @@ function createCodeHeatmapTab_(parent, status) {
     });
 }
 
-/** Renders whole page. */
+/**
+ * Renders stats page.
+ * @param {Object} data - Data for page rendering.
+ */
 function renderPage(data) {
   var tabHeader = d3.select('body')
     .append('ul')
@@ -103,7 +118,10 @@ function renderPage(data) {
   }
 }
 
-/** Shows tab specified by tabID. */
+/**
+  * Makes tab specified by tabId active.
+  * @param {string} tabId - Next active tab identifier.
+  */
 function showTab_(tabId) {
   var allTabs = document.getElementsByClassName('tab-content');
   for (var i = 0; i < allTabs.length; i++) {
@@ -113,7 +131,7 @@ function showTab_(tabId) {
   currentTab.style.display = 'block';
 }
 
-/** Main function. */
+/** Makes request to server and renders page with received data. */
 function main() {
   d3.json(JSON_URI, function(data) {
     renderPage(data);
