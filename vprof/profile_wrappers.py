@@ -182,14 +182,6 @@ class MemoryProfile(BaseProfile):
     Runs memory profiler and processes all obtained stats.
     """
 
-    def _transform_stats(self, code_stats):
-        memory_stats = []
-        for code, lines in code_stats.items():
-            for line, usage in lines.items():
-                line_id = (code.co_filename, line, code.co_name)
-                memory_stats.append((line_id, usage))
-        return memory_stats
-
     def run_profiler(self):
         """Collects memory stats for specified Python program."""
         try:

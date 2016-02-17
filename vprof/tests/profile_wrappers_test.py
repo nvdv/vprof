@@ -103,22 +103,6 @@ class RuntimeProfileUnittest(unittest.TestCase):
             self._profile._transform_stats(stats), _CALL_GRAPH)
 
 
-class MemoryProfileUnittest(unittest.TestCase):
-    def setUp(self):
-        self._profile = object.__new__(profile_wrappers.MemoryProfile)
-
-    def testTransformStats(self):
-        code_obj1, code_obj2 = mock.MagicMock(), mock.MagicMock()
-        code_obj1.co_filename, code_obj2.co_filename = 'foo.py', 'bar.py'
-        code_obj1.co_name, code_obj2.co_name = 'baz', 'mno'
-        code_stats = collections.OrderedDict()
-        code_stats[code_obj1] = {10: 20}
-        code_stats[code_obj2] = {30: 40}
-        self.assertListEqual(
-            self._profile._transform_stats(code_stats),
-            [(('foo.py', 10, 'baz'), 20), (('bar.py', 30, 'mno'), 40)])
-
-
 class CodeEventsTrackerUnittest(unittest.TestCase):
     def setUp(self):
         self._tracker = object.__new__(profile_wrappers.CodeEventsTracker)

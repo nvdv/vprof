@@ -74,17 +74,19 @@ class StatsHandler(http_server.SimpleHTTPRequestHandler):
             self.end_headers()
 
 
-def start(host, port, profile_stats):
+def start(host, port, profile_stats, dont_start_browser):
     """Starts HTTP server with specified parameters.
 
     Args:
         host: Server hostname.
         port: Server port.
         profile_stats: Dict with collected progran stats.
+        dont_start_browser: Whether to start browser after profiling.
     """
     stats_handler = functools.partial(
         StatsHandler, profile_stats)
-    webbrowser.open('http://{}:{}/'.format(host, port))
+    if not dont_start_browser:
+        webbrowser.open('http://{}:{}/'.format(host, port))
     try:
         _StatsServer((host, port), stats_handler).serve_forever()
     except KeyboardInterrupt:

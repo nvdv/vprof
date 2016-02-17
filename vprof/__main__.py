@@ -29,6 +29,9 @@ def main():
     parser.add_argument('--debug', dest='debug_mode',
                         action='store_true', default=False,
                         help="Don't suppress error messages")
+    parser.add_argument('-n', '--no-browser', dest='dont_start_browser',
+                        action='store_true', default=False,
+                        help='Do not start browser after profiling')
     args = parser.parse_args()
 
     if len(args.profilers) > len(set(args.profilers)):
@@ -49,7 +52,8 @@ def main():
     if not args.debug_mode:
         sys.stderr = open(os.devnull, "w")
     print('Starting HTTP server...')
-    stats_server.start(_HOST, args.port, program_stats)
+    stats_server.start(
+        _HOST, args.port, program_stats, args.dont_start_browser)
 
 if __name__ == "__main__":
     main()
