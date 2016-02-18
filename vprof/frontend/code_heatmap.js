@@ -68,7 +68,7 @@ CodeHeatmap.prototype.changeBackgroundColor_ = function(_, i) {
 /**
  * Shows line execution count inside tooltip and adds line highlighting.
  * @param {Object} element - Element representing highlighted line.
- * @param {Object} tooltip - Element representing tooltip,
+ * @param {Object} tooltip - Element representing tooltip.
  * @param {number} i - Source line number.
  */
 CodeHeatmap.prototype.showTooltip_ = function(element, tooltip, i) {
@@ -85,7 +85,7 @@ CodeHeatmap.prototype.showTooltip_ = function(element, tooltip, i) {
 /**
  * Hides provided tooltip and removes line highlighting.
  * @param {Object} element - Element representing highlighted line.
- * @param {Object} tooltip - Element representing tooltip,
+ * @param {Object} tooltip - Element representing tooltip.
  */
 CodeHeatmap.prototype.hideTooltip_ = function(element, tooltip) {
   d3.select(element).attr('class', 'src-line-normal');
@@ -95,6 +95,7 @@ CodeHeatmap.prototype.hideTooltip_ = function(element, tooltip) {
 /**
  * Adds line numbers and additional formatting since highlight.js does not
  * support them.
+ * @static
  * @param {string} srcCode - Python source code.
  * @returns {string}
  */

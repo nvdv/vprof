@@ -83,8 +83,7 @@ def start(host, port, profile_stats, dont_start_browser):
         profile_stats: Dict with collected progran stats.
         dont_start_browser: Whether to start browser after profiling.
     """
-    stats_handler = functools.partial(
-        StatsHandler, profile_stats)
+    stats_handler = functools.partial(StatsHandler, profile_stats)
     if not dont_start_browser:
         webbrowser.open('http://{}:{}/'.format(host, port))
     try:
