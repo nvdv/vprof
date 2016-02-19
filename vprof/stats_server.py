@@ -22,49 +22,57 @@ _PROFILE_HTML = '%s/profile.html' % _STATIC_DIR
 
 
 class _StatsServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
-    """Declares Multithreaded HTTP server."""
+    """Declares multithreaded HTTP server."""
     allow_reuse_address = True
 
 
 class StatsHandler(http_server.SimpleHTTPRequestHandler):
     """Program stats request handler."""
-    ROOT_URI = '/'
-    PROFILE_URI = '/profile'
 
     def __init__(self, profile_json, *args, **kwargs):
         self._profile_json = profile_json
+        self.uri_map = {
+            '/': self.handle_root,
+            '/profile': self.handle_profile,
+        }
         # Since this class is old-style - call parent method directly.
         http_server.SimpleHTTPRequestHandler.__init__(
             self, *args, **kwargs)
 
+    def handle_root(self):
+        """Handles index.html requests."""
+        res_filename = os.path.join(
+            os.path.dirname(__file__), _PROFILE_HTML)
+        with io.open(res_filename, 'rb') as res_file:
+            content = res_file.read()
+        return content, 'text/html'
+
+    def handle_profile(self):
+        """Handles profile stats requests."""
+        return json.dumps(self._profile_json), 'text/json'
+
+    def handle_other(self):
+        """Handles static files requests."""
+        res_filename = os.path.join(
+            os.path.dirname(__file__), _STATIC_DIR,
+            os.path.basename(self.path))
+        with io.open(res_filename, 'rb') as res_file:
+            content = res_file.read()
+        _, extension = os.path.splitext(self.path)
+        return content, 'text/%s' % extension
+
     def do_GET(self):
         """Handles HTTP GET requests."""
-        if self.path == self.ROOT_URI:
-            res_filename = os.path.join(
-                os.path.dirname(__file__), _PROFILE_HTML)
-            with io.open(res_filename, 'rb') as res_file:
-                output = res_file.read()
-            content_type = 'text/html'
-        elif self.path == self.PROFILE_URI:
-            output = json.dumps(self._profile_json)
-            content_type = 'text/json'
-        else:
-            res_filename = os.path.join(
-                os.path.dirname(__file__), _STATIC_DIR,
-                os.path.basename(self.path))
-            with io.open(res_filename, 'rb') as res_file:
-                output = res_file.read()
-            _, extension = os.path.splitext(self.path)
-            content_type = 'text/%s' % extension
-
+        handler = self.uri_map.get(self.path) or self.handle_other
+        content, content_type = handler()
         self._send_response(
             200, headers=(('Content-type', '%s; charset=utf-8' % content_type),
-                          ('Content-Length', len(output))))
+                          ('Content-Length', len(content))))
         # Convert to bytes for Python 3.
-        if (sys.version_info[0] >= 3) and isinstance(output, str):
-            self.wfile.write(bytes(output, 'utf-8'))
+        if (sys.version_info[0] >= 3) and isinstance(content, str):
+            self.wfile.write(bytes(content, 'utf-8'))
         else:
-            self.wfile.write(output)
+            self.wfile.write(content)
 
     def _send_response(self, http_code, message=None, headers=None):
         """Sends HTTP response code, message and headers."""
