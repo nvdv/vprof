@@ -4,7 +4,9 @@ import os
 import sys
 
 from collections import OrderedDict
-from vprof import profile_wrappers
+from vprof import code_heatmap
+from vprof import memory_profile
+from vprof import runtime_profile
 from vprof import stats_server
 
 
@@ -12,9 +14,9 @@ _MODULE_DESC = 'Python visual profiler'
 _HOST = 'localhost'
 
 _PROFILE_MAP = {
-    'c': profile_wrappers.RuntimeProfile,
-    'm': profile_wrappers.MemoryProfile,
-    'h': profile_wrappers.CodeHeatmapProfile,
+    'c': runtime_profile.RuntimeProfile,
+    'm': memory_profile.MemoryProfile,
+    'h': code_heatmap.CodeHeatmapProfile,
 }
 
 def main():

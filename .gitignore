@@ -1,0 +1,3 @@
+*.pyc
+vprof/frontend/vprof_min.js
+.DS_Store
