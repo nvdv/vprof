@@ -1,9 +1,9 @@
 """Module for runtime profiling."""
-import base_profile
 import cProfile
 import pstats
 
 from collections import defaultdict
+from vprof import base_profile
 
 
 class RuntimeProfile(base_profile.BaseProfile):

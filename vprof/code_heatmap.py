@@ -1,9 +1,9 @@
 """Module for code heatmap rendering."""
-import base_profile
 import inspect
 import sys
 
 from collections import defaultdict
+from vprof import base_profile
 
 
 class CodeHeatmapCalculator(object):

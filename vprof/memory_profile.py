@@ -1,11 +1,12 @@
 """Module for memory profiling."""
-import base_profile
 import inspect
 import os
 import psutil
 import sys
 
 from collections import deque
+from vprof import base_profile
+
 
 _BYTES_IN_MB = 1024 * 1024
 
