@@ -6,16 +6,8 @@ import os
 import sys
 import webbrowser
 
-# For Python 2 and Python 3 compatibility.
-try:
-    import SimpleHTTPServer as http_server
-except ImportError:
-    import http.server as http_server
-
-try:
-    import SocketServer as socketserver
-except ImportError:
-    import socketserver
+from six.moves import socketserver
+from six.moves import SimpleHTTPServer as http_server
 
 _STATIC_DIR = 'frontend'
 _PROFILE_HTML = '%s/profile.html' % _STATIC_DIR
