@@ -9,10 +9,9 @@ from vprof import memory_profile
 from vprof import runtime_profile
 from vprof import stats_server
 
-
+_PROGRAN_NAME = 'vprof'
 _MODULE_DESC = 'Python visual profiler'
 _HOST = 'localhost'
-
 _PROFILE_MAP = {
     'c': runtime_profile.RuntimeProfile,
     'm': memory_profile.MemoryProfile,
@@ -21,19 +20,20 @@ _PROFILE_MAP = {
 
 def main():
     """Visual profiler main function."""
-    parser = argparse.ArgumentParser(description=_MODULE_DESC)
-    parser.add_argument('profilers', metavar='opts',
-                        help='Profilers configuration')
+    parser = argparse.ArgumentParser(
+        prog=_PROGRAN_NAME, description=_MODULE_DESC)
+    parser.add_argument('profilers', metavar='options',
+                        help='profiler configuration')
     parser.add_argument('source', metavar='src', nargs=1,
-                        help='Python program to profile')
+                        help='Python module to profile')
     parser.add_argument('--port', dest='port', default=8000, type=int,
-                        help='Internal webserver port')
+                        help='set internal webserver port')
     parser.add_argument('--debug', dest='debug_mode',
                         action='store_true', default=False,
-                        help="Don't suppress error messages")
+                        help="don't suppress error messages")
     parser.add_argument('-n', '--no-browser', dest='dont_start_browser',
                         action='store_true', default=False,
-                        help='Do not start browser after profiling')
+                        help="don't start browser after profiling")
     args = parser.parse_args()
 
     if len(args.profilers) > len(set(args.profilers)):
