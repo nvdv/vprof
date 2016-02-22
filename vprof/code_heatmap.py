@@ -50,9 +50,9 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
     def run_profiler(self):
         """Calculates code heatmap for specified Python program."""
         try:
-            with open(self._program_name, 'rb') as srcfile,\
+            with open(self._program_name, 'r') as srcfile,\
                 CodeHeatmapCalculator() as prof:
-                src_code = srcfile.read().decode('utf-8')
+                src_code = srcfile.read()
                 code = compile(src_code, self._program_name, 'exec')
                 prof.add_code(code)
                 exec(code, self._globs, None)
