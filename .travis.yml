@@ -11,7 +11,6 @@ addons:
       - npm
 
 install:
-  - pip install pylint
   - make deps_install
 
 script:
