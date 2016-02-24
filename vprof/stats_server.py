@@ -45,9 +45,13 @@ class StatsHandler(http_server.SimpleHTTPRequestHandler):
 
     def handle_other(self):
         """Handles static files requests."""
+        res_basename = os.path.basename(self.path)
+        # TODO(nvdv): Replace this workaround with real favicon.
+        if res_basename == 'favicon.ico':
+            return '', ''
         res_filename = os.path.join(
             os.path.dirname(__file__), _STATIC_DIR,
-            os.path.basename(self.path))
+            res_basename)
         with io.open(res_filename, 'rb') as res_file:
             content = res_file.read()
         _, extension = os.path.splitext(self.path)
