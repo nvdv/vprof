@@ -63,3 +63,13 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
             'srcCode': src_code,
             'heatmap': prof.heatmap
         }
+
+    def run(self):
+        """Runs code heatmap calculation and returns calculated heatmap.
+
+        Executed in current process to avoid crashes.
+        https://github.com/nvdv/vprof/issues/26
+        """
+        code_heatmap = {}
+        self.collect_stats(code_heatmap)
+        return code_heatmap
