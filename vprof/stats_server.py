@@ -13,7 +13,7 @@ _STATIC_DIR = 'frontend'
 _PROFILE_HTML = '%s/profile.html' % _STATIC_DIR
 
 
-class _StatsServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
+class StatsServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     """Declares multithreaded HTTP server."""
     allow_reuse_address = True
 
@@ -92,7 +92,7 @@ def start(host, port, profile_stats, dont_start_browser):
     if not dont_start_browser:
         webbrowser.open('http://{}:{}/'.format(host, port))
     try:
-        _StatsServer((host, port), stats_handler).serve_forever()
+        StatsServer((host, port), stats_handler).serve_forever()
     except KeyboardInterrupt:
         print('Stopping...')
         sys.exit(0)

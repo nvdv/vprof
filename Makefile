@@ -2,7 +2,8 @@ all: lint test deps_install install clean
 
 .PHONY: test
 test:
-	python -m vprof.tests
+	python -m unittest discover -b vprof "*_test.py"
+	python -m unittest discover -b vprof "*_e2e.py"
 	npm run test
 
 install:

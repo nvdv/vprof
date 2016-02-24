@@ -1,12 +1,13 @@
-"""Code heatmap end to end tests."""
+"""Memory profile end to end tests."""
 import json
-import multiprocessing
+import functools
+import threading
 import unittest
 
 from six.moves import builtins
 from six.moves import urllib
 
-from vprof import code_heatmap
+from vprof import memory_profile
 from vprof import stats_server
 
 # For Python 2 and Python 3 compatibility.
@@ -27,20 +28,21 @@ list(fib(20))
 _HOST, _PORT = 'localhost', 12345
 
 
-class CodeHeatmapEndToEndTest(unittest.TestCase):
+class MemoryProfilepEndToEndTest(unittest.TestCase):
 
     def setUp(self):
         self.patch = mock.patch.object(
             builtins, 'open', mock.mock_open(read_data=_TEST_FILE))
         self.patch.start()
-        program_stats = code_heatmap.CodeHeatmapProfile('foo.py').run()
-        self.process = multiprocessing.Process(
-            target=stats_server.start, args=(
-                _HOST, _PORT, program_stats, True))
-        self.process.start()
+        program_stats = memory_profile.MemoryProfile('foo.py').run()
+        stats_handler = functools.partial(
+            stats_server.StatsHandler, program_stats)
+        self.server = stats_server.StatsServer(
+            (_HOST, _PORT), stats_handler)
+        threading.Thread(target=self.server.serve_forever).start()
 
     def tearDown(self):
-        self.process.terminate()
+        self.server.shutdown()
         self.patch.stop()
 
     def testRequest(self):
@@ -48,7 +50,9 @@ class CodeHeatmapEndToEndTest(unittest.TestCase):
             'http://%s:%s/profile' % (_HOST, _PORT))
         stats = json.loads(response.read().decode('utf-8'))
         self.assertEqual(stats['programName'], 'foo.py')
-        self.assertEqual(stats['srcCode'], _TEST_FILE)
-        self.assertDictEqual(
-            stats['heatmap'],
-            {'2': 1, '3': 1, '4': 21, '5': 20, '6': 20, '8': 1})
+        self.assertEqual(stats['totalEvents'], 64)
+        first_event = stats['codeEvents'][0]
+        self.assertEqual(first_event[0], 1)
+        self.assertEqual(first_event[1], 2)
+        self.assertEqual(first_event[3], 'line')
+        self.assertEqual(first_event[4], '<module>')
