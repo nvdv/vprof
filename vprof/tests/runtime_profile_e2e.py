@@ -1,4 +1,4 @@
-"""Memory profile end to end tests."""
+"""Runtime profile end to end tests."""
 import json
 import functools
 import threading
@@ -7,7 +7,7 @@ import unittest
 from six.moves import builtins
 from six.moves import urllib
 
-from vprof import memory_profile
+from vprof import runtime_profile
 from vprof import stats_server
 
 # For Python 2 and Python 3 compatibility.
@@ -25,16 +25,16 @@ def fib(n):
 
 list(fib(20))
 """
-_HOST, _PORT = 'localhost', 12345
+_HOST, _PORT = 'localhost', 12347
 
 
-class MemoryProfileEndToEndTest(unittest.TestCase):
+class RuntimeProfileEndToEndTest(unittest.TestCase):
 
     def setUp(self):
         self.patch = mock.patch.object(
             builtins, 'open', mock.mock_open(read_data=_TEST_FILE))
         self.patch.start()
-        program_stats = memory_profile.MemoryProfile('foo.py').run()
+        program_stats = runtime_profile.RuntimeProfile('foo.py').run()
         stats_handler = functools.partial(
             stats_server.StatsHandler, program_stats)
         self.server = stats_server.StatsServer(
@@ -50,9 +50,6 @@ class MemoryProfileEndToEndTest(unittest.TestCase):
             'http://%s:%s/profile' % (_HOST, _PORT))
         stats = json.loads(response.read().decode('utf-8'))
         self.assertEqual(stats['programName'], 'foo.py')
-        self.assertEqual(stats['totalEvents'], 64)
-        first_event = stats['codeEvents'][0]
-        self.assertEqual(first_event[0], 1)
-        self.assertEqual(first_event[1], 2)
-        self.assertEqual(first_event[3], 'line')
-        self.assertEqual(first_event[4], '<module>')
+        self.assertTrue('primitiveCalls' in stats)
+        self.assertTrue('runTime' in stats)
+        self.assertTrue('totalCalls' in stats)

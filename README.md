@@ -61,7 +61,7 @@ Check ```vprof -h``` for full list of supported parameters.
 ## Testing
 Just run
 
-    make test
+    make test && make e2e_test
 
 ## License
 BSD
