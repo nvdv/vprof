@@ -99,20 +99,20 @@ function renderPage(data) {
       case 'c':
         createFlameChartTab_(tabHeader, status);
         var flameChart = createHiddenTabContent_('flame-chart');
-        flame_chart.renderFlameChart(data.c, flameChart);
         flameChart.attr('style', 'display: ' + display);
+        flame_chart.renderFlameChart(data.c, flameChart);
         break;
       case 'm':
         createMemoryChartTab_(tabHeader, status);
         var memoryChart = createHiddenTabContent_('memory-chart');
-        memory_stats.renderMemoryStats(data.m, memoryChart);
         memoryChart.attr('style', 'display: ' + display);
+        memory_stats.renderMemoryStats(data.m, memoryChart);
         break;
       case 'h':
         createCodeHeatmapTab_(tabHeader, status);
         var codeHeatmap = createHiddenTabContent_('code-heatmap');
-        code_heatmap.renderCodeHeatmap(data.h, codeHeatmap);
         codeHeatmap.attr('style', 'display: ' + display);
+        code_heatmap.renderCodeHeatmap(data.h, codeHeatmap);
         break;
     }
   }

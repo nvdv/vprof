@@ -15,10 +15,9 @@ var d3 = require('d3');
  * @param {Object} data - Data for flame chart rendering.
  */
 function FlameChart(parent, data) {
-  this.HEIGHT_SCALE = 0.93;
-  this.HEIGHT = window.innerHeight * this.HEIGHT_SCALE;
-  this.WIDTH_SCALE = 0.98;
-  this.WIDTH = window.innerWidth * this.WIDTH_SCALE;
+  this.PAD_SIZE = 10;
+  this.HEIGHT = parent.node().scrollHeight - this.PAD_SIZE;
+  this.WIDTH = parent.node().scrollWidth - this.PAD_SIZE;
   this.TEXT_OFFSET_X = 5;
   this.TEXT_OFFSET_Y= 14;
   this.TEXT_CUTOFF = 0.075 * this.WIDTH;

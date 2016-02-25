@@ -1,6 +1,10 @@
 body {
   background: #4C4C4C;
   font-family: 'Helvetica Neue', Helvetica;
+  margin-bottom: 5px;
+  margin-left: 0;
+  margin-right: 0;
+  margin-top: 5px;
 }
 
 .tab-header {
@@ -9,6 +13,7 @@ body {
 
 .tab-content {
   background: #F1F1F1;
+  height: 96%;
 }
 
 .tab-header li {
@@ -30,7 +35,7 @@ body {
 
 svg {
   font-size: 13px;
-  padding: 10px;
+  padding: 5px;
 }
 
 .memory-graph {
@@ -125,14 +130,6 @@ svg {
 p {
   margin: 0px;
   text-align: left;
-}
-
-.memory-bar-normal {
-  opacity: 0.85;
-}
-
-.memory-bar-hightlight {
-  opacity: 0.5;
 }
 
 #code-container {
