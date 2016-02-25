@@ -19,7 +19,6 @@ function FlameChart(parent, data) {
   this.HEIGHT = window.innerHeight * this.HEIGHT_SCALE;
   this.WIDTH_SCALE = 0.98;
   this.WIDTH = window.innerWidth * this.WIDTH_SCALE;
-  this.ZOOM_DURATION = 250;
   this.TEXT_OFFSET_X = 5;
   this.TEXT_OFFSET_Y= 14;
   this.TEXT_CUTOFF = 0.075 * this.WIDTH;
@@ -90,9 +89,7 @@ FlameChart.prototype.zoomIn_ = function(node, allNodes, titles) {
   this.xScale_.domain([node.x, node.x + node.dx]);
   this.yScale_.domain([0, 1 - node.y]).range([0, this.HEIGHT]);
   var self = this;
-  allNodes.transition()
-    .duration(this.ZOOM_DURATION)
-    .attr('x', function(d) { return self.xScale_(d.x); })
+  allNodes.attr('x', function(d) { return self.xScale_(d.x); })
     .attr('y', function(d) { return self.yScale_(1 - d.y - d.dy); })
     .attr('width', function(d) {
       return self.xScale_(d.x + d.dx) - self.xScale_(d.x); })
@@ -110,9 +107,7 @@ FlameChart.prototype.zoomOut_ = function(allNodes, titles) {
   this.xScale_.domain([0, 1]);
   this.yScale_.domain([0, 1]);
   var self = this;
-  allNodes.transition()
-    .duration(this.ZOOM_DURATION)
-    .attr('x', function(d) { return self.xScale_(d.x); })
+  allNodes.attr('x', function(d) { return self.xScale_(d.x); })
     .attr('y', function(d) { return self.yScale_(1 - d.y - d.dy); })
     .attr('width', function(d) { return self.xScale_(d.dx); })
     .attr('height', function(d) { return self.yScale_(d.dy); });
@@ -125,9 +120,7 @@ FlameChart.prototype.zoomOut_ = function(allNodes, titles) {
  */
 FlameChart.prototype.redrawTitles_ = function(titles) {
   var self = this;
-  titles.transition()
-    .duration(this.ZOOM_DURATION)
-    .attr('x', function(d) { return self.xScale_(d.x) + self.TEXT_OFFSET_X; })
+  titles.attr('x', function(d) { return self.xScale_(d.x) + self.TEXT_OFFSET_X; })
     .attr('y', function(d) {
       return self.yScale_(1 - d.y - d.dy) + self.TEXT_OFFSET_Y; })
     .text(function(d) {
