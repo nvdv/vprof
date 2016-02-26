@@ -1,5 +1,5 @@
 /**
- * Renders memory stats.
+ * @file Memory chart rendering.
  */
 
 /* jshint strict: false, browser: true, globalstrict: true */
@@ -8,43 +8,308 @@
 'use strict';
 var d3 = require('d3');
 
-var MARGIN_LEFT = 40;
-var MARGIN_RIGHT = 5;
-var MARGIN_TOP = 15;
-var MARGIN_BOTTOM  = 30;
-var HEIGHT_SCALE = 0.93;
-var WIDTH_SCALE = 0.97;
-var FULL_HEIGHT = window.innerHeight * HEIGHT_SCALE;
-var FULL_WIDTH = window.innerWidth * WIDTH_SCALE;
-var GRAPH_HEIGHT = FULL_HEIGHT - HEIGHT_SCALE * (MARGIN_TOP + MARGIN_BOTTOM);
-var GRAPH_WIDTH = FULL_WIDTH - WIDTH_SCALE * (MARGIN_LEFT + MARGIN_RIGHT);
-var MIN_RANGE_C = 0.98;
-var MAX_RANGE_C = 1.02;
-var AXIS_TEXT_X = GRAPH_WIDTH;
-var AXIS_TEXT_Y = 12;
-var AXIS_TEXT_Y_OFFSET = 30;
-var LEGEND_X = GRAPH_WIDTH - 350;
-var LEGEND_Y = 100;
-var MOUSE_X_OFFSET = 10;
-var TICKS_NUMBER = 10;
-var FOCUS_RADIUS = 5;
-var DOT_RADIUS = 3;
-var TOOLTIP_OFFSET = 20;
-var SCALE_FACTOR = 3;
-var MAX_ZOOM_POINTS = 20;
+/**
+ * Represents memory chart.
+ * @constructor
+ * @param {Object} parent - Parent element for memory chart.
+ * @param {Object} data - Data for memory chart rendering.
+ */
+function MemoryChart(parent, data) {
+  this.MARGIN_LEFT = 40;
+  this.MARGIN_RIGHT = 5;
+  this.MARGIN_TOP = 15;
+  this.MARGIN_BOTTOM  = 30;
+  this.HEIGHT_SCALE = 0.93;
+  this.WIDTH_SCALE = 0.97;
+  this.FULL_HEIGHT = window.innerHeight * this.HEIGHT_SCALE;
+  this.FULL_WIDTH = window.innerWidth * this.WIDTH_SCALE;
+  this.GRAPH_HEIGHT = this.FULL_HEIGHT - this.HEIGHT_SCALE * (
+      this.MARGIN_TOP + this.MARGIN_BOTTOM);
+  this.GRAPH_WIDTH = this.FULL_WIDTH - this.WIDTH_SCALE * (
+      this.MARGIN_LEFT + this.MARGIN_RIGHT);
+  this.MIN_RANGE_C = 0.98;
+  this.MAX_RANGE_C = 1.02;
+  this.AXIS_TEXT_X = this.GRAPH_WIDTH;
+  this.AXIS_TEXT_Y = 12;
+  this.AXIS_TEXT_Y_OFFSET = 30;
+  this.LEGEND_X = this.GRAPH_WIDTH - 350;
+  this.LEGEND_Y = 100;
+  this.MOUSE_X_OFFSET = 10;
+  this.TICKS_NUMBER = 10;
+  this.FOCUS_RADIUS = 5;
+  this.DOT_RADIUS = 3;
+  this.TOOLTIP_OFFSET = 20;
+  this.SCALE_FACTOR = 3;
+  this.MAX_ZOOM_POINTS = 20;
 
-/** Renders memory stats legend. */
-function renderLegend_(parent, data) {
-  parent.append('div')
-    .attr('class', 'legend')
-    .html('<p>Filename: ' + data.programName + '</p>' +
-          '<p>Total lines executed: ' + data.totalEvents + '</p>')
-    .style('left', LEGEND_X)
-    .style('top', LEGEND_Y);
+  this.data_ = data;
+  this.parent_ = parent;
+  this.xScale_ = d3.scale.linear()
+    .domain(d3.extent(this.data_.codeEvents, function(d) { return d[0]; }))
+    .range([0, this.GRAPH_WIDTH]);
+  this.xAxis_ = d3.svg.axis()
+    .scale(this.xScale_)
+    .ticks(Math.min(this.TICKS_NUMBER, this.data_.codeEvents.length))
+    .tickFormat(d3.format(',.0f'))
+    .orient('bottom');
+
+  this.yRange_ = d3.extent(this.data_.codeEvents, function(d) { return d[2]; });
+  this.yScale_ = d3.scale.linear()
+    .domain([this.MIN_RANGE_C * this.yRange_[0],
+             this.MAX_RANGE_C * this.yRange_[1]])
+    .range([this.GRAPH_HEIGHT, 0]);
+  this.yAxis_ = d3.svg.axis()
+      .scale(this.yScale_)
+      .orient('left');
+
+  this.memoryGraph_ = d3.svg.area()
+    .x(function(d) { return this.xScale_(d[0]); })
+    .y0(this.GRAPH_HEIGHT)
+    .y1(function(d) { return this.yScale_(d[2]); });
+
+  this.currZoomRange_ = {
+    'highlightStartIndex': 0,
+    'highlightEndIndex': 0,
+    'highlightIndexRange': 0,
+    'zoomIndexStart': 0,
+    'zoomIndexEnd': this.data_.codeEvents.length,
+    'zoomIndexRange': this.data_.codeEvents.length,
+  };
 }
 
-/** Generates tooltip text from line stats. */
-function generateTooltipText_(stats) {
+/** Renders memory chart. */
+MemoryChart.prototype.render = function() {
+  var canvas = this.parent_.append('svg')
+    .attr('width', this.FULL_WIDTH)
+    .attr('height', this.FULL_HEIGHT)
+    .append('g')
+    .attr('transform',
+          'translate(' + this.MARGIN_LEFT + ',' + this.MARGIN_TOP + ')');
+  var tooltip = this.parent_.append('div')
+    .attr('class', 'tooltip tooltip-invisible');
+
+  this.renderLegend_();
+
+  var path = canvas.append('path')
+    .attr('class', 'memory-graph')
+    .attr('d', this.memoryGraph_(this.data_.codeEvents));
+
+  var focus = canvas.append('circle')
+    .style('display', 'none')
+    .attr('class', 'memory-graph-focus')
+    .attr('r', this.FOCUS_RADIUS)
+    .attr('transform',
+          'translate(' + (-100) + ', '  + (-100) + ')');  // Hide focus.
+  var focusXLine = canvas.append('line')
+    .attr('class', 'focus-line')
+    .attr('y1', this.GRAPH_HEIGHT);
+  var focusYLine = canvas.append('line')
+    .attr('class', 'focus-line')
+    .attr('x1', 0);
+  var focusHiglightArc = canvas.append('path')
+    .attr('class', 'focus-line-highlight');
+
+  var self = this;
+  canvas.style('pointer-events', 'all')
+    .on('mouseover', function() {
+        self.showFocus_(focus, focusXLine, focusYLine, focusHiglightArc); })
+    .on('mouseout', function() { self.hideFocus_(
+        focus, tooltip, focusXLine, focusYLine, focusHiglightArc); })
+    .on('mousemove', function() { self.redrawFocus_(
+        canvas, focus, tooltip, focusXLine, focusYLine, focusHiglightArc); });
+
+  // Draw axes.
+  canvas.append('g')
+    .attr('class', 'x axis')
+    .attr('transform', 'translate(0,' + this.GRAPH_HEIGHT + ')')
+    .call(this.xAxis_)
+    .append('text')
+    .attr('x', this.AXIS_TEXT_X)
+    .attr('y', this.AXIS_TEXT_Y - this.AXIS_TEXT_Y_OFFSET)
+    .attr('dy', '.71em')
+    .text('Executed lines');
+
+  canvas.append('g')
+    .attr('class', 'y axis')
+    .call(this.yAxis_)
+    .append('text')
+    .attr('transform', 'rotate(-90)')
+    .attr('y', this.AXIS_TEXT_Y)
+    .attr('dy', '.71em')
+    .text('Memory usage, MB');
+
+  // Zoom in.
+  canvas.on('click', function() {
+      self.zoomIn_(path, canvas, focus, tooltip, focusXLine,
+                   focusYLine, focusHiglightArc); });
+  // Zoom out.
+  this.parent_.on('dblclick', function() { self.zoomOut_(path, canvas); });
+};
+
+/**
+ * Handles zoom in.
+ * @param {Object} path - Represents memory graph.
+ * @param {Object} canvas - Represents drawing canvas.
+ * @param {Object} focus - Object representing focus circle.
+ * @param {Object} tooltip - Object representing tooltip.
+ * @param {Object} focusXLine - Object representing focus line parallel to OY.
+ * @param {Object} focusYLine - Object representing focus line parallel to OX.
+ * @param {Object} focusHiglightArc - Object representing focus highlight region.
+ */
+MemoryChart.prototype.zoomIn_ = function(path, canvas, focus, tooltip,
+    focusXLine, focusYLine, focusHiglightArc) {
+  var crds = d3.mouse(canvas.node());
+  var midIndex = Math.round(this.xScale_.invert(crds[0])) - 1;
+  this.updateZoomRangeParams_(midIndex);
+  if (this.currZoomRange_.zoomIndexStart < this.currZoomRange_.zoomIndexEnd) {
+    if (this.currZoomRange_.zoomIndexRange < this.TICKS_NUMBER) {
+      this.xAxis_.ticks(this.currZoomRange_.zoomIndexRange);
+    }
+    this.xScale_.domain(
+      [this.data_.codeEvents[this.currZoomRange_.zoomIndexStart][0],
+       this.data_.codeEvents[this.currZoomRange_.zoomIndexEnd][0]]);
+    var eventsSlice = this.data_.codeEvents.slice(
+        this.currZoomRange_.zoomIndexStart,
+        this.currZoomRange_.zoomIndexEnd + 1);
+    path.attr('d', this.memoryGraph_(eventsSlice));
+    canvas.selectAll('g.x.axis')
+      .call(this.xAxis_);
+
+    var closestX = this.xScale_(this.data_.codeEvents[midIndex][0]);
+    var closestY = this.yScale_(this.data_.codeEvents[midIndex][2]);
+    focus.attr('transform', 'translate(' + closestX + ', ' +
+                closestY + ')');
+    focusXLine.attr('x1', closestX)
+      .attr('x2', closestX)
+      .attr('y2', closestY);
+    focusYLine.attr('y1', closestY)
+      .attr('x2', closestX)
+      .attr('y2', closestY);
+    var tooltipText = MemoryChart.generateTooltipText_(
+        this.data_.codeEvents[midIndex]);
+    tooltip.attr('class', 'tooltip tooltip-visible')
+      .html(tooltipText)
+      .style('left', closestX)
+      .style('top', closestY - this.TOOLTIP_OFFSET);
+    if (this.currZoomRange_.zoomIndexRange > this.MAX_ZOOM_POINTS) {
+      this.updateHighlightRangeParams_(midIndex);
+      var highlightSlice = this.data_.codeEvents.slice(
+          this.currZoomRange_.highlightStartIndex,
+          this.currZoomRange_.highlightEndIndex + 1);
+      focusHiglightArc.attr('d', this.memoryGraph_(highlightSlice));
+    } else {
+      focusHiglightArc.style('display', 'none');
+    }
+  }
+};
+
+/**
+ * Handles zoom out.
+ * @param {Object} path - Represents memory graph.
+ * @param {Object} canvas - Represents drawing canvas.
+ */
+MemoryChart.prototype.zoomOut_ = function(path, canvas) {
+  this.resetZoomRangeParams_();
+  this.xScale_.domain(
+      d3.extent(this.data_.codeEvents, function(d) { return d[0]; }));
+  path.attr('d', this.memoryGraph_(this.data_.codeEvents));
+  this.xAxis_.ticks(
+      Math.min(this.TICKS_NUMBER, this.data_.codeEvents.length));
+  canvas.selectAll('g.x.axis')
+    .call(this.xAxis_);
+};
+
+/** Renders memory chart legend. */
+MemoryChart.prototype.renderLegend_ = function() {
+  this.parent_.append('div')
+    .attr('class', 'legend')
+    .html('<p>Filename: ' + this.data_.programName + '</p>' +
+          '<p>Total lines executed: ' + this.data_.totalEvents + '</p>')
+    .style('left', this.LEGEND_X)
+    .style('top', this.LEGEND_Y);
+};
+
+/**
+ * Hides focus, it's guiding lines and tooltip.
+ * @param {Object} focus - Object representing focus circle.
+ * @param {Object} tooltip - Object representing tooltip.
+ * @param {Object} focusXLine - Object representing focus line parallel to OY.
+ * @param {Object} focusYLine - Object representing focus line parallel to OX.
+ * @param {Object} focusHiglightArc - Object representing focus highlight region.
+ */
+MemoryChart.prototype.hideFocus_ = function(focus, tooltip, focusXLine,
+    focusYLine, focusHiglightArc) {
+  focus.style('display', 'none');
+  tooltip.attr('class', 'tooltip tooltip-invisible');
+  focusXLine.style('display', 'none');
+  focusYLine.style('display', 'none');
+  focusHiglightArc.style('display', 'none');
+};
+
+/**
+ * Shows focus, it's guiding lines and tooltip.
+ * @param {Object} focus - Object representing focus circle.
+ * @param {Object} tooltip - Object representing tooltip.
+ * @param {Object} focusXLine - Object representing focus line parallel to OY.
+ * @param {Object} focusYLine - Object representing focus line parallel to OX.
+ * @param {Object} focusHiglightArc - Object representing focus highlight region.
+ */
+MemoryChart.prototype.showFocus_ = function(focus, focusXLine,
+    focusYLine, focusHiglightArc) {
+  focus.style('display', null);
+  focusXLine.style('display', null);
+  focusYLine.style('display', null);
+  if (this.currZoomRange_.zoomIndexRange > this.MAX_ZOOM_POINTS) {
+    focusHiglightArc.style('display', null);
+  }
+};
+
+/**
+ * Redraws focus, it's guiding lines and tooltip.
+ * @param {Object} canvas - Object representing canvas.
+ * @param {Object} focus - Object representing focus circle.
+ * @param {Object} tooltip - Object representing tooltip.
+ * @param {Object} focusXLine - Object representing focus line parallel to OY.
+ * @param {Object} focusYLine - Object representing focus line parallel to OX.
+ * @param {Object} focusHiglightArc - Object representing focus highlight region.
+ */
+MemoryChart.prototype.redrawFocus_ = function(canvas, focus, tooltip,
+    focusXLine, focusYLine, focusHiglightArc) {
+  var crds = d3.mouse(canvas.node());
+  var closestIndex = Math.round(this.xScale_.invert(crds[0])) - 1;
+  var closestX = this.xScale_(this.data_.codeEvents[closestIndex][0]);
+  var closestY = this.yScale_(this.data_.codeEvents[closestIndex][2]);
+  focus.attr('transform', 'translate(' + closestX + ', ' +
+              closestY + ')');
+  focusXLine.attr('x1', closestX)
+    .attr('x2', closestX)
+    .attr('y2', closestY);
+  focusYLine.attr('y1', closestY)
+    .attr('x2', closestX)
+    .attr('y2', closestY);
+  var tooltipText = MemoryChart.generateTooltipText_(
+    this.data_.codeEvents[closestIndex]);
+  tooltip.attr('class', 'tooltip tooltip-visible')
+    .html(tooltipText)
+    .style('left', closestX)
+    .style('top', closestY - this.TOOLTIP_OFFSET);
+
+  if (this.currZoomRange_.zoomIndexRange > this.MAX_ZOOM_POINTS) {
+    this.updateHighlightRangeParams_(closestIndex);
+    var highlightSlice = this.data_.codeEvents.slice(
+        this.currZoomRange_.highlightStartIndex,
+        this.currZoomRange_.highlightEndIndex + 1);
+    focusHiglightArc.attr('d', this.memoryGraph_(highlightSlice));
+  }
+};
+
+/**
+ * Generates tooltip text from line stats.
+ * @static
+ * @param {Object[]} stats - Line memory stats.
+ * @returns {string} - Text for tooltip with line stats.
+ */
+MemoryChart.generateTooltipText_ = function(stats) {
   var result = '';
   if (stats) {
     var functionName = stats[3].replace('<', '[').replace('>',  ']');
@@ -54,228 +319,64 @@ function generateTooltipText_(stats) {
                '<p>Memory usage: ' + stats[2] + ' MB</p>');
   }
   return result;
-}
-/** Updates highlight zone params based on previous params and mid index.*/
-function updateHighlightRangeParams_(midIndex, rangeParams) {
-  var startIndex = midIndex - Math.floor(
-      0.5 * rangeParams.zoomIndexRange / SCALE_FACTOR);
-  var endIndex = midIndex + Math.floor(
-      0.5 * rangeParams.zoomIndexRange / SCALE_FACTOR);
-  rangeParams.highlightStartIndex = Math.max(
-    startIndex, rangeParams.zoomIndexStart);
-  rangeParams.highlightEndIndex = Math.min(
-    endIndex, rangeParams.zoomIndexEnd);
-  rangeParams.highlightIndexRange = (
-    rangeParams.highlightEndIndex - rangeParams.highlightStartIndex);
-}
+};
 
-/** Updates zoom zone params based on previous params and mid index.*/
-function updateZoomRangeParams_(midIndex, rangeParams, maxLength) {
+/**
+ * Updates zoom highlight params based on previous params and mid index.
+ * @param {number} midIndex - Mid index of zoom region.
+ */
+MemoryChart.prototype.updateHighlightRangeParams_ = function(midIndex) {
   var startIndex = midIndex - Math.floor(
-      0.5 * rangeParams.zoomIndexRange / SCALE_FACTOR);
+      0.5 * this.currZoomRange_.zoomIndexRange / this.SCALE_FACTOR);
   var endIndex = midIndex + Math.floor(
-      0.5 * rangeParams.zoomIndexRange / SCALE_FACTOR);
-  rangeParams.zoomIndexStart = Math.max(startIndex, 0);
-  rangeParams.zoomIndexEnd = Math.min(endIndex, maxLength);
-  rangeParams.zoomIndexRange = (
-    rangeParams.zoomIndexEnd - rangeParams.zoomIndexStart);
-}
-/** Resets zoom range params to initial ones.*/
-function resetZoomRangeParams_(zoomRange, maxLength) {
-  zoomRange.highlightStartIndex = 0;
-  zoomRange.highlightEndIndex = 0;
-  zoomRange.highlightIndexRange =  0;
-  zoomRange.zoomIndexStart = 0;
-  zoomRange.zoomIndexEnd = maxLength;
-  zoomRange.zoomIndexRange = maxLength;
-}
+      0.5 * this.currZoomRange_.zoomIndexRange / this.SCALE_FACTOR);
+  this.currZoomRange_.highlightStartIndex = Math.max(
+      startIndex, this.currZoomRange_.zoomIndexStart);
+  this.currZoomRange_.highlightEndIndex = Math.min(
+      endIndex, this.currZoomRange_.zoomIndexEnd);
+  this.currZoomRange_.highlightIndexRange = (
+      this.currZoomRange_.highlightEndIndex -
+      this.currZoomRange_.highlightStartIndex);
+};
 
-// TODO(nvdv): Factor this function into separate class to improve readability.
-/** Renders memory usage graph. */
+/**
+ * Updates zoom region params based on previous params and mid index.
+ * @param {number} midIndex - Mid index of zoom region.
+ */
+MemoryChart.prototype.updateZoomRangeParams_ = function(midIndex) {
+  var startIndex = midIndex - Math.floor(
+      0.5 * this.currZoomRange_.zoomIndexRange / this.SCALE_FACTOR);
+  var endIndex = midIndex + Math.floor(
+      0.5 * this.currZoomRange_.zoomIndexRange / this.SCALE_FACTOR);
+  this.currZoomRange_.zoomIndexStart = Math.max(startIndex, 0);
+  this.currZoomRange_.zoomIndexEnd = Math.min(
+      endIndex, this.data_.codeEvents.length - 1);
+  this.currZoomRange_.zoomIndexRange = (
+      this.currZoomRange_.zoomIndexEnd -
+      this.currZoomRange_.zoomIndexStart);
+};
+
+/** Resets zoom range params. */
+MemoryChart.prototype.resetZoomRangeParams_ = function() {
+  this.currZoomRange_.highlightStartIndex = 0;
+  this.currZoomRange_.highlightEndIndex = 0;
+  this.currZoomRange_.highlightIndexRange =  0;
+  this.currZoomRange_.zoomIndexStart = 0;
+  this.currZoomRange_.zoomIndexEnd = this.data_.codeEvents.length;
+  this.currZoomRange_.zoomIndexRange = this.data_.codeEvents.length;
+};
+
+/**
+ * Renders memory chart and attaches it to parent.
+ * @param {Object} parent - Parent element for memory chart.
+ * @param {Object} data - Data for memory chart rendering.
+ */
 function renderMemoryStats(data, parent) {
-  var canvas = parent.append('svg')
-    .attr('width', FULL_WIDTH)
-    .attr('height', FULL_HEIGHT)
-    .append('g')
-    .attr('transform', 'translate(' + MARGIN_LEFT + ',' + MARGIN_TOP + ')');
-
-  var xScale = d3.scale.linear()
-    .domain(d3.extent(data.codeEvents, function(d) { return d[0]; }))
-    .range([0, GRAPH_WIDTH]);
-
-  var yRange = d3.extent(data.codeEvents, function(d) { return d[2]; });
-  var yScale = d3.scale.linear()
-    .domain([MIN_RANGE_C * yRange[0], MAX_RANGE_C * yRange[1]])
-    .range([GRAPH_HEIGHT, 0]);
-
-  var xAxis = d3.svg.axis()
-    .scale(xScale)
-    .ticks(Math.min(TICKS_NUMBER, data.codeEvents.length))
-    .tickFormat(d3.format(',.0f'))
-    .orient('bottom');
-
-  var yAxis = d3.svg.axis()
-    .scale(yScale)
-    .orient('left');
-
-  var tooltip = parent.append('div')
-    .attr('class', 'tooltip tooltip-invisible');
-
-  renderLegend_(parent, data);
-
-  var memoryGraph = d3.svg.area()
-    .x(function(d) { return xScale(d[0]); })
-    .y0(GRAPH_HEIGHT)
-    .y1(function(d) { return yScale(d[2]); });
-
-  var path = canvas.append('path')
-    .attr('class', 'memory-graph')
-    .attr('d', memoryGraph(data.codeEvents));
-
-  var focus = canvas.append('circle')
-    .style('display', 'none')
-    .attr('class', 'memory-graph-focus')
-    .attr('r', FOCUS_RADIUS)
-    .attr('transform', 'translate(' + (-100) + ', '  + (-100) + ')');
-
-  var focusXLine = canvas.append('line')
-    .attr('class', 'focus-line')
-    .attr('y1', GRAPH_HEIGHT);
-
-  var focusYLine = canvas.append('line')
-    .attr('class', 'focus-line')
-    .attr('x1', 0);
-
-  var focusHiglightArc = canvas.append('path')
-    .attr('class', 'focus-line-highlight');
-
-  var zoomRange = {
-    'highlightStartIndex': 0,
-    'highlightEndIndex': 0,
-    'highlightIndexRange': 0,
-    'zoomIndexStart': 0,
-    'zoomIndexEnd': data.codeEvents.length,
-    'zoomIndexRange': data.codeEvents.length,
-  };
-
-  canvas.style('pointer-events', 'all')
-    .on('mouseover', function() {
-      focus.style('display', null);
-      focusXLine.style('display', null);
-      focusYLine.style('display', null);
-      if (zoomRange.zoomIndexRange > MAX_ZOOM_POINTS) {
-        focusHiglightArc.style('display', null);
-      }
-    })
-    .on('mouseout', function() {
-      focus.style('display', 'none');
-      tooltip.attr('class', 'tooltip tooltip-invisible');
-      focusXLine.style('display', 'none');
-      focusYLine.style('display', 'none');
-      focusHiglightArc.style('display', 'none');
-    })
-    .on('mousemove', function() {
-      var crds = d3.mouse(canvas.node());
-      var closestIndex = Math.round(xScale.invert(crds[0])) - 1;
-      var closestX = xScale(data.codeEvents[closestIndex][0]);
-      var closestY = yScale(data.codeEvents[closestIndex][2]);
-      focus.attr('transform', 'translate(' + closestX + ', ' +
-                  closestY + ')');
-      focusXLine.attr('x1', closestX)
-        .attr('x2', closestX)
-        .attr('y2', closestY);
-      focusYLine.attr('y1', closestY)
-        .attr('x2', closestX)
-        .attr('y2', closestY);
-      var tooltipText = generateTooltipText_(data.codeEvents[closestIndex]);
-      tooltip.attr('class', 'tooltip tooltip-visible')
-        .html(tooltipText)
-        .style('left', closestX)
-        .style('top', closestY - TOOLTIP_OFFSET);
-
-      if (zoomRange.zoomIndexRange > MAX_ZOOM_POINTS) {
-        updateHighlightRangeParams_(closestIndex, zoomRange);
-        var highlightSlice = data.codeEvents.slice(
-          zoomRange.highlightStartIndex, zoomRange.highlightEndIndex + 1);
-        focusHiglightArc.attr('d', memoryGraph(highlightSlice));
-      }
-    });
-
-  // Draw axes.
-  canvas.append('g')
-    .attr('class', 'x axis')
-    .attr('transform', 'translate(0,' + GRAPH_HEIGHT + ')')
-    .call(xAxis)
-    .append('text')
-    .attr('x', AXIS_TEXT_X)
-    .attr('y', AXIS_TEXT_Y - AXIS_TEXT_Y_OFFSET)
-    .attr('dy', '.71em')
-    .text('Executed lines');
-
-  canvas.append('g')
-    .attr('class', 'y axis')
-    .call(yAxis)
-    .append('text')
-    .attr('transform', 'rotate(-90)')
-    .attr('y', AXIS_TEXT_Y)
-    .attr('dy', '.71em')
-    .text('Memory usage, MB');
-
-  // Zoom in.
-  canvas.on('click', function(d) {
-    var crds = d3.mouse(canvas.node());
-    var midIndex = Math.round(xScale.invert(crds[0])) - 1;
-    updateZoomRangeParams_(midIndex, zoomRange, data.codeEvents.length - 1);
-    if (zoomRange.zoomIndexStart < zoomRange.zoomIndexEnd) {
-      if (zoomRange.zoomIndexRange < TICKS_NUMBER) {
-        xAxis.ticks(zoomRange.zoomIndexRange);
-      }
-      xScale.domain([data.codeEvents[zoomRange.zoomIndexStart][0],
-                     data.codeEvents[zoomRange.zoomIndexEnd][0]]);
-      var eventsSlice = data.codeEvents.slice(
-          zoomRange.zoomIndexStart, zoomRange.zoomIndexEnd + 1);
-      path.attr('d', memoryGraph(eventsSlice));
-      canvas.selectAll('g.x.axis')
-        .call(xAxis);
-
-      var closestX = xScale(data.codeEvents[midIndex][0]);
-      var closestY = yScale(data.codeEvents[midIndex][2]);
-      focus.attr('transform', 'translate(' + closestX + ', ' +
-                  closestY + ')');
-      focusXLine.attr('x1', closestX)
-        .attr('x2', closestX)
-        .attr('y2', closestY);
-      focusYLine.attr('y1', closestY)
-        .attr('x2', closestX)
-        .attr('y2', closestY);
-      var tooltipText = generateTooltipText_(data.codeEvents[midIndex]);
-      tooltip.attr('class', 'tooltip tooltip-visible')
-        .html(tooltipText)
-        .style('left', closestX)
-        .style('top', closestY - TOOLTIP_OFFSET);
-
-      if (zoomRange.zoomIndexRange > MAX_ZOOM_POINTS) {
-        updateHighlightRangeParams_(midIndex, zoomRange);
-        var highlightSlice = data.codeEvents.slice(
-          zoomRange.highlightStartIndex, zoomRange.highlightEndIndex + 1);
-        focusHiglightArc.attr('d', memoryGraph(highlightSlice));
-      } else {
-        focusHiglightArc.style('display', 'none');
-      }
-    }
-  });
-
-  // Zoom out.
-  parent.on('dblclick', function(d) {
-    resetZoomRangeParams_(zoomRange, data.codeEvents.length);
-    xScale.domain(d3.extent(data.codeEvents, function(d) { return d[0]; }));
-    path.attr('d', memoryGraph(data.codeEvents));
-    xAxis.ticks(Math.min(TICKS_NUMBER, data.codeEvents.length));
-    canvas.selectAll('g.x.axis')
-      .call(xAxis);
-  });
+  var memoryChart = new MemoryChart(parent, data);
+  memoryChart.render();
 }
 
 module.exports = {
+  'MemoryChart': MemoryChart,
   'renderMemoryStats': renderMemoryStats,
 };
