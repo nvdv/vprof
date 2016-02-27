@@ -80,3 +80,9 @@ class RuntimeProfile(base_profile.BaseProfile):
             'totalCalls': cprofile_stats.total_calls,
             'callStats': self._transform_stats(cprofile_stats)
         }
+
+    def run(self):
+        """Runs profile and returns collected stats."""
+        runtime_stats = {}
+        self.collect_stats(runtime_stats)
+        return runtime_stats
