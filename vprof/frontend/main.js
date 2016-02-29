@@ -14,15 +14,14 @@ var code_heatmap = require('./code_heatmap.js');
 var JSON_URI = 'profile';
 
 /**
- * Creates empty hidden div with specified ID.
- * @param {string} content_id - div ID.
+ * Creates empty div with specified ID and class tab-content.
+ * @param {string} id - div ID.
  */
-function createHiddenTabContent_(id) {
+function createTabContent_(id) {
   return d3.select('body')
     .append('div')
     .attr('class', 'tab-content')
-    .attr('id', id)
-    .attr('style', 'display: none');
+    .attr('id', id);
 }
 
 /**
@@ -98,21 +97,21 @@ function renderPage(data) {
     switch (props[i]) {
       case 'c':
         createFlameChartTab_(tabHeader, status);
-        var flameChart = createHiddenTabContent_('flame-chart');
-        flameChart.attr('style', 'display: ' + display);
+        var flameChart = createTabContent_('flame-chart');
         flame_chart.renderFlameChart(data.c, flameChart);
+        flameChart.attr('style', 'display: ' + display);
         break;
       case 'm':
         createMemoryChartTab_(tabHeader, status);
-        var memoryChart = createHiddenTabContent_('memory-chart');
-        memoryChart.attr('style', 'display: ' + display);
+        var memoryChart = createTabContent_('memory-chart');
         memory_stats.renderMemoryStats(data.m, memoryChart);
+        memoryChart.attr('style', 'display: ' + display);
         break;
       case 'h':
         createCodeHeatmapTab_(tabHeader, status);
-        var codeHeatmap = createHiddenTabContent_('code-heatmap');
-        codeHeatmap.attr('style', 'display: ' + display);
+        var codeHeatmap = createTabContent_('code-heatmap');
         code_heatmap.renderCodeHeatmap(data.h, codeHeatmap);
+        codeHeatmap.attr('style', 'display: ' + display);
         break;
     }
   }
