@@ -12,11 +12,12 @@ from vprof import stats_server
 _PROGRAN_NAME = 'vprof'
 _MODULE_DESC = 'Python visual profiler'
 _HOST = 'localhost'
-_PROFILE_MAP = {
-    'c': runtime_profile.RuntimeProfile,
-    'm': memory_profile.MemoryProfile,
-    'h': code_heatmap.CodeHeatmapProfile,
-}
+_PROFILERS = (
+    ('c', runtime_profile.RuntimeProfile),
+    ('m', memory_profile.MemoryProfile),
+    ('h', code_heatmap.CodeHeatmapProfile),
+)
+
 
 def main():
     """Visual profiler main function."""
@@ -40,15 +41,17 @@ def main():
         print('Profiler configuration is ambiguous. Remove duplicates.')
         sys.exit(1)
 
+    available_profilers = {opt for opt, _ in _PROFILERS}
     for option in args.profilers:
-        if option not in _PROFILE_MAP:
+        if option not in available_profilers:
             print('Unrecognized option: %s' % option)
             sys.exit(2)
 
     sys.argv[:] = args.source
     program_name, program_stats = args.source[0], OrderedDict()
-    for option in args.profilers:
-        curr_profiler = _PROFILE_MAP[option](program_name)
+    present_profilers = ((s, p) for s, p in _PROFILERS if s in args.profilers)
+    for option, profiler in present_profilers:
+        curr_profiler = profiler(program_name)
         print('Running %s...' % curr_profiler.__class__.__name__)
         program_stats[option] = curr_profiler.run()
     if not args.debug_mode:
