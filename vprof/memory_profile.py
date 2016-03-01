@@ -67,7 +67,7 @@ class MemoryProfile(base_profile.BaseProfile):
     Runs memory profiler and processes all obtained stats.
     """
 
-    def run_profiler(self):
+    def run(self):
         """Collects memory stats for specified Python program."""
         try:
             with open(self._program_name, 'rb') as srcfile,\
@@ -84,12 +84,3 @@ class MemoryProfile(base_profile.BaseProfile):
                 for i, (line, mem, event, func) in enumerate(prof.events_list)],
             'totalEvents': len(prof.events_list)
         }
-
-    def run(self):
-        """Runs profile and returns collected stats.
-
-        Runs memory stats collection in current process to avoid copy-on-write.
-        """
-        memory_stats = {}
-        self.collect_stats(memory_stats)
-        return memory_stats

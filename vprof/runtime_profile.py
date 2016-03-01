@@ -62,7 +62,7 @@ class RuntimeProfile(base_profile.BaseProfile):
         root, _ = max(stats.stats.items(), key=_statcmp)
         return self._build_call_tree(root, callees, stats.stats)
 
-    def run_profiler(self):
+    def run(self):
         """Collects CProfile stats for specified Python program."""
         prof = cProfile.Profile()
         try:

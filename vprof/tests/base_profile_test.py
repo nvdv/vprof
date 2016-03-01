@@ -24,11 +24,6 @@ class BaseProfileUnittest(unittest.TestCase):
             '__package__': None
         })
 
-    def testCollectStats(self):
-        result = {'foo': 'bar', 'baz': 'mno'}
-        self._profile._program_name = 'foo.py'
-        self._profile._program_args = ['--foo', '--bar']
-        self._profile.run_profiler = mock.MagicMock(return_value=result)
-        run_stats = {}
-        self._profile.collect_stats(run_stats)
-        self.assertDictEqual(run_stats, result)
+    def testRun(self):
+        with self.assertRaises(NotImplementedError):
+            self._profile.run()
