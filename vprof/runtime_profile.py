@@ -62,7 +62,7 @@ class RuntimeProfile(base_profile.BaseProfile):
         root, _ = max(stats.stats.items(), key=_statcmp)
         return self._build_call_tree(root, callees, stats.stats)
 
-    def run_profiler(self):
+    def run(self):
         """Collects CProfile stats for specified Python program."""
         prof = cProfile.Profile()
         try:
@@ -80,9 +80,3 @@ class RuntimeProfile(base_profile.BaseProfile):
             'totalCalls': cprofile_stats.total_calls,
             'callStats': self._transform_stats(cprofile_stats)
         }
-
-    def run(self):
-        """Runs profile and returns collected stats."""
-        runtime_stats = {}
-        self.collect_stats(runtime_stats)
-        return runtime_stats
