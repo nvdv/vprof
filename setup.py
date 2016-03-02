@@ -4,7 +4,7 @@ from pip.download import PipSession
 
 setup(
     name='vprof',
-    version='0.21',
+    version='0.22',
     packages=['vprof'],
     description="Visual profiler for Python",
     url='http://github.com/nvdv/vprof',
