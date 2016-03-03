@@ -25,5 +25,9 @@
   "browserify": {
       "transform": ["browserify-css"]
   },
-  "license": "BSD"
+  "license": "BSD-2-Clause",
+  "repository" : {
+    "type" : "git",
+    "url" : "http://github.com/nvdv/vprof.git"
+ }
 }

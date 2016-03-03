@@ -31,11 +31,11 @@ All Python and ```npm``` module dependencies are listed in package.json and requ
 
 To install current dev version, clone this repository and execute
 
-    make install
+    python setup.py install
 
 To install just ```vprof``` dependencies, run
 
-    make deps_install
+    python setup.py deps_install
 
 
 ## Usage
@@ -61,7 +61,7 @@ Check ```vprof -h``` for full list of supported parameters.
 ## Testing
 Just run
 
-    make test && make e2e_test
+    python setup.py test && python setup.py e2e_test
 
 ## License
 BSD

@@ -11,8 +11,8 @@ addons:
       - npm
 
 install:
-  - make deps_install
+  - python setup.py deps_install
 
 script:
-  - make lint
-  - make test
+  - python setup.py lint
+  - python setup.py test
