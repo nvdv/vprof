@@ -1,2 +1,2 @@
 mock>=1.0.0
-pylint==1.5.4
+pylint>=1.5.4
