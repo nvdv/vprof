@@ -17,14 +17,19 @@ _PROFILERS = (
     ('m', memory_profile.MemoryProfile),
     ('h', code_heatmap.CodeHeatmapProfile),
 )
+_MODES_DESC = ("""modes configuration
+available modes:
+  c - runtime flame chart
+  m - memory graph
+  h - code heatmap""")
 
 
 def main():
     """Visual profiler main function."""
     parser = argparse.ArgumentParser(
-        prog=_PROGRAN_NAME, description=_MODULE_DESC)
-    parser.add_argument('profilers', metavar='options',
-                        help='profiler configuration')
+        prog=_PROGRAN_NAME, description=_MODULE_DESC,
+        formatter_class=argparse.RawTextHelpFormatter)
+    parser.add_argument('profilers', metavar='options', help=_MODES_DESC)
     parser.add_argument('source', metavar='src', nargs=1,
                         help='Python module to profile')
     parser.add_argument('--port', dest='port', default=8000, type=int,
