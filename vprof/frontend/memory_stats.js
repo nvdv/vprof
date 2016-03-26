@@ -15,15 +15,16 @@ var d3 = require('d3');
  * @param {Object} data - Data for memory chart rendering.
  */
 function MemoryChart(parent, data) {
+
   this.MARGIN_LEFT = 40;
   this.MARGIN_RIGHT = 5;
   this.MARGIN_TOP = 15;
   this.MARGIN_BOTTOM  = 30;
   this.PAD_SIZE = 10;
-  this.FULL_HEIGHT = parent.node().scrollHeight - this.PAD_SIZE;
-  this.FULL_WIDTH = parent.node().scrollWidth - this.PAD_SIZE;
-  this.GRAPH_HEIGHT = this.FULL_HEIGHT - (this.MARGIN_TOP + this.MARGIN_BOTTOM);
-  this.GRAPH_WIDTH = this.FULL_WIDTH - (this.MARGIN_LEFT + this.MARGIN_RIGHT);
+  this.HEIGHT = parent.node().scrollHeight - this.PAD_SIZE;
+  this.WIDTH = parent.node().scrollWidth - this.PAD_SIZE;
+  this.GRAPH_HEIGHT = this.HEIGHT - (this.MARGIN_TOP + this.MARGIN_BOTTOM);
+  this.GRAPH_WIDTH = this.WIDTH - (this.MARGIN_LEFT + this.MARGIN_RIGHT);
   this.MIN_RANGE_C = 0.98;
   this.MAX_RANGE_C = 1.02;
   this.AXIS_TEXT_X = this.GRAPH_WIDTH;
@@ -77,8 +78,8 @@ function MemoryChart(parent, data) {
 /** Renders memory chart. */
 MemoryChart.prototype.render = function() {
   var canvas = this.parent_.append('svg')
-    .attr('width', this.FULL_WIDTH)
-    .attr('height', this.FULL_HEIGHT)
+    .attr('width', this.WIDTH)
+    .attr('height', this.HEIGHT)
     .append('g')
     .attr('transform',
           'translate(' + this.MARGIN_LEFT + ',' + this.MARGIN_TOP + ')');
