@@ -39,8 +39,9 @@ svg {
 }
 
 .memory-graph {
-  fill: #c6dbef;
-  stroke: #6baed6;
+  fill: #9edae5;
+  opacity: 0.6;
+  stroke: #17becf;
   stroke-width: 2px;
 }
 
