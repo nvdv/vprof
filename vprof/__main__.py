@@ -18,7 +18,7 @@ _PROFILERS = (
     ('h', code_heatmap.CodeHeatmapProfile),
 )
 _MODES_DESC = (
-"""modes configuration
+    """modes configuration
 available modes:
   c - runtime flame chart
   m - memory graph
