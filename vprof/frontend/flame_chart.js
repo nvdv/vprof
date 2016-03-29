@@ -142,6 +142,7 @@ FlameChart.prototype.showTooltip_ = function(element, tooltip, node) {
   tooltip.attr('class', 'tooltip tooltip-visible')
     .html('<p>Function name: ' + functionName + '</p>' +
           '<p>Location: ' + node.moduleName +'</p>' +
+          '<p>Line number: ' + node.lineno + '</p>' +
           '<p>Time percentage: ' + timePercentage + ' %</p>' +
           '<p>Cumulative time: ' + node.cumTime + ' s</p>' +
           '<p>Time per call: ' + node.timePerCall + ' s</p>' +
