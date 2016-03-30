@@ -23,6 +23,23 @@ available modes:
   c - runtime flame chart
   m - memory graph
   h - code heatmap""")
+_ERROR_MSG = {
+    'ambiguous configuration': {
+        'msg': 'Profiler configuration is ambiguous. Remove duplicates.',
+        'code': 1
+    },
+    'bad option': {
+        'msg': 'Unrecognized option: %s',
+        'code': 2
+    },
+    'path does not exits': {
+        'msg': '%s does not exist. Check arguments.',
+        'code': 3
+    },
+    'runtime error': {
+        'code': 4
+    },
+}
 
 
 def main():
@@ -44,22 +61,31 @@ def main():
     args = parser.parse_args()
 
     if len(args.profilers) > len(set(args.profilers)):
-        print('Profiler configuration is ambiguous. Remove duplicates.')
-        sys.exit(1)
+        print(_ERROR_MSG['ambiguous configuration']['msg'])
+        sys.exit(_ERROR_MSG['ambiguous configuration']['code'])
 
     available_profilers = {opt for opt, _ in _PROFILERS}
     for option in args.profilers:
         if option not in available_profilers:
-            print('Unrecognized option: %s' % option)
-            sys.exit(2)
+            print(_ERROR_MSG['bad option']['msg'] % option)
+            sys.exit(_ERROR_MSG['bad option']['code'])
+
+    program_name, program_stats = args.source[0], OrderedDict()
+    if not os.path.exists(program_name):
+        print(_ERROR_MSG['path does not exits']['msg'])
+        sys.exit(_ERROR_MSG['path does not exits']['code'])
 
     sys.argv[:] = args.source
-    program_name, program_stats = args.source[0], OrderedDict()
     present_profilers = ((s, p) for s, p in _PROFILERS if s in args.profilers)
     for option, profiler in present_profilers:
-        curr_profiler = profiler(program_name)
-        print('Running %s...' % curr_profiler.__class__.__name__)
-        program_stats[option] = curr_profiler.run()
+        try:
+            curr_profiler = profiler(program_name)
+            print('Running %s...' % curr_profiler.__class__.__name__)
+            program_stats[option] = curr_profiler.run()
+        except Exception as exc:  #pylint: disable=broad-except
+            print(exc)
+            sys.exit(_ERROR_MSG['runtime error']['code'])
+
     if not args.debug_mode:
         sys.stderr = open(os.devnull, "w")
     print('Starting HTTP server...')
