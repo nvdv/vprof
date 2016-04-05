@@ -58,7 +58,7 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
     """
 
     def _add_source_for_profiled_files(self, package_code, prof):
-        # Write good tests for this function
+        """Returns source code and heatmap for profiled files."""
         resulting_heatmap = []
         for src_fname, (src_code, _) in package_code.items():
             for prof_fname, fname_heatmap in prof.heatmap.items():
