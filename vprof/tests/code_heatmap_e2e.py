@@ -34,7 +34,9 @@ class CodeHeatmapEndToEndTest(unittest.TestCase):
         self.patch = mock.patch.object(
             builtins, 'open', mock.mock_open(read_data=_TEST_FILE))
         self.patch.start()
-        program_stats = code_heatmap.CodeHeatmapProfile('foo.py').run()
+        profiler = code_heatmap.CodeHeatmapProfile('foo.py')
+        profiler._is_module_file, profiler._is_package_dir = True, False
+        program_stats = profiler.run()
         stats_handler = functools.partial(
             stats_server.StatsHandler, program_stats)
         self.server = stats_server.StatsServer(
@@ -50,7 +52,7 @@ class CodeHeatmapEndToEndTest(unittest.TestCase):
             'http://%s:%s/profile' % (_HOST, _PORT))
         stats = json.loads(response.read().decode('utf-8'))
         self.assertEqual(stats['programName'], 'foo.py')
-        self.assertEqual(stats['srcCode'], _TEST_FILE)
+        self.assertEqual(stats['heatmap'][0]['srcCode'], _TEST_FILE)
         self.assertDictEqual(
-            stats['heatmap'],
+            stats['heatmap'][0]['fileHeatmap'],
             {'2': 1, '3': 1, '4': 21, '5': 20, '6': 20, '8': 1})

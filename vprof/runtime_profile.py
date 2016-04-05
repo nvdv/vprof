@@ -6,6 +6,16 @@ from collections import defaultdict
 from vprof import base_profile
 
 
+class Error(Exception):
+    """Base exception for current module."""
+    pass
+
+
+class RuntimeProfilerRunError(Error, base_profile.ProfilerRuntimeException):
+    """Runtime exception for runtime profiler."""
+    pass
+
+
 class RuntimeProfile(base_profile.BaseProfile):
     """CProfile wrapper.
 
@@ -62,15 +72,47 @@ class RuntimeProfile(base_profile.BaseProfile):
         root, _ = max(stats.stats.items(), key=_statcmp)
         return self._build_call_tree(root, callees, stats.stats)
 
-    def run(self):
-        """Collects CProfile stats for specified Python program."""
-        prof = cProfile.Profile()
+    def run_as_package_path(self, prof):
+        """Runs program as package specified with file path."""
+        import runpy
+        prof.enable()
+        try:
+            runpy.run_path(self._program_name)
+        except ImportError:
+            raise RuntimeProfilerRunError(
+                'Unable to run package %s' % self._program_name)
+        except SystemExit:
+            pass
+        prof.disable()
+
+    def run_as_module(self, prof):
+        """Runs program as module."""
         try:
             with open(self._program_name, 'rb') as srcfile:
                 code = compile(srcfile.read(), self._program_name, 'exec')
             prof.runctx(code, self._globs, None)
         except SystemExit:
             pass
+
+    def run_as_package_in_namespace(self, prof):
+        """Runs program as package in Python namespace."""
+        import runpy
+        prof.enable()
+        try:
+            runpy.run_module(self._program_name)
+        except ImportError:
+            raise RuntimeProfilerRunError(
+                'Unable to run package %s' % self._program_name)
+        except SystemExit:
+            pass
+        finally:
+            prof.disable()
+
+    def run(self):
+        """Collects CProfile stats for specified Python program."""
+        prof = cProfile.Profile()
+        run_dispatcher = self.get_run_dispatcher()
+        run_dispatcher(prof)
         prof.create_stats()
         cprofile_stats = pstats.Stats(prof)
         return {

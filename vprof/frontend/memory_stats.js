@@ -36,7 +36,7 @@ function MemoryChart(parent, data) {
   this.TICKS_NUMBER = 10;
   this.FOCUS_RADIUS = 5;
   this.DOT_RADIUS = 3;
-  this.TOOLTIP_OFFSET = 20;
+  this.TOOLTIP_OFFSET = 35;
   this.SCALE_FACTOR = 3;
   this.MAX_ZOOM_POINTS = 20;
 
@@ -310,10 +310,11 @@ MemoryChart.prototype.redrawFocus_ = function(canvas, focus, tooltip,
 MemoryChart.generateTooltipText_ = function(stats) {
   var result = '';
   if (stats) {
-    var functionName = stats[3].replace('<', '[').replace('>',  ']');
+    var functionName = stats[4].replace('<', '[').replace('>',  ']');
     result += ('<p>Executed line: ' + stats[0] + '</p>' +
                '<p>Line number: ' + stats[1] + '</p>' +
                '<p>Function name: ' + functionName + '</p>' +
+               '<p>Filename: ' + stats[5] + '</p>' +
                '<p>Memory usage: ' + stats[2] + ' MB</p>');
   }
   return result;

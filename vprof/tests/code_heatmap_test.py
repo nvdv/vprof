@@ -28,15 +28,19 @@ class CodeHeatmapCalculator(unittest.TestCase):
         self.assertIn(code, self._calc._all_code)
 
     def testCalcHeatmap(self):
-        self._calc.heatmap = defaultdict(int)
+        self._calc.heatmap = defaultdict(lambda: defaultdict(int))
         event, arg = 'line', mock.MagicMock()
         frame1, frame2 = mock.MagicMock(), mock.MagicMock()
-        frame1.f_code, frame1.f_code = 'foo1', 'foo2'
+        frame1.f_code, frame2.f_code = mock.MagicMock(), mock.MagicMock()
+        frame1.f_code.co_filename = 'foo.py'
+        frame2.f_code.co_filename = 'foo.py'
         frame1.f_lineno, frame2.f_lineno = 1, 2
         self._calc._all_code = set((frame1.f_code, frame2.f_code))
 
         self._calc._calc_heatmap(frame1, event, arg)
         self._calc._calc_heatmap(frame2, event, arg)
 
-        self.assertEqual(self._calc.heatmap[frame1.f_lineno], 1)
-        self.assertEqual(self._calc.heatmap[frame2.f_lineno], 1)
+        self.assertEqual(
+            self._calc.heatmap[frame1.f_code.co_filename][frame1.f_lineno], 1)
+        self.assertEqual(
+            self._calc.heatmap[frame2.f_code.co_filename][frame2.f_lineno], 1)

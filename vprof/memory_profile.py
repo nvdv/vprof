@@ -7,8 +7,17 @@ import sys
 from collections import deque
 from vprof import base_profile
 
-
 _BYTES_IN_MB = 1024 * 1024
+
+
+class Error(Exception):
+    """Base exception for current module."""
+    pass
+
+
+class MemoryProfilerRunError(Error, base_profile.ProfilerRuntimeException):
+    """Runtime exception for memory profiler."""
+    pass
 
 
 def get_memory_usage():
@@ -57,7 +66,8 @@ class CodeEventsTracker(object):
                     curr_memory, self.events_list[-1][1])
             else:
                 self.events_list.append(
-                    [frame.f_lineno, curr_memory, event, frame.f_code.co_name])
+                    [frame.f_lineno, curr_memory, event,
+                     frame.f_code.co_name, frame.f_code.co_filename])
         return self._trace_memory_usage
 
 
@@ -67,8 +77,25 @@ class MemoryProfile(base_profile.BaseProfile):
     Runs memory profiler and processes all obtained stats.
     """
 
-    def run(self):
-        """Collects memory stats for specified Python program."""
+    def run_as_package_path(self):
+        """Runs program as package specified with file path."""
+        import runpy
+        pkg_code = base_profile.get_package_code(
+            self._program_name, name_is_path=True)
+        with CodeEventsTracker() as prof:
+            for _, compiled_code in pkg_code.values():
+                prof.add_code(compiled_code)
+            try:
+                runpy.run_path(self._program_name)
+            except ImportError:
+                raise MemoryProfilerRunError(
+                    'Unable to run package %s' % self._program_name)
+            except SystemExit:
+                pass
+        return prof.events_list
+
+    def run_as_module(self):
+        """Runs program as module."""
         try:
             with open(self._program_name, 'rb') as srcfile,\
                 CodeEventsTracker() as prof:
@@ -77,10 +104,32 @@ class MemoryProfile(base_profile.BaseProfile):
                 exec(code, self._globs, None)
         except SystemExit:
             pass
+        return prof.events_list
+
+    def run_as_package_in_namespace(self):
+        import runpy
+        pkg_code = base_profile.get_package_code(self._program_name)
+        with CodeEventsTracker() as prof:
+            for _, compiled_code in pkg_code.values():
+                prof.add_code(compiled_code)
+            try:
+                runpy.run_module(self._program_name)
+            except ImportError:
+                raise MemoryProfilerRunError(
+                    'Unable to run package %s' % self._program_name)
+            except SystemExit:
+                pass
+        return prof.events_list
+
+    def run(self):
+        """Collects memory stats for specified Python program."""
+        run_dispatcher = self.get_run_dispatcher()
+        events_list = run_dispatcher()
         return {
             'programName': self._program_name,
             'codeEvents': [
-                (i + 1, line, mem, event, func)
-                for i, (line, mem, event, func) in enumerate(prof.events_list)],
-            'totalEvents': len(prof.events_list)
+                (i + 1, line, mem, event, func, fname)
+                for i, (line, mem, event, func, fname) in enumerate(
+                    events_list)],
+            'totalEvents': len(events_list)
         }

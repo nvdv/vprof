@@ -4,6 +4,7 @@ import os
 import sys
 
 from collections import OrderedDict
+from vprof import base_profile
 from vprof import code_heatmap
 from vprof import memory_profile
 from vprof import runtime_profile
@@ -32,12 +33,8 @@ _ERROR_MSG = {
         'msg': 'Unrecognized option: %s',
         'code': 2
     },
-    'path does not exits': {
-        'msg': '%s does not exist. Check arguments.',
-        'code': 3
-    },
     'runtime error': {
-        'code': 4
+        'code': 3
     },
 }
 
@@ -71,10 +68,6 @@ def main():
             sys.exit(_ERROR_MSG['bad option']['code'])
 
     program_name, program_stats = args.source[0], OrderedDict()
-    if not os.path.exists(program_name):
-        print(_ERROR_MSG['path does not exits']['msg'])
-        sys.exit(_ERROR_MSG['path does not exits']['code'])
-
     sys.argv[:] = args.source
     present_profilers = ((s, p) for s, p in _PROFILERS if s in args.profilers)
     for option, profiler in present_profilers:
@@ -82,10 +75,9 @@ def main():
             curr_profiler = profiler(program_name)
             print('Running %s...' % curr_profiler.__class__.__name__)
             program_stats[option] = curr_profiler.run()
-        except Exception as exc:  #pylint: disable=broad-except
+        except base_profile.ProfilerRuntimeException as exc:
             print(exc)
             sys.exit(_ERROR_MSG['runtime error']['code'])
-
     if not args.debug_mode:
         sys.stderr = open(os.devnull, "w")
     print('Starting HTTP server...')

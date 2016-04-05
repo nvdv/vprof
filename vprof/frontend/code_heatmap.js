@@ -35,33 +35,50 @@ function CodeHeatmap(parent, data) {
 
 /** Renders code heatmap. */
 CodeHeatmap.prototype.render = function() {
-  var highlightedCode = CodeHeatmap.postProcessCode_(
-      hljs.highlight('python', this.data_.srcCode).value);
+  var heatmapContainer = this.parent_.append('div')
+    .attr('class', 'code-container');
 
-  var codeContainer = this.parent_.append('div')
-    .attr('id', 'code-container')
+  var codeContainer = heatmapContainer.selectAll('div')
+    .data(this.data_.heatmap)
+    .enter()
     .append('div')
-    .attr('class', 'src-code')
-    .html(highlightedCode);
+    .attr('class', 'src-file');
 
-  var tooltip = codeContainer.append('div')
+  codeContainer.append('div')
+    .attr('class', 'src-code-header')
+    .append('text')
+    .html(function(d) { return d.filename; });
+
+  var fileContainers = codeContainer.append('div')
+    .attr('class', 'src-code')
+    .append('text')
+    .html(function(d) {
+        return CodeHeatmap.postProcessCode_(
+            hljs.highlight('python', d.srcCode).value); });
+
+  var tooltip = heatmapContainer.append('div')
     .attr('class', 'tooltip tooltip-invisible');
 
   var self = this;
-  d3.selectAll('.src-line-normal')
-    .style('background-color', this.changeBackgroundColor_.bind(this))
-    .on('mouseover', function(_, i) { self.showTooltip_(this, tooltip, i); })
-    .on('mouseout', function() { self.hideTooltip_(this, tooltip); });
+  heatmapContainer.selectAll('.src-file')
+    .each(function(d, i) {
+      d3.select(fileContainers[0][i]).selectAll('.src-line-normal')
+        .style('background-color', function(_, j) {
+            return self.changeBackgroundColor_(d, j); })
+        .on('mouseover', function(_, j) {
+            self.showTooltip_(this, tooltip, d, j); })
+        .on('mouseout', function() { self.hideTooltip_(this, tooltip); });
+    });
 };
 
 /**
  * Returns line background color based on execution count.
- * @param {Object} _ - Unused argument.
+ * @param {Object} data - Object with heatmap data for current src file.
  * @param {number} i - Line number.
  * @returns {string}
  */
-CodeHeatmap.prototype.changeBackgroundColor_ = function(_, i) {
-  var runCount = this.data_.heatmap[i + 1];
+CodeHeatmap.prototype.changeBackgroundColor_ = function(data, i) {
+  var runCount = data.fileHeatmap[i + 1];
   return runCount ? this.heatmapScale_(runCount) : '';
 };
 
@@ -69,10 +86,11 @@ CodeHeatmap.prototype.changeBackgroundColor_ = function(_, i) {
  * Shows line execution count inside tooltip and adds line highlighting.
  * @param {Object} element - Element representing highlighted line.
  * @param {Object} tooltip - Element representing tooltip.
+ * @param {Object} data - Object with heatmap data for current src file.
  * @param {number} i - Source line number.
  */
-CodeHeatmap.prototype.showTooltip_ = function(element, tooltip, i) {
-  var runCount = this.data_.heatmap[i + 1];
+CodeHeatmap.prototype.showTooltip_ = function(element, tooltip, data, i) {
+  var runCount = data.fileHeatmap[i + 1];
   if (runCount) {
     d3.select(element).attr('class', 'src-line-highlight');
     tooltip.attr('class', 'tooltip tooltip-visible')

@@ -34,7 +34,9 @@ class RuntimeProfileEndToEndTest(unittest.TestCase):
         self.patch = mock.patch.object(
             builtins, 'open', mock.mock_open(read_data=_TEST_FILE))
         self.patch.start()
-        program_stats = runtime_profile.RuntimeProfile('foo.py').run()
+        profiler = runtime_profile.RuntimeProfile('foo.py')
+        profiler._is_module_file, profiler._is_package_dir = True, False
+        program_stats = profiler.run()
         stats_handler = functools.partial(
             stats_server.StatsHandler, program_stats)
         self.server = stats_server.StatsServer(

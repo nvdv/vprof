@@ -19,11 +19,10 @@ describe('Code heatmap test suite', function() {
 
   it('Check changeBackgroundColor_', function() {
     var heatmap = new code_heatmap.CodeHeatmap();
-    heatmap.data_ = { 'heatmap': [0, 0, 2, 3] };
-    var unusedArg = 'foo';
+    var data = { 'fileHeatmap': [0, 0, 2, 3] };
 
-    expect(heatmap.changeBackgroundColor_(unusedArg, 0)).toBe('');
-    expect(heatmap.changeBackgroundColor_(unusedArg, 1)).not.toBe('');
-    expect(heatmap.changeBackgroundColor_(unusedArg, 2)).not.toBe('');
+    expect(heatmap.changeBackgroundColor_(data, 0)).toBe('');
+    expect(heatmap.changeBackgroundColor_(data, 1)).not.toBe('');
+    expect(heatmap.changeBackgroundColor_(data, 2)).not.toBe('');
   });
 });

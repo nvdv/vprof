@@ -6,6 +6,16 @@ from collections import defaultdict
 from vprof import base_profile
 
 
+class Error(Exception):
+    """Base exception for current module."""
+    pass
+
+
+class CodeHeatmapRunError(Error, base_profile.ProfilerRuntimeException):
+    """Runtime exception for code heatmap profiler."""
+    pass
+
+
 class CodeHeatmapCalculator(object):
     """Calculates Python code heatmap.
 
@@ -16,7 +26,7 @@ class CodeHeatmapCalculator(object):
     def __init__(self):
         self._all_code = set()
         self._original_trace_function = sys.gettrace()
-        self.heatmap = defaultdict(int)
+        self.heatmap = defaultdict(lambda: defaultdict(int))
 
     def add_code(self, code):
         """Recursively adds code to be examined."""
@@ -37,7 +47,7 @@ class CodeHeatmapCalculator(object):
     def _calc_heatmap(self, frame, event, arg):  #pylint: disable=unused-argument
         """Calculates code heatmap."""
         if event == 'line' and frame.f_code in self._all_code:
-            self.heatmap[frame.f_lineno] += 1
+            self.heatmap[frame.f_code.co_filename][frame.f_lineno] += 1
         return self._calc_heatmap
 
 
@@ -47,8 +57,34 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
     Contains all logic related to heatmap calculation and processing.
     """
 
-    def run(self):
-        """Calculates code heatmap for specified Python program."""
+    def _add_source_for_profiled_files(self, package_code, prof):
+        # Write good tests for this function
+        resulting_heatmap = []
+        for src_fname, (src_code, _) in package_code.items():
+            for prof_fname, fname_heatmap in prof.heatmap.items():
+                if prof_fname.endswith(src_fname):
+                    resulting_heatmap.append({
+                        'filename': src_fname,
+                        'fileHeatmap': dict(fname_heatmap),
+                        'srcCode': src_code})
+        return resulting_heatmap
+
+    def run_as_package_path(self):
+        """Runs program as package specified with file path."""
+        import runpy
+        pkg_code = base_profile.get_package_code(
+            self._program_name, name_is_path=True)
+        with CodeHeatmapCalculator() as prof:
+            for _, compiled_code in pkg_code.values():
+                prof.add_code(compiled_code)
+            try:
+                runpy.run_path(self._program_name)
+            except SystemExit:
+                pass
+        return self._add_source_for_profiled_files(pkg_code, prof)
+
+    def run_as_module(self):
+        """Runs program as module."""
         try:
             with open(self._program_name, 'r') as srcfile,\
                 CodeHeatmapCalculator() as prof:
@@ -58,8 +94,30 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
                 exec(code, self._globs, None)
         except SystemExit:
             pass
+        return [{'filename': self._program_name,
+                 'fileHeatmap': prof.heatmap[self._program_name],
+                 'srcCode': src_code}]
+
+    def run_as_package_in_namespace(self):
+        """Runs program as package in Python namespace."""
+        import runpy
+        pkg_code = base_profile.get_package_code(self._program_name)
+        with CodeHeatmapCalculator() as prof:
+            for _, compiled_code in pkg_code.values():
+                prof.add_code(compiled_code)
+            try:
+                runpy.run_module(self._program_name)
+            except SystemExit:
+                pass
+            except ImportError:
+                raise
+        return self._add_source_for_profiled_files(pkg_code, prof)
+
+    def run(self):
+        """Calculates code heatmap for specified Python program."""
+        run_dispatcher = self.get_run_dispatcher()
+        heatmap = run_dispatcher()
         return {
             'programName': self._program_name,
-            'srcCode': src_code,
-            'heatmap': prof.heatmap
+            'heatmap': heatmap
         }

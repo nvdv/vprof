@@ -133,27 +133,34 @@ p {
   text-align: left;
 }
 
-#code-container {
+.code-container {
+  height: 97%;
+  margin: 0 auto;
+  overflow-x: auto;
+  overflow-y: auto;
   padding: 8px;
+  width: 50%;
 }
 
 .src-code {
   background: #FBFBFB;
   font-family: "Lucida Sans Typewriter", "Lucida Console", Monaco;
   font-size: 12px;
-  height: 95%;
-  margin: 0 auto;
-  overflow-x: auto;
-  overflow-y: auto;
   white-space: pre;
-  width: 50%;
+}
+
+.src-code-header {
+  font-family: "Lucida Sans Typewriter", "Lucida Console", Monaco;
+  font-size: 13px;
+  padding-bottom: 4px;
+  padding-top: 4px;
 }
 
 .src-line-number {
   background-color: #D2D7D3;
   display: table-cell;
-  padding-right: 8px;
   text-align: right;
+  padding-right: 8px;
   width: 28px;
 }
 

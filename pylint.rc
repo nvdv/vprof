@@ -1,6 +1,7 @@
 [MESSAGES CONTROL]
 disable=locally-disabled, no-self-use, exec-used, too-few-public-methods,
         too-many-instance-attributes, bad-builtin, wrong-import-order,
-        superfluous-parens, import-error, fixme, duplicate-code,
+        superfluous-parens, import-error, fixme, arguments-differ,
+        duplicate-code,
         # Disable duplicate-code globally, since can't disable locally
         # https://github.com/PyCQA/pylint/issues/214

@@ -33,13 +33,13 @@ class CodeEventsTrackerUnittest(unittest.TestCase):
         frame, event, arg = mock.MagicMock(), 'line', mock.MagicMock()
         curr_memory = get_memory_mock.return_value
         lineno, co_name = frame.f_lineno, frame.f_code.co_name
-        code = frame.f_code
+        code, filename = frame.f_code, frame.f_code.co_filename
         self._tracker._all_code = set((code,))
         self._tracker.events_list = deque()
         self._tracker._trace_memory_usage(frame, event, arg)
         self.assertListEqual(
             self._tracker.events_list[-1],
-            [lineno, curr_memory, event, co_name])
+            [lineno, curr_memory, event, co_name, filename])
 
     @mock.patch('vprof.memory_profile.get_memory_usage')
     def testTraceMemoryUsage_NormalUsage(self, get_memory_mock):
@@ -53,6 +53,8 @@ class CodeEventsTrackerUnittest(unittest.TestCase):
         code3, code4 = frame3.f_code, frame4.f_code
         name1, name2 = code1.co_name, code2.co_name
         name3, name4 = code3.co_name, code4.co_name
+        fname1, fname2 = code1.co_filename, code2.co_filename
+        fname3, fname4 = code3.co_filename, code4.co_filename
         self._tracker._all_code = set((code1, code2, code3, code4))
         self._tracker.events_list = deque()
 
@@ -63,10 +65,10 @@ class CodeEventsTrackerUnittest(unittest.TestCase):
 
         self.assertEqual(
             self._tracker.events_list,
-            deque(([1, curr_memory, event, name1],
-                   [2, curr_memory, event, name2],
-                   [3, curr_memory, event, name3],
-                   [4, curr_memory, event, name4])))
+            deque(([1, curr_memory, event, name1, fname1],
+                   [2, curr_memory, event, name2, fname2],
+                   [3, curr_memory, event, name3, fname3],
+                   [4, curr_memory, event, name4, fname4])))
 
     @mock.patch('vprof.memory_profile.get_memory_usage')
     def testTraceMemoryUsage_SameLine(self, get_memory_mock):
@@ -76,6 +78,7 @@ class CodeEventsTrackerUnittest(unittest.TestCase):
             frame1.f_lineno, frame2.f_lineno = 1, 2
             code1, code2 = frame1.f_code, frame2.f_code
             name1, name2 = code1.co_name, code2.co_name
+            fname1, fname2 = code1.co_filename, code2.co_filename
             self._tracker._all_code = set((code1, code2))
             self._tracker.events_list = deque()
 
@@ -86,5 +89,5 @@ class CodeEventsTrackerUnittest(unittest.TestCase):
 
             self.assertEqual(
                 self._tracker.events_list,
-                deque(([1, 30, event, name1],
-                       [2, 40, event, name2])))
+                deque(([1, 30, event, name1, fname1],
+                       [2, 40, event, name2, fname2])))
