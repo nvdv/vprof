@@ -41,13 +41,15 @@ To install just ```vprof``` dependencies, run
 
 ## Usage
 
-    vprof <modes> <test_script>
+    vprof <modes> <test_program>
 
 Supported modes:
 
-* ```c``` - flame chart. Renders running time visualization for ```<test_script>```.
-* ```m``` - memory graph. Shows memory usage during execution of each line of ```<test_script>```.
+* ```c``` - flame chart. Renders running time visualization for ```<test_program>```.
+* ```m``` - memory graph. Shows memory usage during execution of each line of ```<test_program>```.
 * ```h``` - code heatmap. Shows number of executions of each line of code.
+
+```<test_program>``` can be Python source file (e.g. ```testscript.py```), installed Python package (e.g. ```runpy```) or path to package (e.g. ```myproject/test_package```).
 
 Use double quotes to run scripts with arguments:
 
