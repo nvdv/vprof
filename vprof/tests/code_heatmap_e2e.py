@@ -25,7 +25,7 @@ def fib(n):
 
 list(fib(20))
 """
-_HOST, _PORT = 'localhost', 12346
+_HOST, _PORT = 'localhost', 12345
 
 
 class CodeHeatmapEndToEndTest(unittest.TestCase):
@@ -45,6 +45,7 @@ class CodeHeatmapEndToEndTest(unittest.TestCase):
 
     def tearDown(self):
         self.server.shutdown()
+        self.server.server_close()
         self.patch.stop()
 
     def testRequest(self):

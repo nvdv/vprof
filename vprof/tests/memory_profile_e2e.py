@@ -45,6 +45,7 @@ class MemoryProfileEndToEndTest(unittest.TestCase):
 
     def tearDown(self):
         self.server.shutdown()
+        self.server.server_close()
         self.patch.stop()
 
     def testRequest(self):
