@@ -24,7 +24,7 @@ class RunUnittestsCommand(cmd.Command):
 
     def run(self):
         suite = unittest.TestLoader().discover(
-            'vprof/.', pattern="*_test.py")
+            'vprof/tests/.', pattern="*_test.py")
         unittest.TextTestRunner(verbosity=2, buffer=True).run(suite)
         subprocess.check_call(shlex.split('npm run test'))
 
@@ -41,7 +41,7 @@ class RunEndToEndTestCommand(cmd.Command):
 
     def run(self):
         suite = unittest.TestLoader().discover(
-            'vprof/.', pattern="*_e2e.py")
+            'vprof/tests/.', pattern="*_e2e.py")
         unittest.TextTestRunner(verbosity=2, buffer=True).run(suite)
 
 

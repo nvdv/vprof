@@ -1,3 +1,3 @@
-from . import dummy_module
+from test_pkg import dummy_module
 
-list(dummy_module.dummy_fib(10))
+dummy_module.dummy_fib(5)

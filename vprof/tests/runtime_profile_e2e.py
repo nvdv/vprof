@@ -19,7 +19,7 @@ except ImportError:
 
 _HOST, _PORT = 'localhost', 12345
 _MODULE_FILENAME = 'vprof/tests/test_pkg/dummy_module.py'
-_PACKAGE_PATH = 'vprof/tests/test_pkg/dummy_module.py'
+_PACKAGE_PATH = 'vprof/tests/test_pkg/'
 _PACKAGE_NAME = 'vprof.tests.test_pkg'
 
 
@@ -73,7 +73,7 @@ class RuntimeProfilePackageAsPathEndToEndTest(unittest.TestCase):
         self.assertTrue('totalCalls' in stats)
 
 
-class RuntimeProfileImportPackagePackageEndToEndTest(unittest.TestCase):
+class RuntimeProfileImportedPackageEndToEndTest(unittest.TestCase):
 
     def setUp(self):
         program_stats = runtime_profile.RuntimeProfile(
