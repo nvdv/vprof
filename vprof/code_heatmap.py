@@ -1,5 +1,6 @@
 """Module for code heatmap rendering."""
 import inspect
+import operator
 import sys
 
 from collections import defaultdict
@@ -67,7 +68,7 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
                         'filename': src_fname,
                         'fileHeatmap': dict(fname_heatmap),
                         'srcCode': src_code})
-        return resulting_heatmap
+        return sorted(resulting_heatmap, key=operator.itemgetter('filename'))
 
     def run_as_package_path(self):
         """Runs program as package specified with file path."""
