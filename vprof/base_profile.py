@@ -46,54 +46,75 @@ def get_package_code(package_name, name_is_path=False):
 class BaseProfile(object):
     """Base class for a profile wrapper."""
 
-    def __init__(self, program_cmd):
+    def __init__(self, run_object):
         """Initializes wrapper.
 
         Args:
-            program_cmd: Name and arguments of the program to profile.
+            run_object: object that will be run under profiler.
         """
-        fullcmd = program_cmd.split()
-        self._is_package_dir = os.path.isdir(program_cmd)
-        self._is_module_file = os.path.isfile(program_cmd)
-        self._program_name, self._program_args = fullcmd[0], fullcmd
-        self._globs = {
-            '__file__': self._program_name,
-            '__name__': '__main__',
-            '__package__': None,
-        }
-        program_path = os.path.dirname(self._program_name)
-        if sys.path[0] != program_path:
-            sys.path.insert(0, program_path)
+        self._is_run_obj_function, self._is_run_obj_package_dir = False, False
+        self._is_run_obj_module, self._is_run_obj_imported_pkg = False, False
+        if isinstance(run_object, tuple):
+            self._run_object, self._run_args = run_object
+            self._is_run_obj_function = True
+        else:
+            self._run_object, _, self._run_args = run_object.partition(' ')
+            if os.path.isdir(self._run_object):
+                self._is_run_obj_package_dir = True
+            elif os.path.isfile(self._run_object):
+                self._is_run_obj_module = True
+            else:
+                self._is_run_obj_imported_pkg = True
+
+        if self._is_run_obj_module:
+            self._globs = {
+                '__file__': self._run_object,
+                '__name__': '__main__',
+                '__package__': None,
+            }
+            program_path = os.path.dirname(self._run_object)
+            if sys.path[0] != program_path:
+                sys.path.insert(0, program_path)
 
     def run_as_package_path(self):
-        """Runs program as package specified with filesystem path.
+        """Runs object as package specified with filesystem path.
 
-        Runs program specified by self._program_name as package specified by
+        Runs object specified by self._run_object as package specified by
         path in filesystem. Must be overridden in child classes.
         """
         raise NotImplementedError
 
     def run_as_package_in_namespace(self):
-        """Runs program as package in Python namespace.
+        """Runs object as package in Python namespace.
 
-        Runs program specified by self._program_name as package in Python
+        Runs object specified by self._run_object as package in Python
         namespace. Must be overridden in child classes.
         """
         raise NotImplementedError
 
     def run_as_module(self):
-        """Runs program as module.
+        """Runs object as module.
 
-        Runs program specified by self._program_name as Python module.
+        Runs object specified by self._run_object as Python module.
+        Must be overridden in child classes.
+        """
+        raise NotImplementedError
+
+    def run_as_function(self):
+        """Runs object as function.
+
+        Runs object specified by self._run_object as Python function with args.
         Must be overridden in child classes.
         """
         raise NotImplementedError
 
     def get_run_dispatcher(self):
-        """Returns run dispatcher depending on self._program_name value."""
-        if self._is_package_dir:
+        """Returns run dispatcher depending on self._run_object value."""
+        if self._is_run_obj_function:
+            return self.run_as_function
+        elif self._is_run_obj_package_dir:
             return self.run_as_package_path
-        elif self._is_module_file:
+        elif self._is_run_obj_module:
             return self.run_as_module
         return self.run_as_package_in_namespace
 

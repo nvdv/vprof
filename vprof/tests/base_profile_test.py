@@ -19,21 +19,48 @@ class BaseProfileUnittest(unittest.TestCase):
     def setUp(self):
         self._profile = object.__new__(base_profile.BaseProfile)
 
+    def testInit_RunObjFunction(self):
+        _func = lambda foo: foo
+        self._profile.__init__((_func, ('bar')))
+        self.assertEqual(self._profile._run_object, _func)
+        self.assertEqual(self._profile._run_args, ('bar'))
+
+    @mock.patch('os.path.isdir')
+    def testInit_RunObjPackagePath(self, isdir_mock):
+        isdir_mock.return_value = True
+        self._profile.__init__('test/test_pkg')
+        self.assertEqual(self._profile._run_object, 'test/test_pkg')
+        self.assertEqual(self._profile._run_args, '')
+        self._profile.__init__('test/test_pkg --help')
+        self.assertEqual(self._profile._run_object, 'test/test_pkg')
+        self.assertEqual(self._profile._run_args, '--help')
+
     @mock.patch('os.path.isdir')
     @mock.patch('os.path.isfile')
-    def testInit(self, isfile_mock, isdir_mock):
+    def testInit_RunObjModule(self, isfile_mock, isdir_mock):
         isfile_mock.return_value, isdir_mock.return_value = True, False
-        program_cmd = 'foo.py --bar --baz'
-        self._profile.__init__(program_cmd)
-        self.assertEqual(self._profile._program_name, 'foo.py')
-        self.assertEqual(self._profile._program_args, ['foo.py', '--bar', '--baz'])
+        self._profile.__init__('foo.py')
+        self.assertEqual(self._profile._run_object, 'foo.py')
+        self.assertEqual(self._profile._run_args, '')
+        self._profile.__init__('foo.py --bar --baz')
+        self.assertEqual(self._profile._run_object, 'foo.py')
+        self.assertEqual(self._profile._run_args, '--bar --baz')
         self.assertDictEqual(self._profile._globs, {
             '__file__': 'foo.py',
             '__name__': '__main__',
             '__package__': None
         })
-        self.assertFalse(self._profile._is_package_dir)
-        self.assertTrue(self._profile._is_module_file)
+
+    @mock.patch('os.path.isdir')
+    @mock.patch('os.path.isfile')
+    def testInit_RunObjImportedPackage(self, isfile_mock, isdir_mock):
+        isfile_mock.return_value, isdir_mock.return_value = False, False
+        self._profile.__init__('test_pkg')
+        self.assertEqual(self._profile._run_object, 'test_pkg')
+        self.assertEqual(self._profile._run_args, '')
+        self._profile.__init__('test_pkg --bar --baz')
+        self.assertEqual(self._profile._run_object, 'test_pkg')
+        self.assertEqual(self._profile._run_args, '--bar --baz')
 
     def testRun(self):
         with self.assertRaises(NotImplementedError):
@@ -51,19 +78,29 @@ class BaseProfileUnittest(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             self._profile.run_as_package_path()
 
+    def testRunAsFunction(self):
+        with self.assertRaises(NotImplementedError):
+            self._profile.run_as_function()
+
     def testGetRunDispatcher(self):
-        self._profile._is_package_dir = True
+        self._profile._is_run_obj_function = True
+        self.assertEqual(
+            self._profile.get_run_dispatcher(),
+            self._profile.run_as_function)
+
+        self._profile._is_run_obj_function = False
+        self._profile._is_run_obj_package_dir = True
         self.assertEqual(
             self._profile.get_run_dispatcher(),
             self._profile.run_as_package_path)
 
-        self._profile._is_package_dir = False
-        self._profile._is_module_file = True
+        self._profile._is_run_obj_package_dir = False
+        self._profile._is_run_obj_module = True
         self.assertEqual(
             self._profile.get_run_dispatcher(),
             self._profile.run_as_module)
 
-        self._profile._is_module_file = False
+        self._profile._is_run_obj_module = False
         self.assertEqual(
             self._profile.get_run_dispatcher(),
             self._profile.run_as_package_in_namespace)

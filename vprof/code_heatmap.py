@@ -74,12 +74,15 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
         """Runs program as package specified with file path."""
         import runpy
         pkg_code = base_profile.get_package_code(
-            self._program_name, name_is_path=True)
+            self._run_object, name_is_path=True)
         with CodeHeatmapCalculator() as prof:
             for _, compiled_code in pkg_code.values():
                 prof.add_code(compiled_code)
             try:
-                runpy.run_path(self._program_name)
+                runpy.run_path(self._run_object)
+            except ImportError:
+                raise CodeHeatmapRunError(
+                    'Unable to run package %s' % self._run_object)
             except SystemExit:
                 pass
         return self._add_source_for_profiled_files(pkg_code, prof)
@@ -87,38 +90,44 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
     def run_as_module(self):
         """Runs program as module."""
         try:
-            with open(self._program_name, 'r') as srcfile,\
+            with open(self._run_object, 'r') as srcfile,\
                 CodeHeatmapCalculator() as prof:
                 src_code = srcfile.read()
-                code = compile(src_code, self._program_name, 'exec')
+                code = compile(src_code, self._run_object, 'exec')
                 prof.add_code(code)
                 exec(code, self._globs, None)
         except SystemExit:
             pass
-        return [{'filename': self._program_name,
-                 'fileHeatmap': prof.heatmap[self._program_name],
+        return [{'filename': self._run_object,
+                 'fileHeatmap': prof.heatmap[self._run_object],
                  'srcCode': src_code}]
 
     def run_as_package_in_namespace(self):
         """Runs program as package in Python namespace."""
         import runpy
-        pkg_code = base_profile.get_package_code(self._program_name)
+        pkg_code = base_profile.get_package_code(self._run_object)
         with CodeHeatmapCalculator() as prof:
             for _, compiled_code in pkg_code.values():
                 prof.add_code(compiled_code)
             try:
-                runpy.run_module(self._program_name)
+                runpy.run_module(self._run_object)
+            except ImportError:
+                raise CodeHeatmapRunError(
+                    'Unable to run package %s' % self._run_object)
             except SystemExit:
                 pass
-            except ImportError:
-                raise
         return self._add_source_for_profiled_files(pkg_code, prof)
 
     def run(self):
         """Calculates code heatmap for specified Python program."""
+        # Process script arguments properly.
+        if self._run_args:
+            sys.argv[:] = [self._run_object, self._run_args]
+        else:
+            sys.argv[:] = [self._run_object]
         run_dispatcher = self.get_run_dispatcher()
         heatmap = run_dispatcher()
         return {
-            'programName': self._program_name,
+            'programName': self._run_object,
             'heatmap': heatmap
         }

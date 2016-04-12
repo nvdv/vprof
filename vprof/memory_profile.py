@@ -81,15 +81,15 @@ class MemoryProfile(base_profile.BaseProfile):
         """Runs program as package specified with file path."""
         import runpy
         pkg_code = base_profile.get_package_code(
-            self._program_name, name_is_path=True)
+            self._run_object, name_is_path=True)
         with CodeEventsTracker() as prof:
             for _, compiled_code in pkg_code.values():
                 prof.add_code(compiled_code)
             try:
-                runpy.run_path(self._program_name)
+                runpy.run_path(self._run_object, run_name='__main__')
             except ImportError:
                 raise MemoryProfilerRunError(
-                    'Unable to run package %s' % self._program_name)
+                    'Unable to run package %s' % self._run_object)
             except SystemExit:
                 pass
         return prof.events_list
@@ -97,9 +97,9 @@ class MemoryProfile(base_profile.BaseProfile):
     def run_as_module(self):
         """Runs program as module."""
         try:
-            with open(self._program_name, 'rb') as srcfile,\
+            with open(self._run_object, 'rb') as srcfile,\
                 CodeEventsTracker() as prof:
-                code = compile(srcfile.read(), self._program_name, 'exec')
+                code = compile(srcfile.read(), self._run_object, 'exec')
                 prof.add_code(code)
                 exec(code, self._globs, None)
         except SystemExit:
@@ -107,26 +107,32 @@ class MemoryProfile(base_profile.BaseProfile):
         return prof.events_list
 
     def run_as_package_in_namespace(self):
+        """Runs object as package in Python namespace."""
         import runpy
-        pkg_code = base_profile.get_package_code(self._program_name)
+        pkg_code = base_profile.get_package_code(self._run_object)
         with CodeEventsTracker() as prof:
             for _, compiled_code in pkg_code.values():
                 prof.add_code(compiled_code)
             try:
-                runpy.run_module(self._program_name)
+                runpy.run_module(self._run_object, run_name='__main__')
             except ImportError:
                 raise MemoryProfilerRunError(
-                    'Unable to run package %s' % self._program_name)
+                    'Unable to run package %s' % self._run_object)
             except SystemExit:
                 pass
         return prof.events_list
 
     def run(self):
         """Collects memory stats for specified Python program."""
+        # Process script arguments properly.
+        if self._run_args:
+            sys.argv[:] = [self._run_object, self._run_args]
+        else:
+            sys.argv[:] = [self._run_object]
         run_dispatcher = self.get_run_dispatcher()
         events_list = run_dispatcher()
         return {
-            'programName': self._program_name,
+            'programName': self._run_object,
             'codeEvents': [
                 (i + 1, line, mem, event, func, fname)
                 for i, (line, mem, event, func, fname) in enumerate(

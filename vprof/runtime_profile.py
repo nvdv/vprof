@@ -1,6 +1,7 @@
 """Module for runtime profiling."""
 import cProfile
 import pstats
+import sys
 
 from collections import defaultdict
 from vprof import base_profile
@@ -77,10 +78,10 @@ class RuntimeProfile(base_profile.BaseProfile):
         import runpy
         prof.enable()
         try:
-            runpy.run_path(self._program_name)
+            runpy.run_path(self._run_object, run_name='__main__')
         except ImportError:
             raise RuntimeProfilerRunError(
-                'Unable to run package %s' % self._program_name)
+                'Unable to run package %s' % self._run_object)
         except SystemExit:
             pass
         prof.disable()
@@ -88,8 +89,8 @@ class RuntimeProfile(base_profile.BaseProfile):
     def run_as_module(self, prof):
         """Runs program as module."""
         try:
-            with open(self._program_name, 'rb') as srcfile:
-                code = compile(srcfile.read(), self._program_name, 'exec')
+            with open(self._run_object, 'rb') as srcfile:
+                code = compile(srcfile.read(), self._run_object, 'exec')
             prof.runctx(code, self._globs, None)
         except SystemExit:
             pass
@@ -99,10 +100,10 @@ class RuntimeProfile(base_profile.BaseProfile):
         import runpy
         prof.enable()
         try:
-            runpy.run_module(self._program_name)
+            runpy.run_module(self._run_object, run_name='__main__')
         except ImportError:
             raise RuntimeProfilerRunError(
-                'Unable to run package %s' % self._program_name)
+                'Unable to run package %s' % self._run_object)
         except SystemExit:
             pass
         finally:
@@ -110,13 +111,18 @@ class RuntimeProfile(base_profile.BaseProfile):
 
     def run(self):
         """Collects CProfile stats for specified Python program."""
+        # Process script arguments properly.
+        if self._run_args:
+            sys.argv[:] = [self._run_object, self._run_args]
+        else:
+            sys.argv[:] = [self._run_object]
         prof = cProfile.Profile()
         run_dispatcher = self.get_run_dispatcher()
         run_dispatcher(prof)
         prof.create_stats()
         cprofile_stats = pstats.Stats(prof)
         return {
-            'programName': self._program_name,
+            'programName': self._run_object,
             'runTime': cprofile_stats.total_tt,
             'primitiveCalls': cprofile_stats.prim_calls,
             'totalCalls': cprofile_stats.total_calls,
