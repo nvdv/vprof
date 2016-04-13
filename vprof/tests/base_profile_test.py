@@ -21,9 +21,10 @@ class BaseProfileUnittest(unittest.TestCase):
 
     def testInit_RunObjFunction(self):
         _func = lambda foo: foo
-        self._profile.__init__((_func, ('bar')))
+        self._profile.__init__((_func, ('bar'), {'bar': 'baz'}))
         self.assertEqual(self._profile._run_object, _func)
         self.assertEqual(self._profile._run_args, ('bar'))
+        self.assertDictEqual(self._profile._run_kwargs, {'bar': 'baz'})
 
     @mock.patch('os.path.isdir')
     def testInit_RunObjPackagePath(self, isdir_mock):

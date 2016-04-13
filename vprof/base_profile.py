@@ -55,7 +55,7 @@ class BaseProfile(object):
         self._is_run_obj_function, self._is_run_obj_package_dir = False, False
         self._is_run_obj_module, self._is_run_obj_imported_pkg = False, False
         if isinstance(run_object, tuple):
-            self._run_object, self._run_args = run_object
+            self._run_object, self._run_args, self._run_kwargs = run_object
             self._is_run_obj_function = True
         else:
             self._run_object, _, self._run_args = run_object.partition(' ')

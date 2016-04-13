@@ -92,6 +92,7 @@ class MemoryProfile(base_profile.BaseProfile):
                     'Unable to run package %s' % self._run_object)
             except SystemExit:
                 pass
+        self._object_name = self._run_object
         return prof.events_list
 
     def run_as_module(self):
@@ -104,6 +105,7 @@ class MemoryProfile(base_profile.BaseProfile):
                 exec(code, self._globs, None)
         except SystemExit:
             pass
+        self._object_name = self._run_object
         return prof.events_list
 
     def run_as_package_in_namespace(self):
@@ -120,6 +122,15 @@ class MemoryProfile(base_profile.BaseProfile):
                     'Unable to run package %s' % self._run_object)
             except SystemExit:
                 pass
+        self._object_name = self._run_object
+        return prof.events_list
+
+    def run_as_function(self):
+        """Runs object as function."""
+        with CodeEventsTracker() as prof:
+            prof.add_code(self._run_object.__code__)
+            self._run_object(*self._run_args, **self._run_kwargs)
+        self._object_name = 'function %s' % self._run_object.__name__
         return prof.events_list
 
     def run(self):
@@ -132,7 +143,7 @@ class MemoryProfile(base_profile.BaseProfile):
         run_dispatcher = self.get_run_dispatcher()
         events_list = run_dispatcher()
         return {
-            'programName': self._run_object,
+            'programName': self._object_name,
             'codeEvents': [
                 (i + 1, line, mem, event, func, fname)
                 for i, (line, mem, event, func, fname) in enumerate(
