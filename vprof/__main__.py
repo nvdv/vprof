@@ -39,6 +39,30 @@ _ERROR_MSG = {
 }
 
 
+def run_profilers(run_object, prof_config, verbose=False):
+    """Runs profilers against run_object.
+
+    Args:
+        run_object: An object (string or tuple) to run profilers agaist.
+        prof_config: A string with profilers configuration.
+        verbose: True if info about running profilers should be shown.
+    Returns:
+        An ordered dictionary with collected stats.
+    """
+    run_stats = OrderedDict()
+    present_profilers = ((o, p) for o, p in _PROFILERS if o in prof_config)
+    for option, profiler in present_profilers:
+        try:
+            curr_profiler = profiler(run_object)
+            if verbose:
+                print('Running %s...' % curr_profiler.__class__.__name__)
+            run_stats[option] = curr_profiler.run()
+        except base_profile.ProfilerRuntimeException as exc:
+            print(exc)
+            sys.exit(_ERROR_MSG['runtime error']['code'])
+    return run_stats
+
+
 def main():
     """Visual profiler main function."""
     parser = argparse.ArgumentParser(
@@ -67,17 +91,7 @@ def main():
             print(_ERROR_MSG['bad option']['msg'] % option)
             sys.exit(_ERROR_MSG['bad option']['code'])
 
-    program_name, program_stats = args.source[0], OrderedDict()
-    sys.argv[:] = args.source
-    present_profilers = ((s, p) for s, p in _PROFILERS if s in args.profilers)
-    for option, profiler in present_profilers:
-        try:
-            curr_profiler = profiler(program_name)
-            print('Running %s...' % curr_profiler.__class__.__name__)
-            program_stats[option] = curr_profiler.run()
-        except base_profile.ProfilerRuntimeException as exc:
-            print(exc)
-            sys.exit(_ERROR_MSG['runtime error']['code'])
+    program_stats = run_profilers(args.source[0], args.profilers, verbose=True)
     if not args.debug_mode:
         sys.stderr = open(os.devnull, "w")
     print('Starting HTTP server...')
