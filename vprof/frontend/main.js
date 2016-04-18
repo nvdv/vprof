@@ -12,6 +12,7 @@ var memory_stats = require('./memory_stats.js');
 var code_heatmap = require('./code_heatmap.js');
 
 var JSON_URI = 'profile';
+var POLL_INTERVAL = 500;  // msec
 
 /**
  * Creates empty div with specified ID and class tab-content.
@@ -132,9 +133,14 @@ function showTab_(tabId) {
 
 /** Makes request to server and renders page with received data. */
 function main() {
-  d3.json(JSON_URI, function(data) {
-    renderPage(data);
-  });
+  var timerId = setInterval(function() {
+    d3.json(JSON_URI, function(data) {
+      if (Object.keys(data).length !== 0) {
+        renderPage(data);
+        clearInterval(timerId);
+      }
+    });
+  }, POLL_INTERVAL);
 }
 
 main();
