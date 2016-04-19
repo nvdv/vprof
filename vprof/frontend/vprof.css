@@ -178,3 +178,11 @@ p {
   display: block;
   opacity: 0.6;
 }
+
+#progress-indicator {
+  background: url('progress.gif') no-repeat center center;
+  background-color: #F1F1F1;
+  height: 100%;
+  position: absolute;
+  width: 100%;
+}
