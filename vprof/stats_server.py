@@ -73,7 +73,7 @@ class StatsHandler(http_server.SimpleHTTPRequestHandler):
     def do_POST(self):
         """Handles HTTP POST requests."""
         post_data = self.rfile.read(int(self.headers['Content-Length']))
-        self._profile_json = json.loads(post_data)
+        self._profile_json.update(json.loads(post_data))
         self._send_response(
             200, headers=(('Content-type', '%s; charset=utf-8' % 'text/json'),
                           ('Content-Length', len(post_data))))

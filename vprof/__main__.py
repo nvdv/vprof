@@ -3,21 +3,13 @@ import argparse
 import os
 import sys
 
-from collections import OrderedDict
 from vprof import base_profile
-from vprof import code_heatmap
-from vprof import memory_profile
-from vprof import runtime_profile
 from vprof import stats_server
+from vprof import vprof_runtime
 
 _PROGRAN_NAME = 'vprof'
 _MODULE_DESC = 'Python visual profiler'
 _HOST = 'localhost'
-_PROFILERS = (
-    ('c', runtime_profile.RuntimeProfile),
-    ('m', memory_profile.MemoryProfile),
-    ('h', code_heatmap.CodeHeatmapProfile),
-)
 _MODES_DESC = (
     """modes configuration
 available modes:
@@ -30,37 +22,12 @@ _ERROR_MSG = {
         'code': 1
     },
     'bad option': {
-        'msg': 'Unrecognized option: %s',
         'code': 2
     },
     'runtime error': {
         'code': 3
     },
 }
-
-
-def run_profilers(run_object, prof_config, verbose=False):
-    """Runs profilers against run_object.
-
-    Args:
-        run_object: An object (string or tuple) to run profilers agaist.
-        prof_config: A string with profilers configuration.
-        verbose: True if info about running profilers should be shown.
-    Returns:
-        An ordered dictionary with collected stats.
-    """
-    run_stats = OrderedDict()
-    present_profilers = ((o, p) for o, p in _PROFILERS if o in prof_config)
-    for option, profiler in present_profilers:
-        try:
-            curr_profiler = profiler(run_object)
-            if verbose:
-                print('Running %s...' % curr_profiler.__class__.__name__)
-            run_stats[option] = curr_profiler.run()
-        except base_profile.ProfilerRuntimeException as exc:
-            print(exc)
-            sys.exit(_ERROR_MSG['runtime error']['code'])
-    return run_stats
 
 
 def main():
@@ -81,17 +48,19 @@ def main():
                         help="don't start browser after profiling")
     args = parser.parse_args()
 
-    if len(args.profilers) > len(set(args.profilers)):
+    try:
+        program_stats = vprof_runtime.run_profilers(
+            args.source[0], args.profilers, verbose=True)
+    except vprof_runtime.AmbiguousConfigurationError:
         print(_ERROR_MSG['ambiguous configuration']['msg'])
         sys.exit(_ERROR_MSG['ambiguous configuration']['code'])
+    except vprof_runtime.BadOptionError as exc:
+        print(exc)
+        sys.exit(_ERROR_MSG['bad option']['code'])
+    except base_profile.ProfilerRuntimeException as exc:
+        print(exc)
+        sys.exit(_ERROR_MSG['runtime error']['code'])
 
-    available_profilers = {opt for opt, _ in _PROFILERS}
-    for option in args.profilers:
-        if option not in available_profilers:
-            print(_ERROR_MSG['bad option']['msg'] % option)
-            sys.exit(_ERROR_MSG['bad option']['code'])
-
-    program_stats = run_profilers(args.source[0], args.profilers, verbose=True)
     if not args.debug_mode:
         sys.stderr = open(os.devnull, "w")
     print('Starting HTTP server...')
