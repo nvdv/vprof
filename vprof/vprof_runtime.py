@@ -1,5 +1,8 @@
 """Module that contains vprof runtime logic."""
+import json
+
 from collections import OrderedDict
+from six.moves import urllib
 from vprof import code_heatmap
 from vprof import memory_profile
 from vprof import runtime_profile
@@ -56,3 +59,18 @@ def run_profilers(run_object, prof_config, verbose=False):
             print('Running %s...' % curr_profiler.__class__.__name__)
         run_stats[option] = curr_profiler.run()
     return run_stats
+
+
+def run(func, options, args=(), kwargs={}, host='localhost', port=80):  # pylint: disable=dangerous-default-value
+    """Runs profilers specified by options against func.
+    Args:
+        func: Python function object.
+        options: A string with profilers configuration (i.e. 'cmh').
+        args: Arguments to pass to func.
+        kwargs: Keyword arguments to pass to func.
+        host: Host to send profilers data.
+        port: Port to send profilers.data.
+    """
+    run_stats = run_profilers((func, args, kwargs), options)
+    urllib.request.urlopen(
+        'http://%s:%s' % (host, port), data=json.dumps(run_stats))
