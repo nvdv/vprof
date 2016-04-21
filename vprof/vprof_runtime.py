@@ -61,7 +61,7 @@ def run_profilers(run_object, prof_config, verbose=False):
     return run_stats
 
 
-def run(func, options, args=(), kwargs={}, host='localhost', port=80):  # pylint: disable=dangerous-default-value
+def run(func, options, args=(), kwargs={}, host='localhost', port=8000):  # pylint: disable=dangerous-default-value
     """Runs profilers specified by options against func.
     Args:
         func: Python function object.
