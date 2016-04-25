@@ -57,6 +57,8 @@ def main():
                         help="don't suppress error messages")
     args = parser.parse_args()
 
+    # if not args.config
+
     if args.config and args.remote:
         print(_ERROR_MSG['config error']['msg'])
         sys.exit(_ERROR_MSG['config error']['code'])

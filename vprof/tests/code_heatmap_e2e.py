@@ -20,6 +20,17 @@ _HOST, _PORT = 'localhost', 12345
 _MODULE_FILENAME = 'vprof/tests/test_pkg/dummy_module.py'
 _PACKAGE_PATH = 'vprof/tests/test_pkg/'
 _PACKAGE_NAME = 'vprof.tests.test_pkg'
+_DUMMY_MODULE_SOURCELINES = [
+    [1, 'def dummy_fib(n):'],
+    [2, '    if n < 2:'],
+    [3, '        return n'],
+    [4, '    return dummy_fib(n - 1) + dummy_fib(n - 2)'],
+    [5, '']]
+_MAIN_MODULE_SOURCELINES = [
+    [1, 'from test_pkg import dummy_module'],
+    [2, ''],
+    [3, 'dummy_module.dummy_fib(5)'],
+    [4, '']]
 
 
 class CodeHeatmapModuleEndToEndTest(unittest.TestCase):
@@ -41,8 +52,10 @@ class CodeHeatmapModuleEndToEndTest(unittest.TestCase):
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
         stats = json.loads(response.read().decode('utf-8'))
-        self.assertEqual(stats['programName'], _MODULE_FILENAME)
-        self.assertDictEqual(stats['heatmap'][0]['fileHeatmap'], {'1': 1})
+        self.assertEqual(len(stats), 1)
+        self.assertEqual(stats[0]['objectName'], _MODULE_FILENAME)
+        self.assertDictEqual(stats[0]['heatmap'], {'1': 1})
+        self.assertListEqual(stats[0]['srcCode'], _DUMMY_MODULE_SOURCELINES)
 
 
 class CodeHeatmapPackageAsPathEndToEndTest(unittest.TestCase):
@@ -64,18 +77,13 @@ class CodeHeatmapPackageAsPathEndToEndTest(unittest.TestCase):
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
         stats = json.loads(response.read().decode('utf-8'))
-        self.assertEqual(stats['programName'], _PACKAGE_PATH)
-        self.assertTrue(
-            stats['heatmap'][0]['filename'].endswith(
-                'vprof/tests/test_pkg/__main__.py'))
-        self.assertDictEqual(
-            stats['heatmap'][0]['fileHeatmap'], {'1': 1, '3': 1})
-        self.assertTrue(
-            stats['heatmap'][1]['filename'].endswith(
-                'vprof/tests/test_pkg/dummy_module.py'))
-        self.assertEqual(stats['heatmap'][1]['fileHeatmap']['2'], 15)
-        self.assertEqual(stats['heatmap'][1]['fileHeatmap']['3'], 8)
-        self.assertEqual(stats['heatmap'][1]['fileHeatmap']['4'], 7)
+        self.assertEqual(len(stats), 2)
+        self.assertEqual(
+            stats[0]['objectName'], 'vprof/tests/test_pkg/__main__.py')
+        self.assertEqual(
+            stats[1]['objectName'], 'vprof/tests/test_pkg/dummy_module.py')
+        self.assertListEqual(stats[0]['srcCode'], _MAIN_MODULE_SOURCELINES)
+        self.assertListEqual(stats[1]['srcCode'], _DUMMY_MODULE_SOURCELINES)
 
 
 class CodeHeatmapImportedPackageEndToEndTest(unittest.TestCase):
@@ -97,16 +105,10 @@ class CodeHeatmapImportedPackageEndToEndTest(unittest.TestCase):
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
         stats = json.loads(response.read().decode('utf-8'))
-
-        self.assertEqual(stats['programName'], _PACKAGE_NAME)
-        self.assertTrue(
-            stats['heatmap'][0]['filename'].endswith(
-                'vprof/tests/test_pkg/__main__.py'))
-        self.assertDictEqual(
-            stats['heatmap'][0]['fileHeatmap'], {'1': 1, '3': 1})
-        self.assertTrue(
-            stats['heatmap'][1]['filename'].endswith(
-                'vprof/tests/test_pkg/dummy_module.py'))
-        self.assertEqual(stats['heatmap'][1]['fileHeatmap']['2'], 15)
-        self.assertEqual(stats['heatmap'][1]['fileHeatmap']['3'], 8)
-        self.assertEqual(stats['heatmap'][1]['fileHeatmap']['4'], 7)
+        self.assertEqual(len(stats), 2)
+        self.assertEqual(
+            stats[0]['objectName'], 'vprof/tests/test_pkg/__main__.py')
+        self.assertEqual(
+            stats[1]['objectName'], 'vprof/tests/test_pkg/dummy_module.py')
+        self.assertListEqual(stats[0]['srcCode'], _MAIN_MODULE_SOURCELINES)
+        self.assertListEqual(stats[1]['srcCode'], _DUMMY_MODULE_SOURCELINES)

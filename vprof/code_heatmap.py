@@ -1,6 +1,7 @@
 """Module for code heatmap rendering."""
 import inspect
 import operator
+import os
 import sys
 
 from collections import defaultdict
@@ -58,17 +59,20 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
     Contains all logic related to heatmap calculation and processing.
     """
 
-    def _add_source_for_profiled_files(self, package_code, prof):
-        """Returns source code and heatmap for profiled files."""
-        resulting_heatmap = []
-        for src_fname, (src_code, _) in package_code.items():
-            for prof_fname, fname_heatmap in prof.heatmap.items():
-                if prof_fname.endswith(src_fname):
-                    resulting_heatmap.append({
-                        'filename': src_fname,
-                        'fileHeatmap': dict(fname_heatmap),
-                        'srcCode': src_code})
-        return sorted(resulting_heatmap, key=operator.itemgetter('filename'))
+    def _consodalidate_stats(self, package_code, prof):
+        """Merges profiler stats and package_code."""
+        package_heatmap = []
+        for modname, (src_code, _) in package_code.items():
+            abs_path = (modname if os.path.isabs(modname)
+                        else os.path.abspath(modname))
+            source_lines = [
+                (i + 1, l) for i, l in enumerate(src_code.split('\n'))]
+            package_heatmap.append({
+                'objectName': os.path.relpath(abs_path),
+                'heatmap': prof.heatmap[abs_path],
+                'srcCode': source_lines
+            })
+        return sorted(package_heatmap, key=operator.itemgetter('objectName'))
 
     def run_as_package_path(self):
         """Runs program as package specified with file path."""
@@ -85,8 +89,7 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
                     'Unable to run package %s' % self._run_object)
             except SystemExit:
                 pass
-        self._object_name = self._run_object
-        return self._add_source_for_profiled_files(pkg_code, prof)
+        return self._consodalidate_stats(pkg_code, prof)
 
     def run_as_module(self):
         """Runs program as module."""
@@ -99,10 +102,12 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
                 exec(code, self._globs, None)
         except SystemExit:
             pass
-        self._object_name = self._run_object
-        return [{'filename': self._run_object,
-                 'fileHeatmap': prof.heatmap[self._run_object],
-                 'srcCode': src_code}]
+        source_lines = [(i + 1, l) for i, l in enumerate(src_code.split('\n'))]
+        return [{
+            'objectName': self._run_object,
+            'heatmap': prof.heatmap[self._run_object],
+            'srcCode': source_lines
+        }]
 
     def run_as_package_in_namespace(self):
         """Runs program as package in Python namespace."""
@@ -118,18 +123,26 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
                     'Unable to run package %s' % self._run_object)
             except SystemExit:
                 pass
-        self._object_name = self._run_object
-        return self._add_source_for_profiled_files(pkg_code, prof)
+        return self._consodalidate_stats(pkg_code, prof)
 
     def run_as_function(self):
         """Runs object as function."""
         with CodeHeatmapCalculator() as prof:
             prof.add_code(self._run_object.__code__)
             self._run_object(*self._run_args, **self._run_kwargs)
-        self._object_name = inspect.getsourcefile(self._run_object)
-        return [{'filename': 'function %s' % self._run_object.__name__,
-                 'fileHeatmap': prof.heatmap,
-                 'srcCode': inspect.getsource(self._run_object)}]
+        code_lines, start_line = inspect.getsourcelines(self._run_object)
+        filename = inspect.getsourcefile(self._run_object)
+
+        source_lines = []
+        for line in code_lines:
+            source_lines.append((start_line, line))
+            start_line += 1
+
+        return [{
+            'objectName': 'function %s' % self._run_object.__name__,
+            'heatmap': prof.heatmap[filename],
+            'srcCode': source_lines,
+        }]
 
     def run(self):
         """Calculates code heatmap for specified Python program."""
@@ -139,8 +152,4 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
         else:
             sys.argv[:] = [self._run_object]
         run_dispatcher = self.get_run_dispatcher()
-        heatmap = run_dispatcher()
-        return {
-            'programName': self._object_name,
-            'heatmap': heatmap
-        }
+        return run_dispatcher()
