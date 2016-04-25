@@ -30,6 +30,10 @@ _ERROR_MSG = {
     'config error': {
         'msg': 'Remote and config options cannot be used together.',
         'code': 4
+    },
+    'no config': {
+        'msg': 'Please, specify profiler configuration.',
+        'code': 5
     }
 }
 
@@ -57,11 +61,13 @@ def main():
                         help="don't suppress error messages")
     args = parser.parse_args()
 
-    # if not args.config
-
     if args.config and args.remote:
         print(_ERROR_MSG['config error']['msg'])
         sys.exit(_ERROR_MSG['config error']['code'])
+
+    if not args.config and not args.remote:
+        print(_ERROR_MSG['no config']['msg'])
+        sys.exit(_ERROR_MSG['no config']['code'])
 
     program_stats = {}
     if not args.remote:
