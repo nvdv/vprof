@@ -138,8 +138,10 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
             source_lines.append((start_line, line))
             start_line += 1
 
+        object_name = 'function %s @ %s' % (
+            self._run_object.__name__, filename)
         return [{
-            'objectName': 'function %s' % self._run_object.__name__,
+            'objectName': object_name,
             'heatmap': prof.heatmap[filename],
             'srcCode': source_lines,
         }]

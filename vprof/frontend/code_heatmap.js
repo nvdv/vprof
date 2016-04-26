@@ -39,7 +39,7 @@ CodeHeatmap.prototype.render = function() {
     .attr('class', 'code-container');
 
   var codeContainer = heatmapContainer.selectAll('div')
-    .data(this.data_.heatmap)
+    .data(this.data_)
     .enter()
     .append('div')
     .attr('class', 'src-file');
@@ -47,14 +47,12 @@ CodeHeatmap.prototype.render = function() {
   codeContainer.append('div')
     .attr('class', 'src-code-header')
     .append('text')
-    .html(function(d) { return d.filename; });
+    .html(function(d) { return d.objectName; });
 
   var fileContainers = codeContainer.append('div')
     .attr('class', 'src-code')
     .append('text')
-    .html(function(d) {
-        return CodeHeatmap.postProcessCode_(
-            hljs.highlight('python', d.srcCode).value); });
+    .html(function(d) { return CodeHeatmap.processCode_(d.srcCode); });
 
   var tooltip = heatmapContainer.append('div')
     .attr('class', 'tooltip tooltip-invisible');
@@ -67,7 +65,8 @@ CodeHeatmap.prototype.render = function() {
             return self.changeBackgroundColor_(d, j); })
         .on('mouseover', function(_, j) {
             self.showTooltip_(this, tooltip, d, j); })
-        .on('mouseout', function() { self.hideTooltip_(this, tooltip); });
+        .on('mouseout', function() {
+            self.hideTooltip_(this, tooltip); });
     });
 };
 
@@ -78,7 +77,8 @@ CodeHeatmap.prototype.render = function() {
  * @returns {string}
  */
 CodeHeatmap.prototype.changeBackgroundColor_ = function(data, i) {
-  var runCount = data.fileHeatmap[i + 1];
+  var codeLine = data.srcCode[i][0];
+  var runCount = data.heatmap[codeLine];
   return runCount ? this.heatmapScale_(runCount) : '';
 };
 
@@ -90,7 +90,8 @@ CodeHeatmap.prototype.changeBackgroundColor_ = function(data, i) {
  * @param {number} i - Source line number.
  */
 CodeHeatmap.prototype.showTooltip_ = function(element, tooltip, data, i) {
-  var runCount = data.fileHeatmap[i + 1];
+  var codeLine = data.srcCode[i][0];
+  var runCount = data.heatmap[codeLine];
   if (runCount) {
     d3.select(element).attr('class', 'src-line-highlight');
     tooltip.attr('class', 'tooltip tooltip-visible')
@@ -111,22 +112,24 @@ CodeHeatmap.prototype.hideTooltip_ = function(element, tooltip) {
 };
 
 /**
- * Adds line numbers and additional formatting since highlight.js does not
- * support them.
+ * Adds line numbers and code highlighting.
  * @static
  * @param {string} srcCode - Python source code.
  * @returns {string}
  */
-CodeHeatmap.postProcessCode_ = function(srcCode) {
-  var lines = srcCode.split('\n');
-  for (var i = 1; i < lines.length + 1; i++) {
-    lines[i - 1] = (
+CodeHeatmap.processCode_ = function(srcCode) {
+  var code = [];
+  for (var i = 0; i < srcCode.length; i++) {
+    var lineNumber = srcCode[i][0], codeLine = srcCode[i][1];
+    var highlightedLine = hljs.highlight('python', codeLine).value;
+    var currLine = (
         "<div class='src-line-normal'>" +
-            "<div class='src-line-number'>" + i + "</div>" +
-            "<div class='src-line-code'>" + lines[i - 1] + "</div>" +
+            "<div class='src-line-number'>" + lineNumber + "</div>" +
+            "<div class='src-line-code'>" + highlightedLine + "</div>" +
         "</div>");
+    code.push(currLine);
   }
-  return lines.join('');
+  return code.join('');
 };
 
 /**
