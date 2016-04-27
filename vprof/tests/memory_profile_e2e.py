@@ -131,6 +131,5 @@ class MemoryProfileFunctionEndToEndTest(unittest.TestCase):
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
         stats = json.loads(response.read().decode('utf-8'))
-        self.assertEqual(len(stats), 1)
         self.assertTrue('function _func' in stats['m']['programName'])
         self.assertEqual(stats['m']['totalEvents'], 2)
