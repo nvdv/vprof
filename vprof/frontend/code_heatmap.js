@@ -35,30 +35,49 @@ function CodeHeatmap(parent, data) {
 
 /** Renders code heatmap. */
 CodeHeatmap.prototype.render = function() {
-  var heatmapContainer = this.parent_.append('div')
+  var pageContainer = this.parent_.append('div')
+    .attr('id', 'heatmap-layout');
+
+  var moduleList = pageContainer.append('div')
+    .attr('class', 'module-list')
+    .html('Modules')
+    .selectAll('div')
+    .data(this.data_)
+    .enter()
+    .append('a')
+    .attr('href', function(d) { return '#' + d.objectName; })
+    .append('div')
+    .attr('class', 'src-code-header')
+    .append('text')
+    .html(function(d) { return d.objectName; });
+
+  var codeContainer = pageContainer.append('div')
     .attr('class', 'code-container');
 
-  var codeContainer = heatmapContainer.selectAll('div')
+  var heatmapContainer = codeContainer.selectAll('div')
     .data(this.data_)
     .enter()
     .append('div')
     .attr('class', 'src-file');
 
-  codeContainer.append('div')
+  heatmapContainer.append('div')
+    .append('a')
+    .attr('href', function(d) { return '#' + d.objectName; })
     .attr('class', 'src-code-header')
+    .attr('id', function(d) { return d.objectName; })
     .append('text')
     .html(function(d) { return d.objectName; });
 
-  var fileContainers = codeContainer.append('div')
+  var fileContainers = heatmapContainer.append('div')
     .attr('class', 'src-code')
     .append('text')
     .html(function(d) { return CodeHeatmap.processCode_(d.srcCode); });
 
-  var tooltip = heatmapContainer.append('div')
+  var tooltip = pageContainer.append('div')
     .attr('class', 'tooltip tooltip-invisible');
 
   var self = this;
-  heatmapContainer.selectAll('.src-file')
+  codeContainer.selectAll('.src-file')
     .each(function(d, i) {
       d3.select(fileContainers[0][i]).selectAll('.src-line-normal')
         .style('background-color', function(_, j) {

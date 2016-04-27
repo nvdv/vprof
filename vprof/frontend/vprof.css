@@ -13,7 +13,12 @@ body {
 
 .tab-content {
   background: #F1F1F1;
+  display: block;
   height: 96%;
+}
+
+.tab-content-hidden {
+ display: none;
 }
 
 .tab-header li {
@@ -133,17 +138,27 @@ p {
   text-align: left;
 }
 
-.code-container {
+#heatmap-layout {
+  display: flex;
   height: 97%;
-  margin: 0 auto;
+  flex-direction: row;
+}
+
+.module-list {
+  padding: 8px;
+  padding-left: 50px;
+  width: 25%;
+}
+
+.code-container {
+  background: #FBFBFB;
   overflow-x: auto;
   overflow-y: auto;
   padding: 8px;
-  width: 50%;
+  width: 45%;
 }
 
 .src-code {
-  background: #FBFBFB;
   font-family: "Lucida Sans Typewriter", "Lucida Console", Monaco;
   font-size: 12px;
   white-space: pre;
