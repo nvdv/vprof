@@ -9,6 +9,7 @@ from six.moves import urllib
 
 from vprof import memory_profile
 from vprof import stats_server
+from vprof import vprof_runtime
 from vprof.tests import test_pkg
 
 # For Python 2 and Python 3 compatibility.
@@ -103,3 +104,33 @@ class MemoryProfileImportedPackageEndToEndTest(unittest.TestCase):
         self.assertEqual(first_event[1], 1)
         self.assertEqual(first_event[3], 'line')
         self.assertEqual(first_event[4], '<module>')
+
+
+class MemoryProfileFunctionEndToEndTest(unittest.TestCase):
+
+    def setUp(self):
+
+        def _func(foo, bar):
+            baz = foo + bar
+            return baz
+        self._func = _func
+
+        stats_handler = functools.partial(
+            stats_server.StatsHandler, {})
+        self.server = stats_server.StatsServer(
+            (_HOST, _PORT), stats_handler)
+        threading.Thread(target=self.server.serve_forever).start()
+
+    def tearDown(self):
+        self.server.shutdown()
+        self.server.server_close()
+
+    def testRequest(self):
+        vprof_runtime.run(
+            self._func, 'm', ('foo', 'bar'), host=_HOST, port=_PORT)
+        response = urllib.request.urlopen(
+            'http://%s:%s/profile' % (_HOST, _PORT))
+        stats = json.loads(response.read().decode('utf-8'))
+        self.assertEqual(len(stats), 1)
+        self.assertTrue('function _func' in stats['m']['programName'])
+        self.assertEqual(stats['m']['totalEvents'], 2)
