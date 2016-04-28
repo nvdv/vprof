@@ -92,6 +92,7 @@ function renderPage(data) {
     .attr('class', 'tab-header');
 
   var props = Object.keys(data);
+  props.sort();
   for (var i = 0; i < props.length; i++) {
     var status = (i === 0) ? 'selected' : 'not-selected';
     var display = (i === 0) ? 'block' : 'none';
