@@ -3,6 +3,6 @@ disable=locally-disabled, no-self-use, exec-used, too-few-public-methods,
         too-many-instance-attributes, bad-builtin, wrong-import-order,
         superfluous-parens, import-error, fixme, arguments-differ,
         duplicate-code, attribute-defined-outside-init, invalid-name,
-        no-member, too-many-arguments
+        no-member, too-many-arguments,
         # Disable duplicate-code globally, since can't disable locally
         # https://github.com/PyCQA/pylint/issues/214
