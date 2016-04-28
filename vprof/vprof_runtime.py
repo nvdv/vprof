@@ -73,4 +73,4 @@ def run(func, options, args=(), kwargs={}, host='localhost', port=8000):  # pyli
     """
     run_stats = run_profilers((func, args, kwargs), options)
     urllib.request.urlopen(
-        'http://%s:%s' % (host, port), data=json.dumps(run_stats))
+        'http://%s:%s' % (host, port), json.dumps(run_stats))
