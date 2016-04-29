@@ -1,21 +1,16 @@
 """Code heatmap end to end tests."""
+# pylint: disable=missing-docstring, blacklisted-name
 import json
 import functools
 import threading
 import unittest
 
-from six.moves import builtins
 from six.moves import urllib
 
 from vprof import code_heatmap
 from vprof import stats_server
 from vprof import vprof_runtime
-
-# For Python 2 and Python 3 compatibility.
-try:
-    import mock
-except ImportError:
-    from unittest import mock
+from vprof.tests import test_pkg # pylint: disable=unused-import
 
 _HOST, _PORT = 'localhost', 12345
 _MODULE_FILENAME = 'vprof/tests/test_pkg/dummy_module.py'
@@ -143,8 +138,11 @@ class CodeHeatmapFunctionEndToEndTest(unittest.TestCase):
         self.assertEqual(len(stats), 1)
         self.assertTrue('function _func' in stats['h'][0]['objectName'])
         self.assertDictEqual(
-            stats['h'][0]['heatmap'], {'123': 1, '124': 1})
-        self.assertListEqual(stats['h'][0]['srcCode'],
-            [[122, '        def _func(foo, bar):\n'],
-             [123, u'            baz = foo + bar\n'],
-             [124, u'            return baz\n']])
+            stats['h'][0]['heatmap'], {'118': 1, '119': 1})
+        self.assertListEqual(
+            stats['h'][0]['srcCode'],
+            [[117, '        def _func(foo, bar):\n'],
+             [118, u'            baz = foo + bar\n'],
+             [119, u'            return baz\n']])
+
+# pylint: enable=missing-docstring, blacklisted-name

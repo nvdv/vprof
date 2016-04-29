@@ -1,22 +1,16 @@
 """Memory profile end to end tests."""
+# pylint: disable=missing-docstring, blacklisted-name
 import json
 import functools
 import threading
 import unittest
 
-from six.moves import builtins
 from six.moves import urllib
 
 from vprof import memory_profile
 from vprof import stats_server
 from vprof import vprof_runtime
-from vprof.tests import test_pkg
-
-# For Python 2 and Python 3 compatibility.
-try:
-    import mock
-except ImportError:
-    from unittest import mock
+from vprof.tests import test_pkg # pylint: disable=unused-import
 
 _HOST, _PORT = 'localhost', 12345
 _MODULE_FILENAME = 'vprof/tests/test_pkg/dummy_module.py'
@@ -133,3 +127,5 @@ class MemoryProfileFunctionEndToEndTest(unittest.TestCase):
         stats = json.loads(response.read().decode('utf-8'))
         self.assertTrue('function _func' in stats['m']['programName'])
         self.assertEqual(stats['m']['totalEvents'], 2)
+
+# pylint: enable=missing-docstring, blacklisted-name
