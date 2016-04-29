@@ -1,3 +1,4 @@
+# pylint: disable=protected-access, missing-docstring
 import sys
 import unittest
 
@@ -8,7 +9,7 @@ from vprof import code_heatmap
 try:
     import mock
 except ImportError:
-    from unittest import mock
+    from unittest import mock  # pylint: disable=ungrouped-imports
 
 
 class CodeHeatmapCalculator(unittest.TestCase):
@@ -44,3 +45,5 @@ class CodeHeatmapCalculator(unittest.TestCase):
             self._calc.heatmap[frame1.f_code.co_filename][frame1.f_lineno], 1)
         self.assertEqual(
             self._calc.heatmap[frame2.f_code.co_filename][frame2.f_lineno], 1)
+
+# pylint: enable=protected-access, missing-docstring

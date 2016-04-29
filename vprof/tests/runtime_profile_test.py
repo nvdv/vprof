@@ -1,3 +1,4 @@
+# pylint: disable=protected-access, missing-docstring
 import unittest
 
 from vprof import runtime_profile
@@ -6,7 +7,7 @@ from vprof import runtime_profile
 try:
     import mock
 except ImportError:
-    from unittest import mock
+    from unittest import mock  # pylint: disable=ungrouped-imports
 
 _RUN_STATS = {
     ('testscript.py', 1, 'prod'): (1, 10, 7e-06, 7e-06, {
@@ -71,3 +72,5 @@ class RuntimeProfileUnittest(unittest.TestCase):
         stats.stats = _RUN_STATS
         self.assertDictEqual(
             self._profile._transform_stats(stats), _CALL_GRAPH)
+
+# pylint:  enable=protected-access, missing-docstring

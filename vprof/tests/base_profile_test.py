@@ -1,3 +1,4 @@
+# pylint: disable=protected-access, missing-docstring
 import unittest
 
 from vprof import base_profile
@@ -105,3 +106,5 @@ class BaseProfileUnittest(unittest.TestCase):
         self.assertEqual(
             self._profile.get_run_dispatcher(),
             self._profile.run_as_package_in_namespace)
+
+# pylint: enable=protected-access, missing-docstring
