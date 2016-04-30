@@ -60,6 +60,9 @@ class RunLintCommand(cmd.Command):
         subprocess.check_call(shlex.split(
             'pylint --reports=n --rcfile=pylint.rc ' + ' '.join(
                 glob.glob('vprof/*.py'))))
+        subprocess.check_call(shlex.split(
+            'pylint --reports=n --rcfile=pylint.rc ' + ' '.join(
+                glob.glob('vprof/tests/*.py'))))
 
 
 class RunCleanCommand(cmd.Command):
