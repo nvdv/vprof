@@ -68,13 +68,13 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
         for modname, (src_code, _) in package_code.items():
             abs_path = (modname if os.path.isabs(modname)
                         else os.path.abspath(modname))
-            src_lines = [
-                (i + 1, l) for i, l in enumerate(src_code.split('\n'))]
             heatmap = prof.heatmap[abs_path]
-            skip_map = self._calc_skips(heatmap)
             if not heatmap:  # If no heatmap - skip module.
                 continue
-            elif not skip_map or len(src_lines) > self._MIN_SKIP_SIZE:
+            src_lines = [
+                (i + 1, l) for i, l in enumerate(src_code.split('\n'))]
+            skip_map = self._calc_skips(heatmap, len(src_lines))
+            if not skip_map or len(src_lines) > self._MIN_SKIP_SIZE:
                 pruned_sources = src_lines
             else:
                 pruned_sources = self._prune_src_lines(src_lines, skip_map)
@@ -86,15 +86,16 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
             })
         return sorted(package_heatmap, key=operator.itemgetter('objectName'))
 
-    def _calc_skips(self, heatmap):
+    def _calc_skips(self, heatmap, num_lines):
         """Calculates line skip map for large sources."""
-        skips, prev_line = [], None
+        skips, prev_line = [], 0
         for line in sorted(heatmap):
-            if prev_line:
-                curr_skip = line - prev_line
-                if curr_skip > self._SKIP_LINES:
-                    skips.append((prev_line, curr_skip))
+            curr_skip = line - prev_line
+            if curr_skip > self._SKIP_LINES:
+                skips.append((prev_line, curr_skip))
             prev_line = line
+        if num_lines - prev_line > self._SKIP_LINES:
+            skips.append((prev_line, num_lines - prev_line))
         return skips
 
     def _prune_src_lines(self, src_lines, skip_map):
@@ -135,7 +136,7 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
             pass
         src_lines = [(i + 1, l) for i, l in enumerate(src_code.split('\n'))]
         heatmap = prof.heatmap[self._run_object]
-        skip_map = self._calc_skips(heatmap)
+        skip_map = self._calc_skips(heatmap, len(src_lines))
         if not skip_map or len(src_lines) > self._MIN_SKIP_SIZE:
             pruned_sources = src_lines
         else:
