@@ -68,56 +68,46 @@ CodeHeatmap.prototype.render = function() {
     .append('text')
     .html(function(d) { return d.objectName; });
 
+  var renderedSources = [];
+  for (var i = 0; i < this.data_.length; i++) {
+    renderedSources.push(
+        this.processCode_(this.data_[i].srcCode,
+                          this.data_[i].heatmap,
+                          this.data_[i].skipMap));
+  }
+
   var fileContainers = heatmapContainer.append('div')
     .attr('class', 'src-code')
     .append('text')
-    .html(function(d) { return CodeHeatmap.processCode_(d.srcCode); });
+    .html(function(_, i) { return renderedSources[i].srcCode; });
 
   var tooltip = pageContainer.append('div')
     .attr('class', 'tooltip tooltip-invisible');
 
   var self = this;
   codeContainer.selectAll('.src-file')
-    .each(function(d, i) {
+    .each(function(_, i) {
       d3.select(fileContainers[0][i]).selectAll('.src-line-normal')
-        .style('background-color', function(_, j) {
-            return self.changeBackgroundColor_(d, j); })
         .on('mouseover', function(_, j) {
-            self.showTooltip_(this, tooltip, d, j); })
-        .on('mouseout', function() {
-            self.hideTooltip_(this, tooltip); });
+          var runCount = renderedSources[i].lineMap[j];
+          if(runCount) {
+            self.showTooltip_(this, tooltip, runCount); }})
+        .on('mouseout', function() { self.hideTooltip_(this, tooltip); });
     });
-};
-
-/**
- * Returns line background color based on execution count.
- * @param {Object} data - Object with heatmap data for current src file.
- * @param {number} i - Line number.
- * @returns {string}
- */
-CodeHeatmap.prototype.changeBackgroundColor_ = function(data, i) {
-  var codeLine = data.srcCode[i][0];
-  var runCount = data.heatmap[codeLine];
-  return runCount ? this.heatmapScale_(runCount) : '';
 };
 
 /**
  * Shows line execution count inside tooltip and adds line highlighting.
  * @param {Object} element - Element representing highlighted line.
  * @param {Object} tooltip - Element representing tooltip.
- * @param {Object} data - Object with heatmap data for current src file.
- * @param {number} i - Source line number.
+ * @param {number} runCount - Number of line runs.
  */
-CodeHeatmap.prototype.showTooltip_ = function(element, tooltip, data, i) {
-  var codeLine = data.srcCode[i][0];
-  var runCount = data.heatmap[codeLine];
-  if (runCount) {
-    d3.select(element).attr('class', 'src-line-highlight');
-    tooltip.attr('class', 'tooltip tooltip-visible')
-      .html('Execution count: ' + runCount)
-      .style('left', d3.event.pageX)
-      .style('top', d3.event.pageY);
-  }
+CodeHeatmap.prototype.showTooltip_ = function(element, tooltip, runCount) {
+  d3.select(element).attr('class', 'src-line-highlight');
+  tooltip.attr('class', 'tooltip tooltip-visible')
+    .html('Execution count: ' + runCount)
+    .style('left', d3.event.pageX)
+    .style('top', d3.event.pageY);
 };
 
 /**
@@ -132,23 +122,81 @@ CodeHeatmap.prototype.hideTooltip_ = function(element, tooltip) {
 
 /**
  * Adds line numbers and code highlighting.
- * @static
  * @param {string} srcCode - Python source code.
- * @returns {string}
+ * @param {Object} heatmap - Python source heatmap.
+ * @param {Object} skipMap - Mapping that shows correspondence between lines
+ *                           on the screen and Python sources.
+ * @returns {Object}
  */
-CodeHeatmap.processCode_ = function(srcCode) {
-  var code = [];
+CodeHeatmap.prototype.processCode_ = function(srcCode, heatmap, skipMap) {
+  if (Object.keys(skipMap).length !== 0) {
+    return this.renderCodeWithSkips_(srcCode, heatmap, skipMap);
+  }
+  return this.renderCode_(srcCode, heatmap);
+};
+
+/**
+ * Renders code without skip map.
+ * @param {string} srcCode - Python source code.
+ * @param {Object} heatmap - Python source heatmap.
+ * @returns {Object}
+ */
+CodeHeatmap.prototype.renderCode_ = function(srcCode, heatmap) {
+  var resultCode = [], lineMap = {};
   for (var i = 0; i < srcCode.length; i++) {
     var lineNumber = srcCode[i][0], codeLine = srcCode[i][1];
-    var highlightedLine = hljs.highlight('python', codeLine).value;
-    var currLine = (
-        "<div class='src-line-normal'>" +
-            "<div class='src-line-number'>" + lineNumber + "</div>" +
-            "<div class='src-line-code'>" + highlightedLine + "</div>" +
-        "</div>");
-    code.push(currLine);
+    var runCount = heatmap[lineNumber];
+    resultCode.push(
+        this.formatSrcLine_(lineNumber, codeLine, runCount));
+    lineMap[i] = runCount;
   }
-  return code.join('');
+  return {'srcCode': resultCode.join(''), 'lineMap': lineMap};
+};
+
+/**
+ * Renders code with skip map.
+ * @param {string} srcCode - Python source code.
+ * @param {Object} heatmap - Python source heatmap.
+ * @param {Object} skipMap - Mapping that shows correspondence between lines
+ *                           on the screen and Python sources.
+ * @returns {Object}
+ */
+CodeHeatmap.prototype.renderCodeWithSkips_ = function(srcCode, heatmap, skipMap) {
+  var resultCode = [], lineMap = {};
+  var codeIndex = 0, currSkipLine = 0;
+  for (var i = 0; i < skipMap.length; i++) {
+    var skipLine = skipMap[i][0], skipLength = skipMap[i][1];
+    for (var j = currSkipLine; j < skipLine; j++) {
+      var lineNumber = srcCode[j][0], codeLine = srcCode[j][1];
+      var runCount = heatmap[lineNumber];
+      resultCode.push(
+          this.formatSrcLine_(lineNumber, codeLine, runCount));
+      lineMap[codeIndex] = runCount;
+      codeIndex++;
+    }
+    currSkipLine = skipLine + skipLength - 1;
+    resultCode.push(
+        "<div class='skip-line'>" + skipLength + ' lines skipped</div>');
+  }
+  return {'srcCode': resultCode.join(''), 'lineMap': lineMap};
+};
+
+/**
+ * Formats single line of Python source file.
+ * @param {number} lineNumber - Line number for code browser.
+ * @param {string} codeLine - Source line.
+ * @param {number} runCount - Number of line runs.
+ * @returns {string}
+ */
+CodeHeatmap.prototype.formatSrcLine_ = function(lineNumber, codeLine, runCount) {
+  var highlightedLine = hljs.highlight('python', codeLine).value;
+  var backgroundColor = runCount ? this.heatmapScale_(runCount) : '';
+  return (
+      "<div class='src-line-normal' style='background-color: " +
+        backgroundColor + "'>" +
+          "<div class='src-line-number'>" + lineNumber + "</div>" +
+          "<div class='src-line-code'>" + highlightedLine + "</div>" +
+      "</div>");
 };
 
 /**

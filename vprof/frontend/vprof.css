@@ -194,6 +194,11 @@ p {
   opacity: 0.6;
 }
 
+.skip-line {
+  padding: 5px;
+  text-align: center;
+}
+
 #progress-indicator {
   background: url('progress.gif') no-repeat center center;
   background-color: #F1F1F1;

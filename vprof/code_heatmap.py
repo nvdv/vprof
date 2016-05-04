@@ -73,15 +73,13 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
                 continue
             src_lines = [
                 (i + 1, l) for i, l in enumerate(src_code.split('\n'))]
-            skip_map = self._calc_skips(heatmap, len(src_lines))
-            if not skip_map or len(src_lines) > self._MIN_SKIP_SIZE:
-                pruned_sources = src_lines
-            else:
-                pruned_sources = self._prune_src_lines(src_lines, skip_map)
+            skip_map = []
+            if len(src_lines) > self._MIN_SKIP_SIZE:
+                skip_map = self._calc_skips(heatmap, len(src_lines))
             package_heatmap.append({
                 'objectName': os.path.relpath(abs_path),
                 'heatmap': heatmap,
-                'srcCode': pruned_sources,
+                'srcCode': src_lines,
                 'skipMap': skip_map
             })
         return sorted(package_heatmap, key=operator.itemgetter('objectName'))
