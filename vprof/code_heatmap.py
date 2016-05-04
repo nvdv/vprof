@@ -77,7 +77,7 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
             if len(src_lines) > self._MIN_SKIP_SIZE:
                 skip_map = self._calc_skips(heatmap, len(src_lines))
             package_heatmap.append({
-                'objectName': os.path.relpath(abs_path),
+                'objectName': abs_path,
                 'heatmap': heatmap,
                 'srcCode': src_lines,
                 'skipMap': skip_map

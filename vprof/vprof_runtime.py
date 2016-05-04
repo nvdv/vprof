@@ -72,5 +72,5 @@ def run(func, options, args=(), kwargs={}, host='localhost', port=8000):  # pyli
         port: Port to send profilers.data.
     """
     run_stats = run_profilers((func, args, kwargs), options)
-    urllib.request.urlopen(
-        'http://%s:%s' % (host, port), json.dumps(run_stats))
+    post_data = json.dumps(run_stats).encode('utf-8')
+    urllib.request.urlopen('http://%s:%s' % (host, port), post_data)

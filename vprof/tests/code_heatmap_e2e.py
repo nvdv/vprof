@@ -74,10 +74,10 @@ class CodeHeatmapPackageAsPathEndToEndTest(unittest.TestCase):
             'http://%s:%s/profile' % (_HOST, _PORT))
         stats = json.loads(response.read().decode('utf-8'))
         self.assertEqual(len(stats), 2)
-        self.assertEqual(
-            stats[0]['objectName'], 'vprof/tests/test_pkg/__main__.py')
-        self.assertEqual(
-            stats[1]['objectName'], 'vprof/tests/test_pkg/dummy_module.py')
+        self.assertTrue(
+            'vprof/tests/test_pkg/__main__.py' in stats[0]['objectName'])
+        self.assertTrue(
+            'vprof/tests/test_pkg/dummy_module.py' in stats[1]['objectName'])
         self.assertListEqual(stats[0]['srcCode'], _MAIN_MODULE_SOURCELINES)
         self.assertListEqual(stats[1]['srcCode'], _DUMMY_MODULE_SOURCELINES)
 
@@ -102,10 +102,10 @@ class CodeHeatmapImportedPackageEndToEndTest(unittest.TestCase):
             'http://%s:%s/profile' % (_HOST, _PORT))
         stats = json.loads(response.read().decode('utf-8'))
         self.assertEqual(len(stats), 2)
-        self.assertEqual(
-            stats[0]['objectName'], 'vprof/tests/test_pkg/__main__.py')
-        self.assertEqual(
-            stats[1]['objectName'], 'vprof/tests/test_pkg/dummy_module.py')
+        self.assertTrue(
+            'vprof/tests/test_pkg/__main__.py' in stats[0]['objectName'])
+        self.assertTrue(
+            'vprof/tests/test_pkg/dummy_module.py' in stats[1]['objectName'])
         self.assertListEqual(stats[0]['srcCode'], _MAIN_MODULE_SOURCELINES)
         self.assertListEqual(stats[1]['srcCode'], _DUMMY_MODULE_SOURCELINES)
 
