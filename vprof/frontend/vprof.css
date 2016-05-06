@@ -7,6 +7,20 @@ body {
   margin-top: 5px;
 }
 
+a:link {
+  color: #3182bd;
+  text-decoration: none;
+}
+
+a:visited {
+  color: #756bb1;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
 .tab-header {
   margin: 0;
 }
@@ -140,7 +154,7 @@ p {
 
 #heatmap-layout {
   display: flex;
-  height: 97%;
+  height: 99%;
   flex-direction: row;
 }
 
@@ -150,15 +164,29 @@ p {
   width: 25%;
 }
 
+.module-header {
+  font-size: 15px;
+  padding-top: 10px;
+}
+
+.module-name {
+  font-family: "Lucida Sans Typewriter", "Lucida Console", Monaco;
+  font-size: 12px;
+  white-space: pre;
+}
+
 .code-container {
-  background: #FBFBFB;
   overflow-x: auto;
   overflow-y: auto;
-  padding: 8px;
-  width: 45%;
+  padding: 5px;
+}
+
+.src-file {
+  padding-bottom: 15px;
 }
 
 .src-code {
+  background: #FBFBFB;
   font-family: "Lucida Sans Typewriter", "Lucida Console", Monaco;
   font-size: 12px;
   white-space: pre;
@@ -166,9 +194,17 @@ p {
 
 .src-code-header {
   font-family: "Lucida Sans Typewriter", "Lucida Console", Monaco;
-  font-size: 13px;
-  padding-bottom: 4px;
-  padding-top: 4px;
+  font-size: 12px;
+}
+
+.src-line-normal {
+  display: block;
+  opacity: 1;
+}
+
+.src-line-highlight {
+  display: block;
+  opacity: 0.6;
 }
 
 .src-line-number {
@@ -182,16 +218,6 @@ p {
 .src-line-code {
   display: table-cell;
   padding-left: 5px;
-}
-
-.src-line-normal {
-  display: block;
-  opacity: 1;
-}
-
-.src-line-highlight {
-  display: block;
-  opacity: 0.6;
 }
 
 .skip-line {

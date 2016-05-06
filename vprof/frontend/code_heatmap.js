@@ -40,14 +40,17 @@ CodeHeatmap.prototype.render = function() {
 
   var moduleList = pageContainer.append('div')
     .attr('class', 'module-list')
-    .html('Modules')
-    .selectAll('div')
+  moduleList.append('div')
+    .attr('class', 'module-header')
+    .html('Inspected modules');
+
+  moduleList.selectAll('.module-name')
     .data(this.data_)
     .enter()
     .append('a')
     .attr('href', function(d) { return '#' + d.objectName; })
     .append('div')
-    .attr('class', 'src-code-header')
+    .attr('class', 'module-name')
     .append('text')
     .html(function(d) { return d.objectName; });
 
@@ -60,8 +63,7 @@ CodeHeatmap.prototype.render = function() {
     .append('div')
     .attr('class', 'src-file');
 
-  heatmapContainer.append('div')
-    .append('a')
+  heatmapContainer.append('a')
     .attr('href', function(d) { return '#' + d.objectName; })
     .attr('class', 'src-code-header')
     .attr('id', function(d) { return d.objectName; })
