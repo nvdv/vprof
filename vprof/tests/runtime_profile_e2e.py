@@ -37,7 +37,7 @@ class RuntimeProfileModuleEndToEndTest(unittest.TestCase):
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
         stats = json.loads(response.read().decode('utf-8'))
-        self.assertEqual(stats['programName'], _MODULE_FILENAME)
+        self.assertEqual(stats['objectName'], '%s (module)' % _MODULE_FILENAME)
         self.assertTrue('primitiveCalls' in stats)
         self.assertTrue('runTime' in stats)
         self.assertTrue('totalCalls' in stats)
@@ -62,7 +62,7 @@ class RuntimeProfilePackageAsPathEndToEndTest(unittest.TestCase):
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
         stats = json.loads(response.read().decode('utf-8'))
-        self.assertEqual(stats['programName'], _PACKAGE_PATH)
+        self.assertEqual(stats['objectName'], '%s (package)' % _PACKAGE_PATH)
         self.assertTrue('primitiveCalls' in stats)
         self.assertTrue('runTime' in stats)
         self.assertTrue('totalCalls' in stats)
@@ -87,7 +87,7 @@ class RuntimeProfileImportedPackageEndToEndTest(unittest.TestCase):
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
         stats = json.loads(response.read().decode('utf-8'))
-        self.assertEqual(stats['programName'], _PACKAGE_NAME)
+        self.assertEqual(stats['objectName'], '%s (package)' % _PACKAGE_NAME)
         self.assertTrue('primitiveCalls' in stats)
         self.assertTrue('runTime' in stats)
         self.assertTrue('totalCalls' in stats)
@@ -118,7 +118,7 @@ class RuntimeProfileFunctionEndToEndTest(unittest.TestCase):
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
         stats = json.loads(response.read().decode('utf-8'))
-        self.assertTrue('function _func' in stats['c']['programName'])
+        self.assertEqual(stats['c']['objectName'], '_func (function)')
         self.assertEqual(stats['c']['totalCalls'], 2)
 
 # pylint: enable=missing-docstring, blacklisted-name

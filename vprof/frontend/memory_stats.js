@@ -221,7 +221,7 @@ MemoryChart.prototype.zoomOut_ = function(path, canvas) {
 MemoryChart.prototype.renderLegend_ = function() {
   this.parent_.append('div')
     .attr('class', 'legend')
-    .html('<p>Filename: ' + this.data_.programName + '</p>' +
+    .html('<p>Object name: ' + this.data_.objectName + '</p>' +
           '<p>Total lines executed: ' + this.data_.totalEvents + '</p>')
     .style('left', this.LEGEND_X)
     .style('top', this.LEGEND_Y);

@@ -37,7 +37,7 @@ class MemoryProfileModuleEndToEndTest(unittest.TestCase):
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
         stats = json.loads(response.read().decode('utf-8'))
-        self.assertEqual(stats['programName'], _MODULE_FILENAME)
+        self.assertEqual(stats['objectName'], '%s (module)' % _MODULE_FILENAME)
         self.assertEqual(stats['totalEvents'], 1)
         first_event = stats['codeEvents'][0]
         self.assertEqual(first_event[0], 1)
@@ -65,7 +65,7 @@ class MemoryProfilePackageAsPathEndToEndTest(unittest.TestCase):
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
         stats = json.loads(response.read().decode('utf-8'))
-        self.assertEqual(stats['programName'], _PACKAGE_PATH)
+        self.assertEqual(stats['objectName'], '%s (package)' % _PACKAGE_PATH)
         first_event = stats['codeEvents'][0]
         self.assertEqual(first_event[0], 1)
         self.assertEqual(first_event[1], 1)
@@ -92,7 +92,7 @@ class MemoryProfileImportedPackageEndToEndTest(unittest.TestCase):
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
         stats = json.loads(response.read().decode('utf-8'))
-        self.assertEqual(stats['programName'], _PACKAGE_NAME)
+        self.assertEqual(stats['objectName'], '%s (package)' % _PACKAGE_NAME)
         first_event = stats['codeEvents'][0]
         self.assertEqual(first_event[0], 1)
         self.assertEqual(first_event[1], 1)
@@ -125,7 +125,7 @@ class MemoryProfileFunctionEndToEndTest(unittest.TestCase):
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
         stats = json.loads(response.read().decode('utf-8'))
-        self.assertTrue('function _func' in stats['m']['programName'])
+        self.assertEqual(stats['m']['objectName'], '_func (function)')
         self.assertEqual(stats['m']['totalEvents'], 2)
 
 # pylint: enable=missing-docstring, blacklisted-name

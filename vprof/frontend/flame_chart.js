@@ -165,7 +165,7 @@ FlameChart.prototype.hideTooltip_ = function(element, tooltip) {
 FlameChart.prototype.renderLegend_ = function() {
   this.parent_.append('div')
     .attr('class', 'legend')
-    .html('<p>Module/package name: ' + this.data_.programName + '</p>' +
+    .html('<p>Object name: ' + this.data_.objectName + '</p>' +
           '<p>Total runtime: ' + this.data_.runTime + 's</p>' +
           '<p>Total calls: ' + this.data_.totalCalls + '</p>' +
           '<p>Primitive calls: ' + this.data_.primitiveCalls + '</p>')

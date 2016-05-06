@@ -76,6 +76,7 @@ class BaseProfile(object):
             if sys.path[0] != program_path:
                 sys.path.insert(0, program_path)
         self._replace_sysargs()
+        self._object_name = None
 
     def _replace_sysargs(self):
         """Replaces sys.argv with proper args to pass to script."""
@@ -119,11 +120,15 @@ class BaseProfile(object):
     def get_run_dispatcher(self):
         """Returns run dispatcher depending on self._run_object value."""
         if self._is_run_obj_function:
+            self._object_name = '%s (function)' % self._run_object.__name__
             return self.run_as_function
         elif self._is_run_obj_package_dir:
+            self._object_name = '%s (package)' % self._run_object
             return self.run_as_package_path
         elif self._is_run_obj_module:
+            self._object_name = '%s (module)' % self._run_object
             return self.run_as_module
+        self._object_name = '%s (package)' % self._run_object
         return self.run_as_package_in_namespace
 
     def run(self):

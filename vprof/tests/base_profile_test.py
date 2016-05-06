@@ -86,6 +86,8 @@ class BaseProfileUnittest(unittest.TestCase):
 
     def testGetRunDispatcher(self):
         self._profile._is_run_obj_function = True
+        _func = lambda a: a
+        self._profile._run_object = _func
         self.assertEqual(
             self._profile.get_run_dispatcher(),
             self._profile.run_as_function)

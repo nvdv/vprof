@@ -63,7 +63,7 @@ class RuntimeProfile(base_profile.BaseProfile):
         """Converts stats from pststs.Stats format to call nested dict."""
 
         def _statcmp(stat):
-            """Comparator by cummulative time."""
+            """Comparator by cumulative time."""
             _, params = stat
             return params[3]
 
@@ -84,7 +84,6 @@ class RuntimeProfile(base_profile.BaseProfile):
         except SystemExit:
             pass
         prof.disable()
-        self._object_name = self._run_object
 
     def run_as_module(self, prof):
         """Runs program as module."""
@@ -94,7 +93,6 @@ class RuntimeProfile(base_profile.BaseProfile):
             prof.runctx(code, self._globs, None)
         except SystemExit:
             pass
-        self._object_name = self._run_object
 
     def run_as_package_in_namespace(self, prof):
         """Runs program as package in Python namespace."""
@@ -109,14 +107,12 @@ class RuntimeProfile(base_profile.BaseProfile):
             pass
         finally:
             prof.disable()
-        self._object_name = self._run_object
 
     def run_as_function(self, prof):
         """Runs object as function."""
         prof.enable()
         self._run_object(*self._run_args, **self._run_kwargs)
         prof.disable()
-        self._object_name = 'function %s' % self._run_object.__name__
 
     def run(self):
         """Collects CProfile stats for specified Python program."""
@@ -126,7 +122,7 @@ class RuntimeProfile(base_profile.BaseProfile):
         prof.create_stats()
         cprofile_stats = pstats.Stats(prof)
         return {
-            'programName': self._object_name,
+            'objectName': self._object_name,  # Set on run dispatching.
             'runTime': cprofile_stats.total_tt,
             'primitiveCalls': cprofile_stats.prim_calls,
             'totalCalls': cprofile_stats.total_calls,
