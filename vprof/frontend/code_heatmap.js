@@ -39,7 +39,8 @@ CodeHeatmap.prototype.render = function() {
     .attr('id', 'heatmap-layout');
 
   var moduleList = pageContainer.append('div')
-    .attr('class', 'module-list')
+    .attr('class', 'module-list');
+
   moduleList.append('div')
     .attr('class', 'module-header')
     .html('Inspected modules');

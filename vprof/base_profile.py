@@ -75,6 +75,14 @@ class BaseProfile(object):
             program_path = os.path.dirname(self._run_object)
             if sys.path[0] != program_path:
                 sys.path.insert(0, program_path)
+        self._replace_sysargs()
+
+    def _replace_sysargs(self):
+        """Replaces sys.argv with proper args to pass to script."""
+        if self._run_args:
+            sys.argv[:] = [self._run_object, self._run_args]
+        else:
+            sys.argv[:] = [self._run_object]
 
     def run_as_package_path(self):
         """Runs object as package specified with filesystem path.

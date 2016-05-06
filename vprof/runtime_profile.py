@@ -1,7 +1,6 @@
 """Module for runtime profiling."""
 import cProfile
 import pstats
-import sys
 
 from collections import defaultdict
 from vprof import base_profile
@@ -121,11 +120,6 @@ class RuntimeProfile(base_profile.BaseProfile):
 
     def run(self):
         """Collects CProfile stats for specified Python program."""
-        # Process script arguments properly.
-        if self._run_args:
-            sys.argv[:] = [self._run_object, self._run_args]
-        else:
-            sys.argv[:] = [self._run_object]
         prof = cProfile.Profile()
         run_dispatcher = self.get_run_dispatcher()
         run_dispatcher(prof)
