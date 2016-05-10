@@ -26,7 +26,7 @@ function FlameChart(parent, data) {
 
   this.data_ = data;
   this.parent_ = parent;
-  this.xScale_ = d3.scale.linear().range([0, this.WIDTH]);
+  this.xScale_ = d3.scale.linear().domain([0, 1]).range([0, this.WIDTH]);
   this.yScale_ = d3.scale.linear().range([0, this.HEIGHT]);
   this.color_ = d3.scale.category10();
   this.flameChart_ = d3.layout.partition()
@@ -55,7 +55,19 @@ FlameChart.prototype.render = function() {
   var self = this;
   var nodes = cells.append('rect')
     .attr('class', 'rect-normal')
-    .attr('x', function(d) { return self.xScale_(d.x); })
+    .attr('x', function(d) {
+      // Recalculate horizontal position and width since
+      // d3 does not provide ability to customize their calculation.
+      if (d.children) {
+        var currX = d.x;
+        for (var i = 0; i < d.children.length; i++) {
+          d.children[i].x = currX;
+          d.children[i].dx = d.children[i].cumTime / self.data_.runTime;
+          currX += d.children[i].dx;
+        }
+      }
+      return self.xScale_(d.x);
+    })
     .attr('y', function(d) { return self.yScale_(1 - d.y - d.dy); })
     .attr('width', function(d) { return self.xScale_(d.dx); })
     .attr('height', function(d) { return self.yScale_(d.dy); })
