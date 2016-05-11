@@ -27,7 +27,8 @@ _CALLEES = {
     ],
     ('testscript.py', 1, 'prod'): [
         ('testscript.py', 1, 'prod')
-    ]
+    ],
+    ('~', 0, '<range>'): []
 }
 
 _CALL_GRAPH = {
@@ -63,13 +64,9 @@ class RuntimeProfileUnittest(unittest.TestCase):
     def setUp(self):
         self._profile = object.__new__(runtime_profile.RuntimeProfile)
 
-    def testBuildCallees(self):
-        self.assertDictEqual(
-            dict(self._profile._build_callees(_RUN_STATS)), _CALLEES)
-
     def testTransformStats(self):
         stats = mock.MagicMock()
-        stats.stats = _RUN_STATS
+        stats.stats, stats.all_callees = _RUN_STATS, _CALLEES
         self.assertDictEqual(
             self._profile._transform_stats(stats), _CALL_GRAPH)
 
