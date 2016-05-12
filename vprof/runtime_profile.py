@@ -24,19 +24,20 @@ class RuntimeProfile(base_profile.BaseProfile):
     pstats.Stats.
     """
 
-    def _build_call_tree(self, node, stats, seen=set()):  # pylint: disable=dangerous-default-value
-        """Builds call tree from callees tree and pstats.Stats.
+    def _build_call_tree(self, node, callees, stats, seen=set()):  # pylint: disable=dangerous-default-value
+        """Builds call tree from callees tree.
 
         Args:
             node: Current call tree node.
+            callees: Call tree node stats.
             stats: Profile stats.
             seen: Set to track previously seen nodes to handle recursion.
         Returns:
             A dict representing call tree with all necessary parameters.
         """
-        seen.add(node)
         module_name, lineno, func_name = node
-        cum_calls, num_calls, time_per_call, cum_time, _ = stats.stats[node]
+        cum_calls, num_calls, time_per_call, cum_time = stats
+        seen.add(node + stats)
         return {
             'moduleName': module_name,
             'lineno': lineno,
@@ -45,12 +46,14 @@ class RuntimeProfile(base_profile.BaseProfile):
             'totalCalls': num_calls,
             'timePerCall': time_per_call,
             'cumTime': cum_time,
-            'children': [self._build_call_tree(c, stats, seen)
-                         for c in stats.all_callees[node] if c not in seen]
+            'children': [
+                self._build_call_tree(child, callees, child_stats)
+                for child, child_stats in callees[node].items()
+                if child + child_stats not in seen]
         }
 
     def _transform_stats(self, stats):
-        """Converts stats from pststs.Stats format to call nested dict."""
+        """Converts stats from pststs.Stats to nested dict."""
 
         def _statcmp(stat):
             """Comparator by cumulative time."""
@@ -59,7 +62,8 @@ class RuntimeProfile(base_profile.BaseProfile):
 
         stats.calc_callees()
         root, _ = max(stats.stats.items(), key=_statcmp)
-        return self._build_call_tree(root, stats)
+        return self._build_call_tree(
+            root, stats.all_callees, stats.stats[root][:-1])
 
     def run_as_package_path(self, prof):
         """Runs program as package specified with file path."""
