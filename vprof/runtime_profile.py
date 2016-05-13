@@ -112,7 +112,6 @@ class RuntimeProfile(base_profile.BaseProfile):
         prof = cProfile.Profile()
         run_dispatcher = self.get_run_dispatcher()
         run_dispatcher(prof)
-        prof.create_stats()
         cprofile_stats = pstats.Stats(prof)
         return {
             'objectName': self._object_name,  # Set on run dispatching.
