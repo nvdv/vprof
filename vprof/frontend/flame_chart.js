@@ -56,18 +56,8 @@ FlameChart.prototype.render = function() {
   var nodes = cells.append('rect')
     .attr('class', 'rect-normal')
     .attr('x', function(d) {
-      // Recalculate horizontal position and width since
-      // d3 does not provide ability to customize their calculation.
-      if (d.children) {
-        var currX = d.x;
-        for (var i = 0; i < d.children.length; i++) {
-          d.children[i].x = currX;
-          d.children[i].dx = d.children[i].cumTime / self.data_.runTime;
-          currX += d.children[i].dx;
-        }
-      }
-      return self.xScale_(d.x);
-    })
+      self.maybeRecalcNode_(d);
+      return self.xScale_(d.x); })
     .attr('y', function(d) { return self.yScale_(1 - d.y - d.dy); })
     .attr('width', function(d) { return self.xScale_(d.dx); })
     .attr('height', function(d) { return self.yScale_(d.dy); })
@@ -123,6 +113,36 @@ FlameChart.prototype.zoomOut_ = function(allNodes, titles) {
     .attr('width', function(d) { return self.xScale_(d.dx); })
     .attr('height', function(d) { return self.yScale_(d.dy); });
   this.redrawTitles_(titles);
+};
+
+/**
+ * Recalculates node horizontal position and width if necessary.
+ * Since d3 does not provide ability to customize partition calculation.
+ * @param {Object} node - Current flame chart node.
+ */
+FlameChart.prototype.maybeRecalcNode_ = function(node) {
+  if (node.children) {
+    // In some cases sum of children cumulative times might be larger
+    // than parent cumulative sum - we need to fix this.
+    var childrenWidth = 0;
+    node.children.forEach(function(child) { childrenWidth += child.dx; });
+
+    // If sum of children cumulative times is larger than parent cumulative
+    // time - determine scale coefficient.
+    var scale = 1;
+    if (childrenWidth > node.dx) {
+      scale = childrenWidth / node.dx;
+    }
+
+    // Recalculate children nodes and scale them if necessary.
+    var currX = node.x;
+    for (var i = 0; i < node.children.length; i++) {
+      node.children[i].x = currX;
+      node.children[i].dx = node.children[i].cumTime / (
+        scale * this.data_.runTime);
+      currX += node.children[i].dx;
+    }
+  }
 };
 
 /**
