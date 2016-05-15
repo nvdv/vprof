@@ -122,25 +122,29 @@ FlameChart.prototype.zoomOut_ = function(allNodes, titles) {
  */
 FlameChart.prototype.maybeRecalcNode_ = function(node) {
   if (node.children) {
-    // In some cases sum of children cumulative times might be larger
-    // than parent cumulative sum - we need to fix this.
-    var childrenWidth = 0;
-    node.children.forEach(function(child) { childrenWidth += child.dx; });
-
-    // If sum of children cumulative times is larger than parent cumulative
-    // time - determine scale coefficient.
-    var scale = 1;
-    if (childrenWidth > node.dx) {
-      scale = childrenWidth / node.dx;
-    }
-
-    // Recalculate children nodes and scale them if necessary.
+    // Recalculate children nodes.
     var currX = node.x;
     for (var i = 0; i < node.children.length; i++) {
       node.children[i].x = currX;
-      node.children[i].dx = node.children[i].cumTime / (
-        scale * this.data_.runTime);
+      node.children[i].dx = node.children[i].cumTime / this.data_.runTime;
       currX += node.children[i].dx;
+    }
+
+    // In some cases width of children might be larger than
+    // parent width - we need to fix this.
+    var childrenWidth = 0;
+    node.children.forEach(function(child) { childrenWidth += child.dx; });
+    var scale = 1;
+    if (childrenWidth > node.dx) {
+      scale = node.dx / childrenWidth;
+    }
+
+    // Rescale children.
+    currX = node.x;
+    for (var j = 0; j < node.children.length; j++) {
+      node.children[j].x = currX;
+      node.children[j].dx *= scale;
+      currX += node.children[j].dx;
     }
   }
 };
