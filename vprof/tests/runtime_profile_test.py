@@ -22,8 +22,8 @@ _RUN_STATS = {
 
 _CALLEES = {
     ('testscript.py', 1, '<module>'): {
-        ('testscript.py', 1, 'prod'): (9, 10, 6e-06, 6e-06),
         ('~', 0, '<range>'): (1, 1, 1e-06, 1e-06),
+        ('testscript.py', 1, 'prod'): (9, 10, 6e-06, 6e-06),
     },
     ('testscript.py', 1, 'prod'): {
         ('testscript.py', 1, 'prod'): (9, 10, 6e-06, 6e-06)
@@ -67,7 +67,6 @@ class RuntimeProfileUnittest(unittest.TestCase):
     def testTransformStats(self):
         stats = mock.MagicMock()
         stats.stats, stats.all_callees = _RUN_STATS, _CALLEES
-        self.maxDiff = None
         self.assertDictEqual(
             self._profile._transform_stats(stats), _CALL_GRAPH)
 

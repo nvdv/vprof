@@ -5,7 +5,7 @@ import sys
 
 from vprof import base_profile
 from vprof import stats_server
-from vprof import vprof_runtime
+from vprof import profiler
 
 _PROGRAN_NAME = 'vprof'
 _MODULE_DESC = 'Python visual profiler'
@@ -72,12 +72,12 @@ def main():
     program_stats = {}
     if not args.remote:
         try:
-            program_stats = vprof_runtime.run_profilers(  # pylint: disable=redefined-variable-type
+            program_stats = profiler.run_profilers(  # pylint: disable=redefined-variable-type
                 args.source[0], args.config, verbose=True)
-        except vprof_runtime.AmbiguousConfigurationError:
+        except profiler.AmbiguousConfigurationError:
             print(_ERROR_MSG['ambiguous configuration']['msg'])
             sys.exit(_ERROR_MSG['ambiguous configuration']['code'])
-        except vprof_runtime.BadOptionError as exc:
+        except profiler.BadOptionError as exc:
             print(exc)
             sys.exit(_ERROR_MSG['bad option']['code'])
         except base_profile.ProfilerRuntimeException as exc:
