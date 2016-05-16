@@ -28,7 +28,9 @@ class CodeHeatmapCalculator(unittest.TestCase):
         self._calc.add_code(code)
         self.assertIn(code, self._calc._all_code)
 
-    def testCalcHeatmap(self):
+    @mock.patch('os.path.abspath')
+    def testCalcHeatmap(self, abspath_mock):
+        abspath_mock.side_effect = lambda arg: arg
         self._calc.heatmap = defaultdict(lambda: defaultdict(int))
         event, arg = 'line', mock.MagicMock()
         frame1, frame2 = mock.MagicMock(), mock.MagicMock()

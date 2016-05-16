@@ -49,7 +49,8 @@ class CodeHeatmapCalculator(object):
     def _calc_heatmap(self, frame, event, arg):  #pylint: disable=unused-argument
         """Calculates code heatmap."""
         if event == 'line' and frame.f_code in self._all_code:
-            self.heatmap[frame.f_code.co_filename][frame.f_lineno] += 1
+            abs_filename = os.path.abspath(frame.f_code.co_filename)
+            self.heatmap[abs_filename][frame.f_lineno] += 1
         return self._calc_heatmap
 
 
@@ -77,7 +78,7 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
             if len(src_lines) > self._MIN_SKIP_SIZE:
                 skip_map = self._calc_skips(heatmap, len(src_lines))
             package_heatmap.append({
-                'objectName': abs_path,
+                'objectName': modname,
                 'heatmap': heatmap,
                 'srcCode': src_lines,
                 'skipMap': skip_map
@@ -133,7 +134,7 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
         except SystemExit:
             pass
         src_lines = [(i + 1, l) for i, l in enumerate(src_code.split('\n'))]
-        heatmap = prof.heatmap[self._run_object]
+        heatmap = prof.heatmap[os.path.abspath(self._run_object)]
         skip_map = self._calc_skips(heatmap, len(src_lines))
         if not skip_map or len(src_lines) > self._MIN_SKIP_SIZE:
             pruned_sources = src_lines
