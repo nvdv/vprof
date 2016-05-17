@@ -176,6 +176,7 @@ p {
 }
 
 .code-container {
+  min-width: 45%;
   overflow-x: auto;
   overflow-y: auto;
   padding: 5px;
