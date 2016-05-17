@@ -11,10 +11,14 @@ The project is in active development and some of it's features might not work as
 expected.
 
 ## Screenshots
+![flame-chart](http://i.imgur.com/gkrERH0.png?1)
+![memory-stats](http://i.imgur.com/Mpb9Nrp.png?1)
+![code-heatmap](http://i.imgur.com/GbQAg0h.png?1)
 
-![flame-chart](http://i.imgur.com/mbszOET.png?1)
-![memory-stats](http://i.imgur.com/jTJGu2t.png?1)
-![code-heatmap](http://i.imgur.com/0FNdQHN.png?1)
+## Contributing
+All contributions are highly encouraged! You can add new features,
+report and fix existing bugs and write docs and tutorials.
+Feel free to open issue or send pull request!
 
 ## Prerequisites
 The required dependencies to build ```vprof``` from source code:
@@ -41,7 +45,7 @@ To install just ```vprof``` dependencies, run
 
 ## Usage
 
-    vprof <modes> <test_program>
+    vprof -c <modes> -s <test_program>
 
 Supported modes:
 
@@ -53,13 +57,30 @@ Supported modes:
 
 Use double quotes to run scripts with arguments:
 
-    vprof cmh "testscript.py --foo --bar"
+    vprof -c cmh -s "testscript.py --foo --bar"
 
 Modes can be combined:
 
-    vprof cm testscript.py
+    vprof -c cm -s testscript.py
 
-Check ```vprof -h``` for full list of supported parameters.
+```vprof``` can also profile single functions. In order to do this,
+launch ```vprof``` in remote mode:
+
+    vprof -r
+
+and then to profile a function you can do:
+
+    from vprof import profiler
+
+    def foo(arg1, arg2):
+        ...
+
+    profiler.run(foo, 'cmh', args=(arg1, arg2), host='localhost', port=8000)
+
+where ```cmh``` is profiling mode, ```host``` and ```port``` are hostname and
+port of ```vprof``` server launched in remote mode.
+
+You can check ```vprof -h``` for full list of supported parameters.
 
 ## Testing
 Just run
