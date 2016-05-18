@@ -169,7 +169,7 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
             prof.add_code(self._run_object.__code__)
             self._run_object(*self._run_args, **self._run_kwargs)
         code_lines, start_line = inspect.getsourcelines(self._run_object)
-        filename = inspect.getsourcefile(self._run_object)
+        filename = os.path.abspath(inspect.getsourcefile(self._run_object))
 
         source_lines = []
         for line in code_lines:
@@ -182,6 +182,7 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
             'objectName': object_name,
             'heatmap': prof.heatmap[filename],
             'srcCode': source_lines,
+            'skipMap': [],
         }]
 
     def run(self):
