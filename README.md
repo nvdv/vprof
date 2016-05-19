@@ -37,9 +37,9 @@ All Python and ```npm``` module dependencies are listed in package.json and requ
 
 
 To install current dev version, clone this repository and execute
-
-    python setup.py install
-
+```sh
+python setup.py deps_install && python setup.py build_ui && python setup.py install
+```
 To install just ```vprof``` dependencies, run
 
     python setup.py deps_install
