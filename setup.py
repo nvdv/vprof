@@ -97,10 +97,15 @@ class RunDepsInstallCommand(cmd.Command):
             shlex.split('npm install'))
 
 
-class VProfInstall(install):
+class VProfBuild(install):
 
     def run(self):
         subprocess.check_call(shlex.split('npm run build'))
+
+
+class VProfInstall(install):
+
+    def run(self):
         install.run(self)
 
 
@@ -140,6 +145,7 @@ setup(
         'e2e_test': RunEndToEndTestCommand,
         'lint': RunLintCommand,
         'deps_install': RunDepsInstallCommand,
+        'build_ui': VProfBuild,
         'install': VProfInstall,
     },
 )
