@@ -106,7 +106,7 @@ class VProfInstall(install):
 
 setup(
     name='vprof',
-    version='0.22',
+    version='0.3',
     packages=['vprof'],
     description="Visual profiler for Python",
     url='http://github.com/nvdv/vprof',
