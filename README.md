@@ -46,9 +46,9 @@ To install just ```vprof``` dependencies, run
 
 
 ## Usage
-
-    vprof -c <modes> -s <test_program>
-
+```sh
+vprof -c <modes> -s <test_program>
+```
 Supported modes:
 
 * ```c``` - flame chart. Renders running time visualization for ```<test_program>```.
@@ -58,17 +58,19 @@ Supported modes:
 ```<test_program>``` can be Python source file (e.g. ```testscript.py```), installed Python package (e.g. ```runpy```) or path to package (e.g. ```myproject/test_package```).
 
 Use double quotes to run scripts with arguments:
-
-    vprof -c cmh -s "testscript.py --foo --bar"
-
+```sh
+vprof -c cmh -s "testscript.py --foo --bar"
+```
 Modes can be combined:
-
-    vprof -c cm -s testscript.py
+```sh
+vprof -c cm -s testscript.py
+```
 
 ```vprof``` can also profile single functions. In order to do this,
 launch ```vprof``` in remote mode:
-
-    vprof -r
+```sh
+vprof -r
+```
 
 and then to profile a function you can do:
 ```python
