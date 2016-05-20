@@ -25,6 +25,7 @@ The required dependencies to build ```vprof``` from source code:
  * Python 2.7, Python 3.4 or Python 3.5
  * ```pip```
  * ```npm``` >= 3.3.12
+ * ```cython```(for pyximport)
 
 ## Dependencies
 All Python and ```npm``` module dependencies are listed in package.json and requirements.txt.
