@@ -71,9 +71,6 @@ class RuntimeProfile(base_profile.BaseProfile):
         prof.enable()
         try:
             runpy.run_path(self._run_object, run_name='__main__')
-        except ImportError:
-            raise RuntimeProfilerRunError(
-                'Unable to run package %s' % self._run_object)
         except SystemExit:
             pass
         prof.disable()
@@ -93,9 +90,6 @@ class RuntimeProfile(base_profile.BaseProfile):
         prof.enable()
         try:
             runpy.run_module(self._run_object, run_name='__main__')
-        except ImportError:
-            raise RuntimeProfilerRunError(
-                'Unable to run package %s' % self._run_object)
         except SystemExit:
             pass
         finally:

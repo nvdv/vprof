@@ -87,9 +87,6 @@ class MemoryProfile(base_profile.BaseProfile):
                 prof.add_code(compiled_code)
             try:
                 runpy.run_path(self._run_object, run_name='__main__')
-            except ImportError:
-                raise MemoryProfilerRunError(
-                    'Unable to run package %s' % self._run_object)
             except SystemExit:
                 pass
         return prof.events_list
@@ -115,9 +112,6 @@ class MemoryProfile(base_profile.BaseProfile):
                 prof.add_code(compiled_code)
             try:
                 runpy.run_module(self._run_object, run_name='__main__')
-            except ImportError:
-                raise MemoryProfilerRunError(
-                    'Unable to run package %s' % self._run_object)
             except SystemExit:
                 pass
         return prof.events_list

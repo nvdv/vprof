@@ -115,9 +115,6 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
                 prof.add_code(compiled_code)
             try:
                 runpy.run_path(self._run_object)
-            except ImportError:
-                raise CodeHeatmapRunError(
-                    'Unable to run package %s' % self._run_object)
             except SystemExit:
                 pass
         return self._consodalidate_stats(pkg_code, prof)
@@ -156,9 +153,6 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
                 prof.add_code(compiled_code)
             try:
                 runpy.run_module(self._run_object)
-            except ImportError:
-                raise CodeHeatmapRunError(
-                    'Unable to run package %s' % self._run_object)
             except SystemExit:
                 pass
         return self._consodalidate_stats(pkg_code, prof)
