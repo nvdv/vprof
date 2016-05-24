@@ -53,10 +53,10 @@ def main():
                                  help='Python module or package to profile')
     parser.add_argument('-c', '--config', metavar='options',
                         help=_MODES_DESC)
-    parser.add_argument('-p', '--port', dest='port', default=_PORT, type=int,
-                        help='set internal webserver port')
     parser.add_argument('-H', '--host', dest='host', default=_HOST, type=str,
                         help='set internal webserver host')
+    parser.add_argument('-p', '--port', dest='port', default=_PORT, type=int,
+                        help='set internal webserver port')
     parser.add_argument('-n', '--no-browser', dest='dont_start_browser',
                         action='store_true', default=False,
                         help="don't start browser automatically")
