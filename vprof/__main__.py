@@ -55,6 +55,8 @@ def main():
                         help=_MODES_DESC)
     parser.add_argument('-p', '--port', dest='port', default=8000, type=int,
                         help='set internal webserver port')
+    parser.add_argument('-H', '--host', dest='host', default=_HOST, type=str,
+                        help='set internal webserver host')
     parser.add_argument('-n', '--no-browser', dest='dont_start_browser',
                         action='store_true', default=False,
                         help="don't start browser automatically")
@@ -92,7 +94,7 @@ def main():
         sys.stderr = open(os.devnull, "w")
     print('Starting HTTP server...')
     stats_server.start(
-        _HOST, args.port, program_stats, args.dont_start_browser)
+        args.host, args.port, program_stats, args.dont_start_browser)
 
 if __name__ == "__main__":
     main()
