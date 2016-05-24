@@ -7,6 +7,8 @@ from vprof import base_profile
 from vprof import stats_server
 from vprof import profiler
 
+__version__ = '0.30'
+
 _PROGRAN_NAME = 'vprof'
 _MODULE_DESC = 'Python visual profiler'
 _HOST = 'localhost'
@@ -59,6 +61,8 @@ def main():
     parser.add_argument('--debug', dest='debug_mode',
                         action='store_true', default=False,
                         help="don't suppress error messages")
+    parser.add_argument('--version', action='version',
+                        version='vprof %s' % __version__)
     args = parser.parse_args()
 
     if args.config and args.remote:

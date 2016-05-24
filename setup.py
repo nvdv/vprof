@@ -10,6 +10,7 @@ from setuptools import setup
 from setuptools.command.install import install
 from pip.req import parse_requirements
 from pip.download import PipSession
+from vprof import __main__
 
 
 class RunUnittestsCommand(cmd.Command):
@@ -111,7 +112,7 @@ class VProfInstall(install):
 
 setup(
     name='vprof',
-    version='0.30',
+    version=__main__.__version__,
     packages=['vprof'],
     description="Visual profiler for Python",
     url='http://github.com/nvdv/vprof',
