@@ -11,7 +11,7 @@ __version__ = '0.30'
 
 _PROGRAN_NAME = 'vprof'
 _MODULE_DESC = 'Python visual profiler'
-_HOST = 'localhost'
+_HOST, _PORT = 'localhost', 8000
 _MODES_DESC = (
     """modes configuration
 available modes:
@@ -53,7 +53,7 @@ def main():
                                  help='Python module or package to profile')
     parser.add_argument('-c', '--config', metavar='options',
                         help=_MODES_DESC)
-    parser.add_argument('-p', '--port', dest='port', default=8000, type=int,
+    parser.add_argument('-p', '--port', dest='port', default=_PORT, type=int,
                         help='set internal webserver port')
     parser.add_argument('-n', '--no-browser', dest='dont_start_browser',
                         action='store_true', default=False,
