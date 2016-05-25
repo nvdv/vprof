@@ -26,8 +26,10 @@ The required dependencies to build ```vprof``` from source code:
  * ```pip```
  * ```npm``` >= 3.3.12
 
+```npm``` is needed to build ```vprof``` from sources only.
+
 ## Dependencies
-All Python and ```npm``` module dependencies are listed in package.json and requirements.txt.
+All Python and ```npm``` module dependencies are listed in ```package.json``` and ```requirements.txt```.
 
 ## Installation
 ```vprof``` can be installed from PyPI
@@ -36,7 +38,7 @@ All Python and ```npm``` module dependencies are listed in package.json and requ
     pip install vprof
 
 
-To install current dev version, clone this repository and execute
+To build ```vprof``` from sources, clone this repository and execute
 ```sh
 python setup.py deps_install && python setup.py build_ui && python setup.py install
 ```
@@ -71,8 +73,9 @@ launch ```vprof``` in remote mode:
 ```sh
 vprof -r
 ```
+```vprof``` will open new tab in default web browser and then wait for stats.
 
-and then to profile a function you can do:
+To profile a function you can do:
 ```python
 from vprof import profiler
 
@@ -82,7 +85,8 @@ def foo(arg1, arg2):
 profiler.run(foo, 'cmh', args=(arg1, arg2), host='localhost', port=8000)
 ```
 where ```cmh``` is profiling mode, ```host``` and ```port``` are hostname and
-port of ```vprof``` server launched in remote mode.
+port of ```vprof``` server launched in remote mode. Obtained stats will be
+rendered in new tab of default web browser, opened by ```vprof -r``` command.
 
 You can check ```vprof -h``` for full list of supported parameters.
 
