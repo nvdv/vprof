@@ -11,7 +11,7 @@ The project is in active development and some of it's features might not work as
 expected.
 
 ## Screenshots
-![flame-chart](http://i.imgur.com/gkrERH0.png?1)
+![flame-graph](http://i.imgur.com/gkrERH0.png?1)
 ![memory-stats](http://i.imgur.com/Mpb9Nrp.png?1)
 ![code-heatmap](http://i.imgur.com/GbQAg0h.png?1)
 
@@ -51,7 +51,7 @@ vprof -c <modes> -s <test_program>
 ```
 Supported modes:
 
-* ```c``` - flame chart. Renders running time visualization for ```<test_program>```.
+* ```c``` - flame graph. Renders running time visualization for ```<test_program>```.
 * ```m``` - memory graph. Shows memory usage during execution of each line of ```<test_program>```.
 * ```h``` - code heatmap. Shows number of executions of each line of code.
 

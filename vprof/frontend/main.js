@@ -7,7 +7,7 @@
 
 'use strict';
 var d3 = require('d3');
-var flame_chart = require('./flame_chart.js');
+var flame_graph = require('./flame_graph.js');
 var memory_stats = require('./memory_stats.js');
 var code_heatmap = require('./code_heatmap.js');
 
@@ -26,21 +26,21 @@ function createTabContent_(id) {
 }
 
 /**
- *  Creates flame chart tab header with specified status and
+ *  Creates flame graph tab header with specified status and
  *  appends it to the parent node.
  *  @param {Object} parent - Parent element to append tab to.
  *  @param {status} status - Specified tab status.
  */
-function createFlameChartTab_(parent, status) {
+function createFlameGraphTab_(parent, status) {
   parent.append('li')
     .attr('class', status)
-    .text('Flame chart')
+    .text('Flame graph')
     .on('click', function(d) {
       d3.selectAll('li')
         .attr('class', 'not-selected');
       d3.select(this)
         .attr('class', 'selected');
-      showTab_('flame-chart');
+      showTab_('flame-graph');
     });
 }
 
@@ -98,10 +98,10 @@ function renderPage(data) {
     var display = (i === 0) ? 'block' : 'none';
     switch (props[i]) {
       case 'c':
-        createFlameChartTab_(tabHeader, status);
-        var flameChart = createTabContent_('flame-chart');
-        flame_chart.renderFlameChart(data.c, flameChart);
-        flameChart.attr('style', 'display: ' + display);
+        createFlameGraphTab_(tabHeader, status);
+        var flameGraph = createTabContent_('flame-graph');
+        flame_graph.renderFlameGraph(data.c, flameGraph);
+        flameGraph.attr('style', 'display: ' + display);
         break;
       case 'm':
         createMemoryChartTab_(tabHeader, status);

@@ -15,7 +15,7 @@ _HOST, _PORT = 'localhost', 8000
 _MODES_DESC = (
     """modes configuration
 available modes:
-  c - runtime flame chart
+  c - flame graph
   m - memory graph
   h - code heatmap""")
 _ERROR_MSG = {

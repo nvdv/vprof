@@ -1,5 +1,5 @@
 /**
- * @file CPU flame chart rendering.
+ * @file CPU flame graph rendering.
  */
 
 /* jshint strict: false, browser: true, globalstrict: true */
@@ -9,12 +9,12 @@
 var d3 = require('d3');
 
 /**
- * Represents CPU flame chart.
+ * Represents CPU flame graph.
  * @constructor
- * @param {Object} parent - Parent element for flame chart.
- * @param {Object} data - Data for flame chart rendering.
+ * @param {Object} parent - Parent element for flame graph.
+ * @param {Object} data - Data for flame graph rendering.
  */
-function FlameChart(parent, data) {
+function FlameGraph(parent, data) {
   this.PAD_SIZE = 10;
   this.HEIGHT = parent.node().scrollHeight - this.PAD_SIZE;
   this.WIDTH = parent.node().scrollWidth - this.PAD_SIZE;
@@ -29,13 +29,13 @@ function FlameChart(parent, data) {
   this.xScale_ = d3.scale.linear().domain([0, 1]).range([0, this.WIDTH]);
   this.yScale_ = d3.scale.linear().range([0, this.HEIGHT]);
   this.color_ = d3.scale.category10();
-  this.flameChart_ = d3.layout.partition()
+  this.flameGraph_ = d3.layout.partition()
     .sort(null)
     .value(function(d) { return d.cumTime; });
 }
 
-/** Renders flame chart. */
-FlameChart.prototype.render = function() {
+/** Renders flame graph. */
+FlameGraph.prototype.render = function() {
   var canvas = this.parent_.append('svg')
     .attr('width', this.WIDTH)
     .attr('height', this.HEIGHT);
@@ -46,12 +46,12 @@ FlameChart.prototype.render = function() {
   this.renderLegend_();
 
   var cells = canvas.selectAll(".cell")
-    .data(this.flameChart_.nodes(this.data_.callStats))
+    .data(this.flameGraph_.nodes(this.data_.callStats))
     .enter()
     .append('g')
     .attr('class', 'cell');
 
-  // Render flame chart nodes.
+  // Render flame graph nodes.
   var self = this;
   var nodes = cells.append('rect')
     .attr('class', 'rect-normal')
@@ -62,7 +62,7 @@ FlameChart.prototype.render = function() {
     .attr('width', function(d) { return self.xScale_(d.dx); })
     .attr('height', function(d) { return self.yScale_(d.dy); })
     .style('fill', function(d) {
-      return self.color_(FlameChart.getNodeName_(d) + d.depth); })
+      return self.color_(FlameGraph.getNodeName_(d) + d.depth); })
     .on('mouseover', function(d) { self.showTooltip_(this, tooltip, d); })
     .on('mouseout', function() { self.hideTooltip_(this, tooltip); });
 
@@ -72,7 +72,7 @@ FlameChart.prototype.render = function() {
       return self.yScale_(1 - d.y - d.dy) + self.TEXT_OFFSET_Y; })
     .text(function(d) {
       var nodeWidth = this.previousElementSibling.getAttribute('width');
-      return FlameChart.getTruncatedNodeName_(d, nodeWidth);
+      return FlameGraph.getTruncatedNodeName_(d, nodeWidth);
     });
 
     // Zoom.
@@ -83,10 +83,10 @@ FlameChart.prototype.render = function() {
 /**
  * Handles zoom in.
  * @param {Object} node - Focus node.
- * @param {Object} allNodes - All flame chart nodes.
- * @param {Object} titles - All flame chart node titles.
+ * @param {Object} allNodes - All flame graph nodes.
+ * @param {Object} titles - All flame graph node titles.
  */
-FlameChart.prototype.zoomIn_ = function(node, allNodes, titles) {
+FlameGraph.prototype.zoomIn_ = function(node, allNodes, titles) {
   this.xScale_.domain([node.x, node.x + node.dx]);
   this.yScale_.domain([0, 1 - node.y]).range([0, this.HEIGHT]);
   var self = this;
@@ -101,10 +101,10 @@ FlameChart.prototype.zoomIn_ = function(node, allNodes, titles) {
 
 /**
  * Handles zoom out.
- * @param {Object} allNodes - All flame chart nodes.
- * @param {Object} titles - All flame chart node titles.
+ * @param {Object} allNodes - All flame graph nodes.
+ * @param {Object} titles - All flame graph node titles.
  */
-FlameChart.prototype.zoomOut_ = function(allNodes, titles) {
+FlameGraph.prototype.zoomOut_ = function(allNodes, titles) {
   this.xScale_.domain([0, 1]);
   this.yScale_.domain([0, 1]);
   var self = this;
@@ -118,9 +118,9 @@ FlameChart.prototype.zoomOut_ = function(allNodes, titles) {
 /**
  * Recalculates node horizontal position and width if necessary.
  * Since d3 does not provide ability to customize partition calculation.
- * @param {Object} node - Current flame chart node.
+ * @param {Object} node - Current flame graph node.
  */
-FlameChart.prototype.maybeRecalcNode_ = function(node) {
+FlameGraph.prototype.maybeRecalcNode_ = function(node) {
   if (node.children) {
     // Recalculate children nodes.
     var currX = node.x;
@@ -151,28 +151,28 @@ FlameChart.prototype.maybeRecalcNode_ = function(node) {
 
 /**
  * Redraws node titles based on current xScale and yScale.
- * @param {Object} titles - All flame chart node titles.
+ * @param {Object} titles - All flame graph node titles.
  */
-FlameChart.prototype.redrawTitles_ = function(titles) {
+FlameGraph.prototype.redrawTitles_ = function(titles) {
   var self = this;
   titles.attr('x', function(d) { return self.xScale_(d.x) + self.TEXT_OFFSET_X; })
     .attr('y', function(d) {
       return self.yScale_(1 - d.y - d.dy) + self.TEXT_OFFSET_Y; })
     .text(function(d) {
       var nodeWidth = self.xScale_(d.x + d.dx) - self.xScale_(d.x);
-      return FlameChart.getTruncatedNodeName_(d, nodeWidth);
+      return FlameGraph.getTruncatedNodeName_(d, nodeWidth);
     });
 };
 
 /**
  * Shows tooltip and flame graph rectangle highlighting.
- * @param {Object} element - Element representing flame chart rectangle.
+ * @param {Object} element - Element representing flame graph rectangle.
  * @param {Object} tooltip - Element representing tooltip.
  * @param {Object} node - Object representing function call info.
  */
-FlameChart.prototype.showTooltip_ = function(element, tooltip, node) {
+FlameGraph.prototype.showTooltip_ = function(element, tooltip, node) {
   d3.select(element).attr('class', 'rect-highlight');
-  var timePercentage = FlameChart.getTimePercentage_(
+  var timePercentage = FlameGraph.getTimePercentage_(
       node.cumTime, this.data_.runTime);
   var functionName = node.funcName.replace('<', '[').replace('>',  ']');
   tooltip.attr('class', 'tooltip tooltip-visible')
@@ -192,13 +192,13 @@ FlameChart.prototype.showTooltip_ = function(element, tooltip, node) {
  * @param {Object} element - Element representing highlighted rectangle.
  * @param {Object} tooltip - Element representing tooltip.
  */
-FlameChart.prototype.hideTooltip_ = function(element, tooltip) {
+FlameGraph.prototype.hideTooltip_ = function(element, tooltip) {
   d3.select(element).attr('class', 'rect-normal');
   tooltip.attr('class', 'tooltip tooltip-invisible');
 };
 
-/** Renders flame chart legend. */
-FlameChart.prototype.renderLegend_ = function() {
+/** Renders flame graph legend. */
+FlameGraph.prototype.renderLegend_ = function() {
   this.parent_.append('div')
     .attr('class', 'legend')
     .html('<p>Object name: ' + this.data_.objectName + '</p>' +
@@ -215,21 +215,21 @@ FlameChart.prototype.renderLegend_ = function() {
  * @param {Object} d - Object representing function call info.
  * @returns {string}
  */
-FlameChart.getNodeName_ = function(d) {
+FlameGraph.getNodeName_ = function(d) {
   var tokens = d.moduleName.split('/');
   var filename = tokens[tokens.length - 1];
   return filename + ':' + d.lineno + '(' + d.funcName + ')';
 };
 
 /**
- * Truncates function name depending on flame chart rectangle length.
+ * Truncates function name depending on flame graph rectangle length.
  * @static
  * @param (Object) d - Object representing function info.
- * @param {number} rectLength - Length of flame chart rectangle.
+ * @param {number} rectLength - Length of flame graph rectangle.
  * @returns {string}
  */
-FlameChart.getTruncatedNodeName_ = function(d, rectLength) {
-  var fullname = FlameChart.getNodeName_(d);
+FlameGraph.getTruncatedNodeName_ = function(d, rectLength) {
+  var fullname = FlameGraph.getNodeName_(d);
   var maxSymbols = rectLength / 10;  // Approx. 10 pixels per character.
   if (maxSymbols <= 3) {
     return '';
@@ -246,21 +246,21 @@ FlameChart.getTruncatedNodeName_ = function(d, rectLength) {
  * @param {number} totalTime - Program run time.
  * @returns {number}
  */
-FlameChart.getTimePercentage_ = function(cumTime, totalTime) {
+FlameGraph.getTimePercentage_ = function(cumTime, totalTime) {
   return 100 * Math.round(cumTime / totalTime * 1000) / 1000;
 };
 
 /**
- * Renders flame chart and attaches it to parent.
- * @param {Object} parent - Parent element for flame chart.
- * @param {Object} data - Data for flame chart rendering.
+ * Renders flame graph and attaches it to parent.
+ * @param {Object} parent - Parent element for flame graph.
+ * @param {Object} data - Data for flame graph rendering.
  */
-function renderFlameChart(data, parent) {
-  var flameChart = new FlameChart(parent, data);
-  flameChart.render();
+function renderFlameGraph(data, parent) {
+  var flameGraph = new FlameGraph(parent, data);
+  flameGraph.render();
 }
 
 module.exports = {
-  'FlameChart': FlameChart,
-  'renderFlameChart': renderFlameChart,
+  'FlameGraph': FlameGraph,
+  'renderFlameGraph': renderFlameGraph,
 };
