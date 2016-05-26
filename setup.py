@@ -1,6 +1,7 @@
 """Setup script for vprof."""
 import glob
 import pip
+import re
 import shlex
 import subprocess
 import unittest
@@ -10,7 +11,6 @@ from setuptools import setup
 from setuptools.command.install import install
 from pip.req import parse_requirements
 from pip.download import PipSession
-from vprof import __main__
 
 
 class RunUnittestsCommand(cmd.Command):
@@ -110,9 +110,19 @@ class VProfInstall(install):
         install.run(self)
 
 
+def get_vprof_version(filename):
+    """Returns actual version specified in filename."""
+    with open(filename) as src_file:
+        version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
+                                  src_file.read(), re.M)
+        if version_match:
+            return version_match.group(1)
+        raise RuntimeError('Unable to find version info.')
+
+
 setup(
     name='vprof',
-    version=__main__.__version__,
+    version=get_vprof_version('vprof/__main__.py'),
     packages=['vprof'],
     description="Visual profiler for Python",
     url='http://github.com/nvdv/vprof',
