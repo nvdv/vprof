@@ -5,16 +5,6 @@ import pstats
 from vprof import base_profile
 
 
-class Error(Exception):
-    """Base exception for current module."""
-    pass
-
-
-class RuntimeProfilerRunError(Error, base_profile.ProfilerRuntimeException):
-    """Runtime exception for runtime profiler."""
-    pass
-
-
 class RuntimeProfile(base_profile.BaseProfile):
     """CProfile wrapper.
 

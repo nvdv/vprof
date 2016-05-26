@@ -10,16 +10,6 @@ from vprof import base_profile
 _BYTES_IN_MB = 1024 * 1024
 
 
-class Error(Exception):
-    """Base exception for current module."""
-    pass
-
-
-class MemoryProfilerRunError(Error, base_profile.ProfilerRuntimeException):
-    """Runtime exception for memory profiler."""
-    pass
-
-
 def get_memory_usage():
     """Returns memory usage for current process."""
     memory_info = psutil.Process(os.getpid()).memory_info()

@@ -8,16 +8,6 @@ from collections import defaultdict
 from vprof import base_profile
 
 
-class Error(Exception):
-    """Base exception for current module."""
-    pass
-
-
-class CodeHeatmapRunError(Error, base_profile.ProfilerRuntimeException):
-    """Runtime exception for code heatmap profiler."""
-    pass
-
-
 class CodeHeatmapCalculator(object):
     """Calculates Python code heatmap.
 
