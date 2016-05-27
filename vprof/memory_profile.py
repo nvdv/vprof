@@ -10,16 +10,6 @@ from vprof import base_profile
 _BYTES_IN_MB = 1024 * 1024
 
 
-class Error(Exception):
-    """Base exception for current module."""
-    pass
-
-
-class MemoryProfilerRunError(Error, base_profile.ProfilerRuntimeException):
-    """Runtime exception for memory profiler."""
-    pass
-
-
 def get_memory_usage():
     """Returns memory usage for current process."""
     memory_info = psutil.Process(os.getpid()).memory_info()
@@ -87,9 +77,6 @@ class MemoryProfile(base_profile.BaseProfile):
                 prof.add_code(compiled_code)
             try:
                 runpy.run_path(self._run_object, run_name='__main__')
-            except ImportError:
-                raise MemoryProfilerRunError(
-                    'Unable to run package %s' % self._run_object)
             except SystemExit:
                 pass
         return prof.events_list
@@ -115,9 +102,6 @@ class MemoryProfile(base_profile.BaseProfile):
                 prof.add_code(compiled_code)
             try:
                 runpy.run_module(self._run_object, run_name='__main__')
-            except ImportError:
-                raise MemoryProfilerRunError(
-                    'Unable to run package %s' % self._run_object)
             except SystemExit:
                 pass
         return prof.events_list

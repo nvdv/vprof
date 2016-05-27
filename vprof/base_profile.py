@@ -3,16 +3,6 @@ import os
 import sys
 
 
-class Error(Exception):
-    """Base exception for current module."""
-    pass
-
-
-class ProfilerRuntimeException(Error):
-    """Base exception for all runtime errors during profiling."""
-    pass
-
-
 def get_package_code(package_name, name_is_path=False):
     """Returns package source code.
     Args:

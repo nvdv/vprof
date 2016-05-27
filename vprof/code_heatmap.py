@@ -8,16 +8,6 @@ from collections import defaultdict
 from vprof import base_profile
 
 
-class Error(Exception):
-    """Base exception for current module."""
-    pass
-
-
-class CodeHeatmapRunError(Error, base_profile.ProfilerRuntimeException):
-    """Runtime exception for code heatmap profiler."""
-    pass
-
-
 class CodeHeatmapCalculator(object):
     """Calculates Python code heatmap.
 
@@ -115,9 +105,6 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
                 prof.add_code(compiled_code)
             try:
                 runpy.run_path(self._run_object)
-            except ImportError:
-                raise CodeHeatmapRunError(
-                    'Unable to run package %s' % self._run_object)
             except SystemExit:
                 pass
         return self._consodalidate_stats(pkg_code, prof)
@@ -156,9 +143,6 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
                 prof.add_code(compiled_code)
             try:
                 runpy.run_module(self._run_object)
-            except ImportError:
-                raise CodeHeatmapRunError(
-                    'Unable to run package %s' % self._run_object)
             except SystemExit:
                 pass
         return self._consodalidate_stats(pkg_code, prof)

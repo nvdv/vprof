@@ -3,7 +3,6 @@ import argparse
 import os
 import sys
 
-from vprof import base_profile
 from vprof import stats_server
 from vprof import profiler
 
@@ -86,9 +85,6 @@ def main():
         except profiler.BadOptionError as exc:
             print(exc)
             sys.exit(_ERROR_MSG['bad option']['code'])
-        except base_profile.ProfilerRuntimeException as exc:
-            print(exc)
-            sys.exit(_ERROR_MSG['runtime error']['code'])
 
     if not args.debug_mode:
         sys.stderr = open(os.devnull, "w")
