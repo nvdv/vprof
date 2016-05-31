@@ -1,4 +1,5 @@
 # pylint: disable=protected-access, missing-docstring
+import sys
 import unittest
 
 from vprof import base_profile
@@ -108,5 +109,18 @@ class BaseProfileUnittest(unittest.TestCase):
         self.assertEqual(
             self._profile.get_run_dispatcher(),
             self._profile.run_as_package_in_namespace)
+
+    def testReplaceSysargs(self):
+        self._profile._run_object = mock.MagicMock()
+        self._profile._run_args = ''
+        with mock.patch.object(sys, 'argv', []):
+            self._profile._replace_sysargs()
+            self.assertEqual(sys.argv, [self._profile._run_object])
+
+        self._profile._run_args = '-s foo -a bar -e baz'
+        with mock.patch.object(sys, 'argv', []):
+            self._profile._replace_sysargs()
+            self.assertEqual(sys.argv, [self._profile._run_object, '-s', 'foo', '-a',
+                                        'bar', '-e', 'baz'])
 
 # pylint: enable=protected-access, missing-docstring
