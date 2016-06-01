@@ -1,4 +1,5 @@
 # pylint: disable=protected-access, missing-docstring
+import operator
 import unittest
 
 from vprof import runtime_profile
@@ -40,14 +41,6 @@ _CALL_GRAPH = {
     'cumTime': 2.3e-05,
     'lineno': 1,
     'children': [
-        {'funcName': 'prod',
-         'primCalls': 9,
-         'totalCalls': 10,
-         'timePerCall': 6e-06,
-         'cumTime': 6e-06,
-         'lineno': 1,
-         'moduleName': 'testscript.py',
-         'children': []},
         {'funcName': '<range>',
          'primCalls': 1,
          'totalCalls': 1,
@@ -55,6 +48,14 @@ _CALL_GRAPH = {
          'cumTime': 1e-06,
          'lineno': 0,
          'moduleName': '~',
+         'children': []},
+        {'funcName': 'prod',
+         'primCalls': 9,
+         'totalCalls': 10,
+         'timePerCall': 6e-06,
+         'cumTime': 6e-06,
+         'lineno': 1,
+         'moduleName': 'testscript.py',
          'children': []}
     ]
 }
@@ -67,7 +68,12 @@ class RuntimeProfileUnittest(unittest.TestCase):
     def testTransformStats(self):
         stats = mock.MagicMock()
         stats.stats, stats.all_callees = _RUN_STATS, _CALLEES
-        self.assertDictEqual(
-            self._profile._transform_stats(stats), _CALL_GRAPH)
+        result = self._profile._transform_stats(stats)
+        self.assertEqual(result['moduleName'], _CALL_GRAPH['moduleName'])
+        self.assertEqual(result['funcName'], _CALL_GRAPH['funcName'])
+        self.assertEqual(result['cumTime'], _CALL_GRAPH['cumTime'])
+        self.assertListEqual(
+            sorted(result['children'], key=operator.itemgetter('funcName')),
+            sorted(_CALL_GRAPH['children'], key=operator.itemgetter('funcName')))
 
 # pylint:  enable=protected-access, missing-docstring

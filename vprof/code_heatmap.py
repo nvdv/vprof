@@ -76,7 +76,12 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
         return sorted(package_heatmap, key=operator.itemgetter('objectName'))
 
     def _calc_skips(self, heatmap, num_lines):
-        """Calculates line skip map for large sources."""
+        """Calculates line skip map for large sources.
+        Skip map is list of tuples, where first element of tuple is line
+        number and second is length of skip region:
+            [(1, 10), (15, 10)] means skip 10 lines after line 1 and
+            10 lines after line 15.
+        """
         skips, prev_line = [], 0
         for line in sorted(heatmap):
             curr_skip = line - prev_line
@@ -89,6 +94,8 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
 
     def _prune_src_lines(self, src_lines, skip_map):
         """Removes lines specified by skip_map from src_lines."""
+        if not skip_map or len(src_lines) < self._MIN_SKIP_SIZE:
+            return src_lines
         pruned_sources, i = [], 0
         for line, length in skip_map:
             pruned_sources.extend(src_lines[i:line])
@@ -123,10 +130,7 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
         src_lines = [(i + 1, l) for i, l in enumerate(src_code.split('\n'))]
         heatmap = prof.heatmap[os.path.abspath(self._run_object)]
         skip_map = self._calc_skips(heatmap, len(src_lines))
-        if not skip_map or len(src_lines) > self._MIN_SKIP_SIZE:
-            pruned_sources = src_lines
-        else:
-            pruned_sources = self._prune_src_lines(src_lines, skip_map)
+        pruned_sources = self._prune_src_lines(src_lines, skip_map)
         return [{
             'objectName': self._run_object,
             'heatmap': heatmap,
