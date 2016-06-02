@@ -62,16 +62,12 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
             heatmap = prof.heatmap[abs_path]
             if not heatmap:  # If no heatmap - skip module.
                 continue
-            src_lines = [
-                (i + 1, l) for i, l in enumerate(src_code.split('\n'))]
-            skip_map = []
-            if len(src_lines) > self._MIN_SKIP_SIZE:
-                skip_map = self._calc_skips(heatmap, len(src_lines))
+            sources = src_code.split('\n')
+            skip_map = self._calc_skips(heatmap, len(sources))
             package_heatmap.append({
                 'objectName': modname,
                 'heatmap': heatmap,
-                'srcCode': src_lines,
-                'skipMap': skip_map
+                'srcCode': self._skip_lines(sources, skip_map)
             })
         return sorted(package_heatmap, key=operator.itemgetter('objectName'))
 
@@ -82,6 +78,8 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
             [(1, 10), (15, 10)] means skip 10 lines after line 1 and
             10 lines after line 15.
         """
+        if num_lines < self._MIN_SKIP_SIZE:
+            return []
         skips, prev_line = [], 0
         for line in sorted(heatmap):
             curr_skip = line - prev_line
@@ -92,15 +90,19 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
             skips.append((prev_line, num_lines - prev_line))
         return skips
 
-    def _prune_src_lines(self, src_lines, skip_map):
-        """Removes lines specified by skip_map from src_lines."""
-        if not skip_map or len(src_lines) < self._MIN_SKIP_SIZE:
-            return src_lines
-        pruned_sources, i = [], 0
+    def _skip_lines(self, src_code, skip_map):
+        """Skips lines in src_code specified by skip map."""
+        if not skip_map:
+            return [('line', j + 1, l) for j, l in enumerate(src_code)]
+        code_with_skips, i = [], 0
         for line, length in skip_map:
-            pruned_sources.extend(src_lines[i:line])
+            code_with_skips.extend(
+                ('line', j + 1, l) for j, l in enumerate(src_code[i:line]))
+            code_with_skips.append(('skip', length))
             i = line + length
-        return pruned_sources
+        code_with_skips.extend(
+            ('line', i + j + 1, l) for j, l in enumerate(src_code[i:]))
+        return code_with_skips
 
     def run_as_package_path(self):
         """Runs program as package specified with file path."""
@@ -127,15 +129,13 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
                 exec(code, self._globs, None)
         except SystemExit:
             pass
-        src_lines = [(i + 1, l) for i, l in enumerate(src_code.split('\n'))]
         heatmap = prof.heatmap[os.path.abspath(self._run_object)]
-        skip_map = self._calc_skips(heatmap, len(src_lines))
-        pruned_sources = self._prune_src_lines(src_lines, skip_map)
+        sources = src_code.split('\n')
+        skip_map = self._calc_skips(heatmap, len(sources))
         return [{
             'objectName': self._run_object,
             'heatmap': heatmap,
-            'srcCode': pruned_sources,
-            'skipMap': skip_map
+            'srcCode': self._skip_lines(sources, skip_map)
         }]
 
     def run_as_package_in_namespace(self):
@@ -170,7 +170,6 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
             'objectName': object_name,
             'heatmap': prof.heatmap[filename],
             'srcCode': source_lines,
-            'skipMap': [],
         }]
 
     def run(self):

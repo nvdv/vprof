@@ -74,9 +74,8 @@ CodeHeatmap.prototype.render = function() {
   var renderedSources = [];
   for (var i = 0; i < this.data_.length; i++) {
     renderedSources.push(
-        this.processCode_(this.data_[i].srcCode,
-                          this.data_[i].heatmap,
-                          this.data_[i].skipMap));
+        this.renderCode_(this.data_[i].srcCode,
+                         this.data_[i].heatmap));
   }
 
   var fileContainers = heatmapContainer.append('div')
@@ -124,22 +123,7 @@ CodeHeatmap.prototype.hideTooltip_ = function(element, tooltip) {
 };
 
 /**
- * Adds line numbers and code highlighting.
- * @param {string} srcCode - Python source code.
- * @param {Object} heatmap - Python source heatmap.
- * @param {Object} skipMap - Mapping that shows correspondence between lines
- *                           on the screen and Python sources.
- * @returns {Object}
- */
-CodeHeatmap.prototype.processCode_ = function(srcCode, heatmap, skipMap) {
-  if (Object.keys(skipMap).length !== 0) {
-    return this.renderCodeWithSkips_(srcCode, heatmap, skipMap);
-  }
-  return this.renderCode_(srcCode, heatmap);
-};
-
-/**
- * Renders code without skip map.
+ * Renders code.
  * @param {string} srcCode - Python source code.
  * @param {Object} heatmap - Python source heatmap.
  * @returns {Object}
@@ -147,39 +131,16 @@ CodeHeatmap.prototype.processCode_ = function(srcCode, heatmap, skipMap) {
 CodeHeatmap.prototype.renderCode_ = function(srcCode, heatmap) {
   var resultCode = [], lineMap = {};
   for (var i = 0; i < srcCode.length; i++) {
-    var lineNumber = srcCode[i][0], codeLine = srcCode[i][1];
-    var runCount = heatmap[lineNumber];
-    resultCode.push(
-        this.formatSrcLine_(lineNumber, codeLine, runCount));
-    lineMap[i] = runCount;
-  }
-  return {'srcCode': resultCode.join(''), 'lineMap': lineMap};
-};
-
-/**
- * Renders code with skip map.
- * @param {string} srcCode - Python source code.
- * @param {Object} heatmap - Python source heatmap.
- * @param {Object} skipMap - Mapping that shows correspondence between lines
- *                           on the screen and Python sources.
- * @returns {Object}
- */
-CodeHeatmap.prototype.renderCodeWithSkips_ = function(srcCode, heatmap, skipMap) {
-  var resultCode = [], lineMap = {};
-  var codeIndex = 0, currSkipLine = 0;
-  for (var i = 0; i < skipMap.length; i++) {
-    var skipLine = skipMap[i][0], skipLength = skipMap[i][1];
-    for (var j = currSkipLine; j < skipLine; j++) {
-      var lineNumber = srcCode[j][0], codeLine = srcCode[j][1];
+    if (srcCode[i][0] == 'line') {
+      var lineNumber = srcCode[i][1], codeLine = srcCode[i][2];
       var runCount = heatmap[lineNumber];
       resultCode.push(
           this.formatSrcLine_(lineNumber, codeLine, runCount));
-      lineMap[codeIndex] = runCount;
-      codeIndex++;
+      lineMap[i] = runCount;
+    } else if (srcCode[i][0] == 'skip') {
+      resultCode.push(
+          "<div class='skip-line'>" + srcCode[i][1] + ' lines skipped</div>');
     }
-    currSkipLine = skipLine + skipLength - 1;
-    resultCode.push(
-        "<div class='skip-line'>" + skipLength + ' lines skipped</div>');
   }
   return {'srcCode': resultCode.join(''), 'lineMap': lineMap};
 };

@@ -65,17 +65,28 @@ class CodeHeatmapProfileUnitTest(unittest.TestCase):
         self.assertListEqual(
             self._profile._calc_skips(heatmap, 115), [(1, 101)])
 
-    def testPruneSrcLines(self):
+    def testSkipLines(self):
         self._profile._MIN_SKIP_SIZE = 0
-        src_lines = [(1, 'foo'), (2, 'bar'), (3, 'baz')]
-        skip_map = []
-        self.assertListEqual(
-            self._profile._prune_src_lines(src_lines, skip_map), src_lines)
 
-        src_lines = [(1, 'foo'), (2, 'bar'), (3, 'baz'), (4, 'hahaha')]
-        skip_map = [(1, 1), (3, 1)]
+        src_lines, skip_map = ['foo', 'bar', 'baz'], []
+        expected_result = [
+            ('line', 1, 'foo'), ('line', 2, 'bar'), ('line', 3, 'baz')]
         self.assertListEqual(
-            self._profile._prune_src_lines(src_lines, skip_map),
-            [(1, 'foo'), (3, 'baz')])
+            self._profile._skip_lines(src_lines, skip_map), expected_result)
+
+        src_lines, skip_map = ['foo', 'bar', 'baz', 'hahaha'], [(1, 2)]
+        self._profile._SKIP_LINES = 1
+        expected_result = [
+            ('line', 1, 'foo'), ('skip', 2), ('line', 4, 'hahaha')]
+        self.assertListEqual(
+            self._profile._skip_lines(src_lines, skip_map), expected_result)
+
+        src_lines = ['foo', 'bar', 'baz', 'hahaha']
+        skip_map = [(2, 1)]
+        expected_result = [
+            ('line', 1, 'foo'), ('line', 2, 'bar'),
+            ('skip', 1), ('line', 4, 'hahaha')]
+        self.assertListEqual(
+            self._profile._skip_lines(src_lines, skip_map), expected_result)
 
 # pylint: enable=protected-access, missing-docstring

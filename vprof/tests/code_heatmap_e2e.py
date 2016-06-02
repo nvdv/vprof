@@ -17,16 +17,16 @@ _MODULE_FILENAME = 'vprof/tests/test_pkg/dummy_module.py'
 _PACKAGE_PATH = 'vprof/tests/test_pkg/'
 _PACKAGE_NAME = 'vprof.tests.test_pkg'
 _DUMMY_MODULE_SOURCELINES = [
-    [1, 'def dummy_fib(n):'],
-    [2, '    if n < 2:'],
-    [3, '        return n'],
-    [4, '    return dummy_fib(n - 1) + dummy_fib(n - 2)'],
-    [5, '']]
+    ['line', 1, 'def dummy_fib(n):'],
+    ['line', 2, '    if n < 2:'],
+    ['line', 3, '        return n'],
+    ['line', 4, '    return dummy_fib(n - 1) + dummy_fib(n - 2)'],
+    ['line', 5, '']]
 _MAIN_MODULE_SOURCELINES = [
-    [1, 'from test_pkg import dummy_module'],
-    [2, ''],
-    [3, 'dummy_module.dummy_fib(5)'],
-    [4, '']]
+    ['line', 1, 'from test_pkg import dummy_module'],
+    ['line', 2, ''],
+    ['line', 3, 'dummy_module.dummy_fib(5)'],
+    ['line', 4, '']]
 
 
 class CodeHeatmapModuleEndToEndTest(unittest.TestCase):
