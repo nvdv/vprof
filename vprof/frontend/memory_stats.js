@@ -45,11 +45,22 @@ function MemoryChart(parent, data) {
   this.xScale_ = d3.scale.linear()
     .domain(d3.extent(this.data_.codeEvents, function(d) { return d[0]; }))
     .range([0, this.GRAPH_WIDTH]);
+
   this.xAxis_ = d3.svg.axis()
     .scale(this.xScale_)
-    .ticks(Math.min(this.TICKS_NUMBER, this.data_.codeEvents.length))
-    .tickFormat(d3.format(',.0f'))
-    .orient('bottom');
+    .orient('bottom')
+    .ticks(3)
+    .tickFormat(d3.format(',.0f'));
+
+  // Since axis.ticks(n) is only a recommendation, set tick values
+  // explicitly when their number is low.
+  if (this.data_.codeEvents.length < this.TICKS_NUMBER) {
+    var tickValues = Array.apply(null, Array(this.data_.codeEvents.length)).map(
+      function (_, i) {return i + 1; });
+    this.xAxis_.tickValues(tickValues);
+  } else {
+    this.xAxis_.ticks(this.TICKS_NUMBER);
+  }
 
   this.yRange_ = d3.extent(this.data_.codeEvents, function(d) { return d[2]; });
   this.yScale_ = d3.scale.linear()
