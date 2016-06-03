@@ -170,8 +170,11 @@ p {
 }
 
 .module-name {
+  direction: rtl;
   font-family: "Lucida Sans Typewriter", "Lucida Console", Monaco;
   font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: pre;
 }
 
