@@ -21,7 +21,7 @@ describe('Code heatmap test suite', function() {
     heatmap = {1: 1, 2: 1, 8: 1};
     expectedResult = {
       'srcCode': "12<div class='skip-line'>5 lines skipped</div>8",
-      'lineMap': {0: 1, 1: 1, 3: 1}};
+      'lineMap': {0: 1, 1: 1, 2: 1}};
     expect(calculator.renderCode_(srcCode, heatmap)).toEqual(
       expectedResult);
   });

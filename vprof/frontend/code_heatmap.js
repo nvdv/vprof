@@ -129,14 +129,15 @@ CodeHeatmap.prototype.hideTooltip_ = function(element, tooltip) {
  * @returns {Object}
  */
 CodeHeatmap.prototype.renderCode_ = function(srcCode, heatmap) {
-  var resultCode = [], lineMap = {};
+  var resultCode = [], lineMap = {}, srcIndex = 0;
   for (var i = 0; i < srcCode.length; i++) {
     if (srcCode[i][0] == 'line') {
       var lineNumber = srcCode[i][1], codeLine = srcCode[i][2];
       var runCount = heatmap[lineNumber];
       resultCode.push(
           this.formatSrcLine_(lineNumber, codeLine, runCount));
-      lineMap[i] = runCount;
+      lineMap[srcIndex] = runCount;
+      srcIndex++;
     } else if (srcCode[i][0] == 'skip') {
       resultCode.push(
           "<div class='skip-line'>" + srcCode[i][1] + ' lines skipped</div>');

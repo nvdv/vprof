@@ -82,7 +82,7 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
             return []
         skips, prev_line = [], 0
         for line in sorted(heatmap):
-            curr_skip = line - prev_line
+            curr_skip = line - prev_line - 1
             if curr_skip > self._SKIP_LINES:
                 skips.append((prev_line, curr_skip))
             prev_line = line
@@ -93,15 +93,18 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
     def _skip_lines(self, src_code, skip_map):
         """Skips lines in src_code specified by skip map."""
         if not skip_map:
-            return [('line', j + 1, l) for j, l in enumerate(src_code)]
+            return [['line', j + 1, l] for j, l in enumerate(src_code)]
         code_with_skips, i = [], 0
         for line, length in skip_map:
             code_with_skips.extend(
-                ('line', j + 1, l) for j, l in enumerate(src_code[i:line]))
-            code_with_skips.append(('skip', length))
+                ['line', i + j + 1, l] for j, l in enumerate(src_code[i:line]))
+            if code_with_skips and code_with_skips[-1][0] == 'skip':  # Merge skips.
+                code_with_skips[-1][1] += length
+            else:
+                code_with_skips.append(['skip', length])
             i = line + length
         code_with_skips.extend(
-            ('line', i + j + 1, l) for j, l in enumerate(src_code[i:]))
+            ['line', i + j + 1, l] for j, l in enumerate(src_code[i:]))
         return code_with_skips
 
     def run_as_package_path(self):
