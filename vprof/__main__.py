@@ -62,6 +62,8 @@ def main():
     parser.add_argument('--debug', dest='debug_mode',
                         action='store_true', default=False,
                         help="don't suppress error messages")
+    parser.add_argument('-u', '--cutoff', dest='cutoff', default=-1.0, type=float,
+                        help='set cutoff time for flame chart')
     parser.add_argument('--version', action='version',
                         version='vprof %s' % __version__)
     args = parser.parse_args()
@@ -78,7 +80,7 @@ def main():
     if not args.remote:
         try:
             program_stats = profiler.run_profilers(  # pylint: disable=redefined-variable-type
-                args.source[0], args.config, verbose=True)
+                args.source[0], args.config, verbose=True, cutoff=args.cutoff)
         except profiler.AmbiguousConfigurationError:
             print(_ERROR_MSG['ambiguous configuration']['msg'])
             sys.exit(_ERROR_MSG['ambiguous configuration']['code'])
