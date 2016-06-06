@@ -8,7 +8,7 @@ from vprof import profiler
 
 __version__ = '0.30'
 
-_PROGRAN_NAME = 'vprof'
+_PROGRAM_NAME = 'vprof'
 _MODULE_DESC = 'Python visual profiler'
 _HOST, _PORT = 'localhost', 8000
 _MODES_DESC = (
@@ -42,7 +42,7 @@ _ERROR_MSG = {
 def main():
     """Visual profiler main function."""
     parser = argparse.ArgumentParser(
-        prog=_PROGRAN_NAME, description=_MODULE_DESC,
+        prog=_PROGRAM_NAME, description=_MODULE_DESC,
         formatter_class=argparse.RawTextHelpFormatter)
     exclusive_group = parser.add_mutually_exclusive_group(required=True)
     exclusive_group.add_argument('-r', '--remote', dest='remote',
