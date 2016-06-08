@@ -42,17 +42,17 @@ LAYOUT = """
   <title>Guestbook</title>
   <body>
     <form method=post action=/add>
-	  Name: <input type=text name=name><br>
-	  Message: <textarea name=message></textarea><br>
-	  <input type=submit value=Post><br>
-	</form>
-	<ul>
-	{% for entry in entries %}
-	  <li><h2>{{ entry.name }}</h2>
-         {{ entry.message | safe }}
+      Name: <input type=text name=name><br>
+      Message: <textarea name=message></textarea><br>
+      <input type=submit value=Post><br>
+    </form>
+    <ul>
+    {% for entry in entries %}
+      <li><h2>{{ entry.name }}</h2>
+        {{ entry.message | safe }}
       </li>
     {% endfor %}
-	</ul>
+    </ul>
   </body>
 </html>
 """
