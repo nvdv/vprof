@@ -23,8 +23,11 @@ function FlameGraph(parent, data) {
   this.TEXT_CUTOFF = 0.075 * this.WIDTH;
   this.LEGEND_X = this.WIDTH - 400;
   this.LEGEND_Y = 100;
+  this.TIME_CUTOFF = 0.5;
 
   this.data_ = data;
+  FlameGraph.pruneNodes_(
+      this.data_.callStats, this.TIME_CUTOFF, this.data_.runTime);
   this.parent_ = parent;
   this.xScale_ = d3.scale.linear().domain([0, 1]).range([0, this.WIDTH]);
   this.yScale_ = d3.scale.linear().range([0, this.HEIGHT]);
@@ -248,6 +251,27 @@ FlameGraph.getTruncatedNodeName_ = function(d, rectLength) {
  */
 FlameGraph.getTimePercentage_ = function(cumTime, totalTime) {
   return 100 * Math.round(cumTime / totalTime * 1000) / 1000;
+};
+
+/**
+ * Removes call graph nodes if their cumulative time is lower
+ * than cutoff percenteag.
+ * @static
+ * @param {object} node - Current call graph node.
+ * @param {number} cutoff - Percentage cutoff.
+ * @param {number} totalRuntime - Program run time.
+ */
+FlameGraph.pruneNodes_ = function(node, cutoff, totalRuntime) {
+  var i = node.children.length;
+  while (i--) {
+    if (FlameGraph.getTimePercentage_(
+          node.children[i].cumTime, totalRuntime) < cutoff) {
+      node.children.splice(i, 1);
+    }
+  }
+  for (var j = 0; j < node.children.length; j++) {
+    FlameGraph.pruneNodes_(node.children[j], cutoff, totalRuntime);
+  }
 };
 
 /**
