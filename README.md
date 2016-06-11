@@ -11,7 +11,7 @@ The project is in active development and some of its features might not work as
 expected.
 
 ## Screenshots
-![flame-graph](http://i.imgur.com/pwgmnho.png?1)
+![flame-graph](http://i.imgur.com/opkPypb.png?1)
 ![memory-stats](http://i.imgur.com/lMS9qGz.png?1)
 ![code-heatmap](http://i.imgur.com/rWFqUfO.png?1)
 
