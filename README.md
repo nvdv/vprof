@@ -11,9 +11,9 @@ The project is in active development and some of its features might not work as
 expected.
 
 ## Screenshots
-![flame-graph](http://i.imgur.com/gkrERH0.png?1)
-![memory-stats](http://i.imgur.com/Mpb9Nrp.png?1)
-![code-heatmap](http://i.imgur.com/GbQAg0h.png?1)
+![flame-graph](http://i.imgur.com/pwgmnho.png?1)
+![memory-stats](http://i.imgur.com/lMS9qGz.png?1)
+![code-heatmap](http://i.imgur.com/rWFqUfO.png?1)
 
 ## Contributing
 All contributions are highly encouraged! You can add new features,
