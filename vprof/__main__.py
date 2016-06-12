@@ -6,7 +6,7 @@ import sys
 from vprof import stats_server
 from vprof import profiler
 
-__version__ = '0.30'
+__version__ = '0.31'
 
 _PROGRAN_NAME = 'vprof'
 _MODULE_DESC = 'Python visual profiler'
