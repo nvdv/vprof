@@ -1,0 +1,19 @@
+{
+  "parserOptions": {
+    "ecmaVersion": 5,
+  },
+  "env": {
+    "browser": 1
+  },
+  "rules": {
+    "camelcase": ["error", { "properties": "never" }],
+    "curly": "error",
+    "comma-spacing": ["error", { "before": false, "after": true }],
+    "eqeqeq": "error",
+    "indent": ["error", 2],
+    "linebreak-style": ["error", "unix"],
+    "no-cond-assign": ["error", "always"],
+    "strict": ["error", "global"],
+    "semi": "error",
+  },
+}

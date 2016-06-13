@@ -1,5 +1,7 @@
-var memory_stats = require('./memory_stats.js');
+"use strict";
+
+var memoryStatsModule = require('./memory_stats.js');
 
 describe('Memory stats test suite', function() {
-    
+
 });

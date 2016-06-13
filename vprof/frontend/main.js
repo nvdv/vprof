@@ -7,9 +7,9 @@
 
 'use strict';
 var d3 = require('d3');
-var flame_graph = require('./flame_graph.js');
-var memory_stats = require('./memory_stats.js');
-var code_heatmap = require('./code_heatmap.js');
+var flameGraphModule = require('./flame_graph.js');
+var memoryStatsModule = require('./memory_stats.js');
+var codeHeatmapModule = require('./code_heatmap.js');
 
 var JSON_URI = 'profile';
 var POLL_INTERVAL = 300;  // msec
@@ -97,24 +97,24 @@ function renderPage(data) {
     var status = (i === 0) ? 'selected' : 'not-selected';
     var display = (i === 0) ? 'block' : 'none';
     switch (props[i]) {
-      case 'c':
-        createFlameGraphTab_(tabHeader, status);
-        var flameGraph = createTabContent_('flame-graph');
-        flame_graph.renderFlameGraph(data.c, flameGraph);
-        flameGraph.attr('style', 'display: ' + display);
-        break;
-      case 'm':
-        createMemoryChartTab_(tabHeader, status);
-        var memoryChart = createTabContent_('memory-chart');
-        memory_stats.renderMemoryStats(data.m, memoryChart);
-        memoryChart.attr('style', 'display: ' + display);
-        break;
-      case 'h':
-        createCodeHeatmapTab_(tabHeader, status);
-        var codeHeatmap = createTabContent_('code-heatmap');
-        code_heatmap.renderCodeHeatmap(data.h, codeHeatmap);
-        codeHeatmap.attr('style', 'display: ' + display);
-        break;
+    case 'c':
+      createFlameGraphTab_(tabHeader, status);
+      var flameGraph = createTabContent_('flame-graph');
+      flameGraphModule.renderFlameGraph(data.c, flameGraph);
+      flameGraph.attr('style', 'display: ' + display);
+      break;
+    case 'm':
+      createMemoryChartTab_(tabHeader, status);
+      var memoryChart = createTabContent_('memory-chart');
+      memoryStatsModule.renderMemoryStats(data.m, memoryChart);
+      memoryChart.attr('style', 'display: ' + display);
+      break;
+    case 'h':
+      createCodeHeatmapTab_(tabHeader, status);
+      var codeHeatmap = createTabContent_('code-heatmap');
+      codeHeatmapModule.renderCodeHeatmap(data.h, codeHeatmap);
+      codeHeatmap.attr('style', 'display: ' + display);
+      break;
     }
   }
 }

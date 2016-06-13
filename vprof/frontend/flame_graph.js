@@ -2,9 +2,6 @@
  * @file CPU flame graph rendering.
  */
 
-/* jshint strict: false, browser: true, globalstrict: true */
-/* global require, module */
-
 'use strict';
 var d3 = require('d3');
 
@@ -78,9 +75,9 @@ FlameGraph.prototype.render = function() {
       return FlameGraph.getTruncatedNodeName_(d, nodeWidth);
     });
 
-    // Zoom.
-    nodes.on('click', function(d) { self.zoomIn_(d, nodes, titles); });
-    canvas.on('dblclick', function(d) { self.zoomOut_(nodes, titles); });
+  // Zoom.
+  nodes.on('click', function(d) { self.zoomIn_(d, nodes, titles); });
+  canvas.on('dblclick', function(d) { self.zoomOut_(nodes, titles); });
 };
 
 /**

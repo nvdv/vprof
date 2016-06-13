@@ -4,7 +4,7 @@
   "main": "vprof/frontend/main.js",
   "dependencies": {
     "d3": "3.5.6",
-    "jshint": "latest",
+    "eslint": "latest",
     "uglify-js": "latest",
     "browserify": "12",
     "browserify-css": "latest",
@@ -17,7 +17,7 @@
     "highlight.js": "latest"
   },
   "scripts": {
-    "lint": "jshint vprof/frontend/*.js",
+    "lint": "eslint vprof/frontend",
     "build": "browserify -g browserify-css vprof/frontend/main.js | uglifyjs > vprof/frontend/vprof_min.js",
     "test": "karma start"
   },

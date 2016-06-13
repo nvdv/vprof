@@ -2,9 +2,6 @@
  * @file Memory chart rendering.
  */
 
-/* jshint strict: false, browser: true, globalstrict: true */
-/* global require, module */
-
 'use strict';
 var d3 = require('d3');
 
@@ -121,7 +118,7 @@ MemoryChart.prototype.render = function() {
   var self = this;
   canvas.style('pointer-events', 'all')
     .on('mouseover', function() {
-        self.showFocus_(focus, focusXLine, focusYLine, focusHiglightArc); })
+      self.showFocus_(focus, focusXLine, focusYLine, focusHiglightArc); })
     .on('mouseout', function() { self.hideFocus_(
         focus, tooltip, focusXLine, focusYLine, focusHiglightArc); })
     .on('mousemove', function() { self.redrawFocus_(
@@ -149,8 +146,8 @@ MemoryChart.prototype.render = function() {
 
   // Zoom in.
   canvas.on('click', function() {
-      self.zoomIn_(path, canvas, focus, tooltip, focusXLine,
-                   focusYLine, focusHiglightArc); });
+    self.zoomIn_(path, canvas, focus, tooltip, focusXLine,
+                 focusYLine, focusHiglightArc); });
   // Zoom out.
   this.parent_.on('dblclick', function() { self.zoomOut_(path, canvas); });
 };

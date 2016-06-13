@@ -1,12 +1,14 @@
-var code_heatmap = require('./code_heatmap.js');
+"use strict";
+
+var codeHeatmapModule = require('./code_heatmap.js');
 
 describe('Code heatmap test suite', function() {
   it('Check renderCode', function() {
-    code_heatmap.CodeHeatmap.prototype.formatSrcLine_ = function(n, l, c) {
+    codeHeatmapModule.CodeHeatmap.prototype.formatSrcLine_ = function(n, l, c) {
       return n;
     };
     var data = {}, parent = {};
-    var calculator = new code_heatmap.CodeHeatmap(parent, data);
+    var calculator = new codeHeatmapModule.CodeHeatmap(parent, data);
 
     var srcCode = [['line', 1, 'foo'], ['line', 2, 'bar'], ['line', 3, 'baz']];
     var heatmap = {1: 1, 2: 1, 3: 1};

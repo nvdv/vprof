@@ -2,9 +2,6 @@
  * @file Code heatmap rendering.
  */
 
-/* jshint strict: false, browser: true, globalstrict: true */
-/* global require, module */
-
 'use strict';
 var d3 = require('d3');
 var hljs = require('highlight.js');
@@ -131,14 +128,14 @@ CodeHeatmap.prototype.hideTooltip_ = function(element, tooltip) {
 CodeHeatmap.prototype.renderCode_ = function(srcCode, heatmap) {
   var resultCode = [], lineMap = {}, srcIndex = 0;
   for (var i = 0; i < srcCode.length; i++) {
-    if (srcCode[i][0] == 'line') {
+    if (srcCode[i][0] === 'line') {
       var lineNumber = srcCode[i][1], codeLine = srcCode[i][2];
       var runCount = heatmap[lineNumber];
       resultCode.push(
           this.formatSrcLine_(lineNumber, codeLine, runCount));
       lineMap[srcIndex] = runCount;
       srcIndex++;
-    } else if (srcCode[i][0] == 'skip') {
+    } else if (srcCode[i][0] === 'skip') {
       resultCode.push(
           "<div class='skip-line'>" + srcCode[i][1] + ' lines skipped</div>');
     }
