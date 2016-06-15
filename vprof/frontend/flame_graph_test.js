@@ -32,4 +32,30 @@ describe('CPU flame graph test suite', function() {
     expect(flameGraphModule.FlameGraph.getTimePercentage_(
       88.8, 88.8)).toBe(100);
   });
+
+  it('Check pruneNodes', function() {
+    var callTree = {
+      'cumTime': 3,
+      'children': [
+        {'cumTime': 1, 'children': []},
+        {'cumTime': 1, 'children': []}
+      ]
+    };
+    var expectedResult = {
+      'cumTime': 3,
+      'children': [
+        {'cumTime': 1, 'children': []},
+        {'cumTime': 1, 'children': []}
+      ]
+    };
+    flameGraphModule.FlameGraph.pruneNodes_(callTree, 5, 3);
+    expect(callTree).toEqual(expectedResult);
+
+    var expectedResult = {
+      'cumTime': 3,
+      'children': []
+    };
+    flameGraphModule.FlameGraph.pruneNodes_(callTree, 40, 3);
+    expect(callTree).toEqual(expectedResult);
+  });
 });
