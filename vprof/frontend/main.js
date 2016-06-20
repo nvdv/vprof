@@ -12,7 +12,7 @@ var memoryStatsModule = require('./memory_stats.js');
 var codeHeatmapModule = require('./code_heatmap.js');
 
 var JSON_URI = 'profile';
-var POLL_INTERVAL = 300;  // msec
+var POLL_INTERVAL = 100;  // msec
 
 /**
  * Creates empty div with specified ID and class tab-content.
@@ -140,6 +140,7 @@ function main() {
 
   var timerId = setInterval(function() {
     d3.json(JSON_URI, function(data) {
+      console.log(data);
       if (Object.keys(data).length !== 0) {
         progressIndicator.remove();
         clearInterval(timerId);
