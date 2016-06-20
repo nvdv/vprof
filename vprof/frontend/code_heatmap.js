@@ -19,13 +19,14 @@ require('./highlight.css');  // Includes code highlighter CSS.
  */
 function CodeHeatmap(parent, data) {
   this.MIN_RUN_COUNT = 0;
-  this.MAX_RUN_COUNT = 2500;
+  this.MAX_RUN_COUNT = 10000;
   this.MIN_RUN_COLOR = '#ebfaeb';
-  this.MAX_RUN_COLOR = '#00cc44';
+  this.MAX_RUN_COLOR = '#47d147';
+  this.COLOR_SCALE_POWER = 0.25;
 
   this.data_ = data;
   this.parent_ = parent;
-  this.heatmapScale_ = d3.scale.sqrt()
+  this.heatmapScale_ = d3.scale.pow(this.COLOR_SCALE_POWER)
     .domain([this.MIN_RUN_COUNT, this.MAX_RUN_COUNT])
     .range([this.MIN_RUN_COLOR, this.MAX_RUN_COLOR]);
 }
