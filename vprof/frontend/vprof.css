@@ -25,14 +25,40 @@ a:hover {
   margin: 0;
 }
 
+.active-tab {
+  display: block;
+}
+
+.inactive-tab {
+  display: none;
+}
+
 .tab-content {
   background: #F1F1F1;
-  display: block;
   height: 96%;
 }
 
 .tab-content-hidden {
- display: none;
+  display: none;
+}
+
+.tabhelp {
+  background: #BCBCBC;
+  font-size: 16px;
+  top: 50%;
+  left: 50%;
+  opacity: 0.9;
+  transform: translate(-50%, -50%);
+  padding: 15px;
+  position: fixed;
+}
+
+.inactive-tabhelp {
+  display: none;
+}
+
+.active-tabhelp {
+  display: block;
 }
 
 .tab-header li {

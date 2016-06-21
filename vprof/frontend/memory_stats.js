@@ -36,6 +36,9 @@ function MemoryChart(parent, data) {
   this.TOOLTIP_OFFSET = 35;
   this.SCALE_FACTOR = 3;
   this.MAX_ZOOM_POINTS = 20;
+  this.HELP_MESSAGE = (
+    '<p>&#8226 Click to zoom highlighted region</p>'+
+    '<p>&#8226 Double click to restore original scale</p>');
 
   this.data_ = data;
   this.parent_ = parent;
@@ -95,6 +98,7 @@ MemoryChart.prototype.render = function() {
     .attr('class', 'tooltip tooltip-invisible');
 
   this.renderLegend_();
+  this.renderHelp_();
 
   var path = canvas.append('path')
     .attr('class', 'memory-graph')
@@ -371,6 +375,13 @@ MemoryChart.prototype.resetZoomRangeParams_ = function() {
   this.currZoomRange_.zoomIndexStart = 0;
   this.currZoomRange_.zoomIndexEnd = this.data_.codeEvents.length;
   this.currZoomRange_.zoomIndexRange = this.data_.codeEvents.length;
+};
+
+/** Renders memory chart help. */
+MemoryChart.prototype.renderHelp_ = function() {
+  this.parent_.append('div')
+    .attr('class', 'tabhelp inactive-tabhelp')
+    .html(this.HELP_MESSAGE);
 };
 
 /**

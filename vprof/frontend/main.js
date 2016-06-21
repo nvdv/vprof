@@ -95,27 +95,44 @@ function renderPage(data) {
   props.sort();
   for (var i = 0; i < props.length; i++) {
     var status = (i === 0) ? 'selected' : 'not-selected';
-    var display = (i === 0) ? 'block' : 'none';
+    var displayClass = (i === 0) ? 'active-tab' : 'inactive-tab';
     switch (props[i]) {
     case 'c':
       createFlameGraphTab_(tabHeader, status);
       var flameGraph = createTabContent_('flame-graph');
       flameGraphModule.renderFlameGraph(data.c, flameGraph);
-      flameGraph.attr('style', 'display: ' + display);
+      flameGraph.classed(displayClass, true);
       break;
     case 'm':
       createMemoryChartTab_(tabHeader, status);
       var memoryChart = createTabContent_('memory-chart');
       memoryStatsModule.renderMemoryStats(data.m, memoryChart);
-      memoryChart.attr('style', 'display: ' + display);
+      memoryChart.classed(displayClass, true);
       break;
     case 'h':
       createCodeHeatmapTab_(tabHeader, status);
       var codeHeatmap = createTabContent_('code-heatmap');
       codeHeatmapModule.renderCodeHeatmap(data.h, codeHeatmap);
-      codeHeatmap.attr('style', 'display: ' + display);
+      codeHeatmap.classed(displayClass, true);
       break;
     }
+  }
+
+  document.onkeypress = handleHelpDisplay;
+}
+
+/**
+  * Handles tab help display..
+  * @param {Object} e - Key event.
+  */
+function handleHelpDisplay(e) {
+  e = e || window.event;
+  if (e.key === 'h') {
+    var helpActiveTab = d3.select('.active-tab .tabhelp');
+    helpActiveTab.classed({
+      'inactive-tabhelp': !helpActiveTab.classed('inactive-tabhelp'),
+      'active-tabhelp': !helpActiveTab.classed('active-tabhelp')
+    });
   }
 }
 
@@ -124,12 +141,10 @@ function renderPage(data) {
   * @param {string} tabId - Next active tab identifier.
   */
 function showTab_(tabId) {
-  var allTabs = document.getElementsByClassName('tab-content');
-  for (var i = 0; i < allTabs.length; i++) {
-    allTabs[i].style.display = 'none';
-  }
-  var currentTab = document.getElementById(tabId);
-  currentTab.style.display = 'block';
+  d3.selectAll('.tab-content')
+   .classed({'active-tab': false, 'inactive-tab': true});
+  d3.select('#' + tabId)
+   .classed({'active-tab': true, 'inactive-tab': false});
 }
 
 /** Makes request to server and renders page with received data. */
@@ -140,7 +155,6 @@ function main() {
 
   var timerId = setInterval(function() {
     d3.json(JSON_URI, function(data) {
-      console.log(data);
       if (Object.keys(data).length !== 0) {
         progressIndicator.remove();
         clearInterval(timerId);

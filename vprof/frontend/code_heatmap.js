@@ -23,6 +23,8 @@ function CodeHeatmap(parent, data) {
   this.MIN_RUN_COLOR = '#ebfaeb';
   this.MAX_RUN_COLOR = '#47d147';
   this.COLOR_SCALE_POWER = 0.25;
+  this.HELP_MESSAGE = (
+    '<p>&#8226 Hover to see line execution count.</p>');
 
   this.data_ = data;
   this.parent_ = parent;
@@ -35,6 +37,8 @@ function CodeHeatmap(parent, data) {
 CodeHeatmap.prototype.render = function() {
   var pageContainer = this.parent_.append('div')
     .attr('id', 'heatmap-layout');
+
+  this.renderHelp_();
 
   var moduleList = pageContainer.append('div')
     .attr('class', 'module-list');
@@ -160,6 +164,13 @@ CodeHeatmap.prototype.formatSrcLine_ = function(lineNumber, codeLine, runCount) 
           "<div class='src-line-number'>" + lineNumber + "</div>" +
           "<div class='src-line-code'>" + highlightedLine + "</div>" +
       "</div>");
+};
+
+/** Renders code heatmap help. */
+CodeHeatmap.prototype.renderHelp_ = function() {
+  this.parent_.append('div')
+    .attr('class', 'tabhelp inactive-tabhelp')
+    .html(this.HELP_MESSAGE);
 };
 
 /**

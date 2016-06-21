@@ -21,6 +21,10 @@ function FlameGraph(parent, data) {
   this.LEGEND_X = this.WIDTH - 400;
   this.LEGEND_Y = 100;
   this.TIME_CUTOFF = 0.5;
+  this.HELP_MESSAGE = (
+    '<p>&#8226 Hover to see node stats</p>' +
+    '<p>&#8226 Click on node to zoom</p>'+
+    '<p>&#8226 Double click to restore original scale</p>');
 
   this.data_ = data;
   FlameGraph.pruneNodes_(
@@ -44,6 +48,7 @@ FlameGraph.prototype.render = function() {
     .attr('class', 'tooltip tooltip-invisible');
 
   this.renderLegend_();
+  this.renderHelp_();
 
   var cells = canvas.selectAll(".cell")
     .data(this.flameGraph_.nodes(this.data_.callStats))
@@ -207,6 +212,13 @@ FlameGraph.prototype.renderLegend_ = function() {
           '<p>Primitive calls: ' + this.data_.primitiveCalls + '</p>')
     .style('left', this.LEGEND_X)
     .style('top', this.LEGEND_Y);
+};
+
+/** Renders flame graph help. */
+FlameGraph.prototype.renderHelp_ = function() {
+  this.parent_.append('div')
+    .attr('class', 'tabhelp inactive-tabhelp')
+    .html(this.HELP_MESSAGE);
 };
 
 /**
