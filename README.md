@@ -99,6 +99,8 @@ where `cmh` is profiling mode, `host` and `port` are hostname and port of `vprof
 
 You can check `vprof -h` for full list of supported parameters.
 
+To show UI help, press `h` when visualizations are displayed in browser.
+
 Also you can check `examples` directory for more profiling examples.
 
 ## Testing
