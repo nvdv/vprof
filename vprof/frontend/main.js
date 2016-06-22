@@ -87,6 +87,10 @@ function createCodeHeatmapTab_(parent, status) {
  * @param {Object} data - Data for page rendering.
  */
 function renderPage(data) {
+  // Remove all existing tabs and their content
+  // in case if user is refreshing main page.
+  d3.select('body').selectAll('*').remove();
+
   var tabHeader = d3.select('body')
     .append('ul')
     .attr('class', 'tab-header');
