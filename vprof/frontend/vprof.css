@@ -1,6 +1,6 @@
 body {
   background: #4C4C4C;
-  font-family: 'Helvetica Neue', Helvetica;
+  font-family: 'Tahoma', Geneva, sans-serif;
   margin-bottom: 5px;
   margin-left: 0;
   margin-right: 0;
@@ -191,7 +191,7 @@ p {
 }
 
 .module-header {
-  font-size: 15px;
+  font-size: 14px;
   padding-top: 10px;
 }
 
