@@ -233,8 +233,8 @@ MemoryChart.prototype.zoomOut_ = function(path, canvas) {
 MemoryChart.prototype.renderLegend_ = function() {
   this.parent_.append('div')
     .attr('class', 'legend')
-    .html('<p>Object name: ' + this.data_.objectName + '</p>' +
-          '<p>Total lines executed: ' + this.data_.totalEvents + '</p>')
+    .html('<p><b>Object name:</b> ' + this.data_.objectName + '</p>' +
+          '<p><b>Total lines executed:</b> ' + this.data_.totalEvents + '</p>')
     .style('left', this.LEGEND_X)
     .style('top', this.LEGEND_Y);
 };
@@ -323,11 +323,11 @@ MemoryChart.generateTooltipText_ = function(stats) {
   var result = '';
   if (stats) {
     var functionName = stats[4].replace('<', '[').replace('>',  ']');
-    result += ('<p>Executed line: ' + stats[0] + '</p>' +
-               '<p>Line number: ' + stats[1] + '</p>' +
-               '<p>Function name: ' + functionName + '</p>' +
-               '<p>Filename: ' + stats[5] + '</p>' +
-               '<p>Memory usage: ' + stats[2] + ' MB</p>');
+    result += ('<p><b>Executed line:</b> ' + stats[0] + '</p>' +
+               '<p><b>Line number:</b> ' + stats[1] + '</p>' +
+               '<p><b>Function name:</b> ' + functionName + '</p>' +
+               '<p><b>Filename:</b> ' + stats[5] + '</p>' +
+               '<p><b>Memory usage:</b> ' + stats[2] + ' MB</p>');
   }
   return result;
 };

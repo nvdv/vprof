@@ -109,7 +109,7 @@ CodeHeatmap.prototype.render = function() {
 CodeHeatmap.prototype.showTooltip_ = function(element, tooltip, runCount) {
   d3.select(element).attr('class', 'src-line-highlight');
   tooltip.attr('class', 'tooltip tooltip-visible')
-    .html('Execution count: ' + runCount)
+    .html('<b>Execution count: </b>' + runCount)
     .style('left', d3.event.pageX)
     .style('top', d3.event.pageY);
 };

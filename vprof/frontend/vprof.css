@@ -44,6 +44,7 @@ a:hover {
 
 .tabhelp {
   background: #BCBCBC;
+  border-radius: 5px;
   font-size: 16px;
   top: 50%;
   left: 50%;
@@ -133,7 +134,9 @@ svg {
 .legend {
   background: #BCBCBC;
   border: 0px;
+  border-radius: 5px;
   font: 15px sans-serif;
+  opacity: 0.9;
   padding: 8px;
   pointer-events: none;
   position: absolute;

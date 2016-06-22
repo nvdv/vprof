@@ -181,13 +181,13 @@ FlameGraph.prototype.showTooltip_ = function(element, tooltip, node) {
       node.cumTime, this.data_.runTime);
   var functionName = node.funcName.replace('<', '[').replace('>',  ']');
   tooltip.attr('class', 'tooltip tooltip-visible')
-    .html('<p>Function name: ' + functionName + '</p>' +
-          '<p>Location: ' + node.moduleName +'</p>' +
-          '<p>Line number: ' + node.lineno + '</p>' +
-          '<p>Time percentage: ' + timePercentage + ' %</p>' +
-          '<p>Cumulative time: ' + node.cumTime + ' s</p>' +
-          '<p>Time per call: ' + node.timePerCall + ' s</p>' +
-          '<p>Primitive calls: ' + node.primCalls + '</p>')
+    .html('<p><b>Function name:</b> ' + functionName + '</p>' +
+          '<p><b>Location:</b> ' + node.moduleName +'</p>' +
+          '<p><b>Line number:</b> ' + node.lineno + '</p>' +
+          '<p><b>Time percentage:</b> ' + timePercentage + ' %</p>' +
+          '<p><b>Cumulative time:</b> ' + node.cumTime + ' s</p>' +
+          '<p><b>Time per call:</b> ' + node.timePerCall + ' s</p>' +
+          '<p><b>Primitive calls:</b> ' + node.primCalls + '</p>')
     .style('left', d3.event.pageX)
     .style('top', d3.event.pageY);
 };
@@ -206,10 +206,10 @@ FlameGraph.prototype.hideTooltip_ = function(element, tooltip) {
 FlameGraph.prototype.renderLegend_ = function() {
   this.parent_.append('div')
     .attr('class', 'legend')
-    .html('<p>Object name: ' + this.data_.objectName + '</p>' +
-          '<p>Total runtime: ' + this.data_.runTime + 's</p>' +
-          '<p>Total calls: ' + this.data_.totalCalls + '</p>' +
-          '<p>Primitive calls: ' + this.data_.primitiveCalls + '</p>')
+    .html('<p><b>Object name:</b> ' + this.data_.objectName + '</p>' +
+          '<p><b>Total runtime:</b> ' + this.data_.runTime + 's</p>' +
+          '<p><b>Total calls:</b> ' + this.data_.totalCalls + '</p>' +
+          '<p><b>Primitive calls:</b> ' + this.data_.primitiveCalls + '</p>')
     .style('left', this.LEGEND_X)
     .style('top', this.LEGEND_Y);
 };
