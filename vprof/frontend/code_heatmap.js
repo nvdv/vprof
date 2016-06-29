@@ -18,7 +18,7 @@ require('./highlight.css');  // Includes code highlighter CSS.
  * @property {string} MAX_RUN_COLOR - Color that represents MAX_RUN_COUNT.
  */
 function CodeHeatmap(parent, data) {
-  this.MIN_RUN_COUNT = 0;
+  this.MIN_RUN_COUNT = 1;
   this.MAX_RUN_COUNT = 10000;
   this.MIN_RUN_COLOR = '#ebfaeb';
   this.MAX_RUN_COLOR = '#47d147';
@@ -28,7 +28,7 @@ function CodeHeatmap(parent, data) {
 
   this.data_ = data;
   this.parent_ = parent;
-  this.heatmapScale_ = d3.scale.pow(this.COLOR_SCALE_POWER)
+  this.heatmapScale_ = d3.scale.log()
     .domain([this.MIN_RUN_COUNT, this.MAX_RUN_COUNT])
     .range([this.MIN_RUN_COLOR, this.MAX_RUN_COLOR]);
 }
