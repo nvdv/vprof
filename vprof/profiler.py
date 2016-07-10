@@ -29,13 +29,14 @@ class BadOptionError(Error):
     pass
 
 
-def run_profilers(run_object, prof_config, verbose=False):
+def run_profilers(run_object, prof_config, verbose=False, cutoff=-1.0):
     """Runs profilers against run_object.
 
     Args:
         run_object: An object (string or tuple) to run profilers agaist.
         prof_config: A string with profilers configuration.
         verbose: True if info about running profilers should be shown.
+        cutoff: (optional) minimimum time of interest, in miliseconds
     Returns:
         An ordered dictionary with collected stats.
     Raises:
@@ -57,7 +58,12 @@ def run_profilers(run_object, prof_config, verbose=False):
         curr_profiler = profiler(run_object)
         if verbose:
             print('Running %s...' % curr_profiler.__class__.__name__)
-        run_stats[option] = curr_profiler.run()
+        results = curr_profiler.run()
+        if 'runTime' in results:
+            if (results['runTime'] >= cutoff):
+                run_stats[option] = results
+        else:
+            run_stats[option] = results
     return run_stats
 
 

@@ -8,7 +8,7 @@ from vprof import profiler
 
 __version__ = '0.32'
 
-_PROGRAN_NAME = 'vprof'
+_PROGRAM_NAME = 'vprof'
 _MODULE_DESC = 'Python visual profiler'
 _HOST, _PORT = 'localhost', 8000
 _MODES_DESC = (
@@ -42,7 +42,7 @@ _ERROR_MSG = {
 def main():
     """Visual profiler main function."""
     parser = argparse.ArgumentParser(
-        prog=_PROGRAN_NAME, description=_MODULE_DESC,
+        prog=_PROGRAM_NAME, description=_MODULE_DESC,
         formatter_class=argparse.RawTextHelpFormatter)
     exclusive_group = parser.add_mutually_exclusive_group(required=True)
     exclusive_group.add_argument('-r', '--remote', dest='remote',
@@ -62,6 +62,8 @@ def main():
     parser.add_argument('--debug', dest='debug_mode',
                         action='store_true', default=False,
                         help="don't suppress error messages")
+    parser.add_argument('-u', '--cutoff', dest='cutoff', default=-1.0, type=float,
+                        help='set cutoff time for flame chart')
     parser.add_argument('--version', action='version',
                         version='vprof %s' % __version__)
     args = parser.parse_args()
@@ -78,7 +80,7 @@ def main():
     if not args.remote:
         try:
             program_stats = profiler.run_profilers(  # pylint: disable=redefined-variable-type
-                args.source[0], args.config, verbose=True)
+                args.source[0], args.config, verbose=True, cutoff=args.cutoff)
         except profiler.AmbiguousConfigurationError:
             print(_ERROR_MSG['ambiguous configuration']['msg'])
             sys.exit(_ERROR_MSG['ambiguous configuration']['code'])
