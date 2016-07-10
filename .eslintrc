@@ -1,8 +1,5 @@
 {
-  "parserOptions": {
-    "ecmaVersion": 5,
-  },
-  "env": {
+   "env": {
     "browser": 1
   },
   "rules": {
