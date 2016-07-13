@@ -12,7 +12,7 @@ var memoryStatsModule = require('./memory_stats.js');
 var codeHeatmapModule = require('./code_heatmap.js');
 
 var JSON_URI = 'profile';
-var POLL_INTERVAL = 100;  // msec
+var POLL_INTERVAL = 200;  // msec
 
 /**
  * Creates empty div with specified ID and class tab-content.
