@@ -157,15 +157,23 @@ function main() {
     .append('div')
     .attr('id', 'progress-indicator');
 
-  var timerId = setInterval(function() {
-    d3.json(JSON_URI, function(data) {
-      if (Object.keys(data).length !== 0) {
-        progressIndicator.remove();
-        clearInterval(timerId);
-        renderPage(data);
-      }
-    });
-  }, POLL_INTERVAL);
+  // TODO (nvdv): Simplify this code.
+  d3.json(JSON_URI, function(data) {
+    if (Object.keys(data).length !== 0) {
+      progressIndicator.remove();
+      renderPage(data);
+    } else {
+      var timerId = setInterval(function() {
+        d3.json(JSON_URI, function(data) {
+          if (Object.keys(data).length !== 0) {
+            progressIndicator.remove();
+            clearInterval(timerId);
+            renderPage(data);
+          }
+        });
+      }, POLL_INTERVAL);
+    }
+  });
 }
 
 main();
