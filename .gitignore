@@ -1,3 +1,7 @@
 *.pyc
 vprof/frontend/vprof_min.js
 .DS_Store
+node_modules
+build
+dist
+vprof.egg-info
