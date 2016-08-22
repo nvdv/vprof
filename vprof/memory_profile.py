@@ -1,10 +1,13 @@
 """Module for memory profiling."""
+import gc
 import inspect
+import itertools
 import os
 import psutil
 import sys
 
 from collections import deque
+from collections import Counter
 from vprof import base_profile
 
 _BYTES_IN_MB = 1024 * 1024
@@ -14,6 +17,19 @@ def _get_memory_usage():
     """Returns memory usage for current process."""
     memory_info = psutil.Process(os.getpid()).memory_info()
     return float(memory_info.rss) / _BYTES_IN_MB
+
+
+def get_object_count_by_type(objects):
+    """Counts Python objects by type."""
+    objects.sort(key=lambda obj: repr(type(obj)))
+    return {k: len(list(g)) for k, g in itertools.groupby(objects, key=type)}
+
+
+def get_obj_count_difference(objs1, objs2):
+    """Returns count difference in two collections of Python objects."""
+    obj_count_1 = get_object_count_by_type(objs1)
+    obj_count_2 = get_object_count_by_type(objs2)
+    return dict(Counter(obj_count_1) - Counter(obj_count_2))
 
 
 class CodeEventsTracker(object):
