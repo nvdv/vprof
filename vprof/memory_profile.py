@@ -132,12 +132,19 @@ class MemoryProfile(base_profile.BaseProfile):
     def run(self):
         """Collects memory stats for specified Python program."""
         run_dispatcher = self.get_run_dispatcher()
+        existing_objects = gc.get_objects()
         events_list = run_dispatcher()
+        new_obj_count = get_obj_count_difference(
+            gc.get_objects(), existing_objects)
+        get_pretty_typename = lambda t: repr(t).split()[1].strip("'>")
         return {
             'objectName': self._object_name,  # Set on run dispatching.
             'codeEvents': [
                 (i + 1, line, mem, event, func, fname)
                 for i, (line, mem, event, func, fname) in enumerate(
                     events_list)],
-            'totalEvents': len(events_list)
+            'totalEvents': len(events_list),
+            'objectsCount': [
+                (get_pretty_typename(t), c)
+                for t, c in new_obj_count.items()]
         }
