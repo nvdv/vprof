@@ -3,6 +3,7 @@ import gc
 import inspect
 import itertools
 import os
+import operator
 import psutil
 import sys
 
@@ -30,6 +31,15 @@ def get_obj_count_difference(objs1, objs2):
     obj_count_1 = get_object_count_by_type(objs1)
     obj_count_2 = get_object_count_by_type(objs2)
     return dict(Counter(obj_count_1) - Counter(obj_count_2))
+
+
+def _format_obj_count(obj_count):
+    """Formats object count."""
+    result = []
+    for obj_type, obj_count in obj_count.items():
+        pretty_type = repr(obj_type).split()[1].strip("'>")
+        result.append((pretty_type, obj_count))
+    return sorted(result, key=operator.itemgetter(1), reverse=True)
 
 
 class CodeEventsTracker(object):
@@ -136,7 +146,7 @@ class MemoryProfile(base_profile.BaseProfile):
         events_list = run_dispatcher()
         new_obj_count = get_obj_count_difference(
             gc.get_objects(), existing_objects)
-        get_pretty_typename = lambda t: repr(t).split()[1].strip("'>")
+        pretty_obj_count = _format_obj_count(new_obj_count)
         return {
             'objectName': self._object_name,  # Set on run dispatching.
             'codeEvents': [
@@ -144,7 +154,5 @@ class MemoryProfile(base_profile.BaseProfile):
                 for i, (line, mem, event, func, fname) in enumerate(
                     events_list)],
             'totalEvents': len(events_list),
-            'objectsCount': [
-                (get_pretty_typename(t), c)
-                for t, c in new_obj_count.items()]
+            'objectsCount': pretty_obj_count
         }

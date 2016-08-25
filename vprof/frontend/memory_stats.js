@@ -12,23 +12,13 @@ var d3 = require('d3');
  * @param {Object} data - Data for memory chart rendering.
  */
 function MemoryChart(parent, data) {
-
   this.MARGIN_LEFT = 40;
   this.MARGIN_RIGHT = 5;
   this.MARGIN_TOP = 15;
   this.MARGIN_BOTTOM  = 30;
   this.PAD_SIZE = 10;
-  this.HEIGHT = parent.node().scrollHeight - this.PAD_SIZE;
-  this.WIDTH = parent.node().scrollWidth - this.PAD_SIZE;
-  this.GRAPH_HEIGHT = this.HEIGHT - (this.MARGIN_TOP + this.MARGIN_BOTTOM);
-  this.GRAPH_WIDTH = this.WIDTH - (this.MARGIN_LEFT + this.MARGIN_RIGHT);
   this.MIN_RANGE_C = 0.98;
   this.MAX_RANGE_C = 1.02;
-  this.AXIS_TEXT_X = this.GRAPH_WIDTH;
-  this.AXIS_TEXT_Y = 12;
-  this.AXIS_TEXT_Y_OFFSET = 30;
-  this.LEGEND_X = this.GRAPH_WIDTH - 350;
-  this.LEGEND_Y = 100;
   this.MOUSE_X_OFFSET = 10;
   this.TICKS_NUMBER = 10;
   this.FOCUS_RADIUS = 5;
@@ -42,6 +32,26 @@ function MemoryChart(parent, data) {
 
   this.data_ = data;
   this.parent_ = parent;
+
+  // Memory view div  size should be specified in CSS to render
+  // SVG graph correctly.
+  this.memoryView_ = this.parent_.append('div')
+    .attr('class', 'memory-info');
+  this.memoryUsageGraph_ = this.memoryView_.append('div')
+    .attr('class', 'memory-usage-graph');
+  this.objectsTable_ = this.memoryView_.append('div')
+    .attr('class', 'memory-objects-table');
+
+  this.HEIGHT = this.memoryUsageGraph_.node().scrollHeight - this.PAD_SIZE;
+  this.WIDTH = this.memoryUsageGraph_.node().scrollWidth - this.PAD_SIZE;
+  this.GRAPH_HEIGHT = this.HEIGHT - (this.MARGIN_TOP + this.MARGIN_BOTTOM);
+  this.GRAPH_WIDTH = this.WIDTH - (this.MARGIN_LEFT + this.MARGIN_RIGHT);
+  this.AXIS_TEXT_X = this.GRAPH_WIDTH;
+  this.AXIS_TEXT_Y = 12;
+  this.AXIS_TEXT_Y_OFFSET = 30;
+  this.LEGEND_X = this.GRAPH_WIDTH - 350;
+  this.LEGEND_Y = 100;
+
   this.xScale_ = d3.scale.linear()
     .domain(d3.extent(this.data_.codeEvents, function(d) { return d[0]; }))
     .range([0, this.GRAPH_WIDTH]);
@@ -88,15 +98,17 @@ function MemoryChart(parent, data) {
 
 /** Renders memory chart. */
 MemoryChart.prototype.render = function() {
-  var canvas = this.parent_.append('svg')
+  var canvas = this.memoryUsageGraph_.append('svg')
     .attr('width', this.WIDTH)
     .attr('height', this.HEIGHT)
     .append('g')
     .attr('transform',
           'translate(' + this.MARGIN_LEFT + ',' + this.MARGIN_TOP + ')');
-  var tooltip = this.parent_.append('div')
+
+  var tooltip = this.memoryUsageGraph_.append('div')
     .attr('class', 'tooltip tooltip-invisible');
 
+  this.renderObjectsTable_();
   this.renderLegend_();
   this.renderHelp_();
 
@@ -382,6 +394,28 @@ MemoryChart.prototype.renderHelp_ = function() {
   this.parent_.append('div')
     .attr('class', 'tabhelp inactive-tabhelp')
     .html(this.HELP_MESSAGE);
+};
+
+/** Renders object count table. */
+MemoryChart.prototype.renderObjectsTable_ = function() {
+  var tableHeader = this.objectsTable_.append('tr')
+    .attr('class', 'memory-table-header memory-table-row');
+
+  tableHeader.append('td')
+    .text('Object type');
+  tableHeader.append('td')
+    .text('Count');
+
+  var countRows = this.objectsTable_.selectAll('.memory-table-row')
+    .data(this.data_.objectsCount)
+    .enter()
+    .append('tr')
+    .attr('class', 'memory-table-row');
+
+  countRows.append('td')
+    .text(function(d) { return d[0]; });
+  countRows.append('td')
+    .text(function(d) { return d[1]; });
 };
 
 /**
