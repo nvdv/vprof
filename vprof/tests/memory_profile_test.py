@@ -28,7 +28,7 @@ class CodeEventsTrackerUnittest(unittest.TestCase):
         self._tracker._trace_memory_usage(frame, event, arg)
         self.assertFalse(self._tracker.events_list)
 
-    @mock.patch('vprof.memory_profile.get_memory_usage')
+    @mock.patch('vprof.memory_profile._get_memory_usage')
     def testTraceMemoryUsage_EmptyEventsList(self, get_memory_mock):
         frame, event, arg = mock.MagicMock(), 'line', mock.MagicMock()
         curr_memory = get_memory_mock.return_value
@@ -41,7 +41,7 @@ class CodeEventsTrackerUnittest(unittest.TestCase):
             self._tracker.events_list[-1],
             [lineno, curr_memory, event, co_name, filename])
 
-    @mock.patch('vprof.memory_profile.get_memory_usage')
+    @mock.patch('vprof.memory_profile._get_memory_usage')
     def testTraceMemoryUsage_NormalUsage(self, get_memory_mock):
         event, arg = 'line', mock.MagicMock()
         curr_memory = get_memory_mock.return_value
@@ -70,7 +70,7 @@ class CodeEventsTrackerUnittest(unittest.TestCase):
                    [3, curr_memory, event, name3, fname3],
                    [4, curr_memory, event, name4, fname4])))
 
-    @mock.patch('vprof.memory_profile.get_memory_usage')
+    @mock.patch('vprof.memory_profile._get_memory_usage')
     def testTraceMemoryUsage_SameLine(self, get_memory_mock):
         event, arg = 'line', mock.MagicMock()
         get_memory_mock.side_effect = [10, 20, 30, 40]

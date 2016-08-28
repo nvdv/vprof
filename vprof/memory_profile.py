@@ -10,7 +10,7 @@ from vprof import base_profile
 _BYTES_IN_MB = 1024 * 1024
 
 
-def get_memory_usage():
+def _get_memory_usage():
     """Returns memory usage for current process."""
     memory_info = psutil.Process(os.getpid()).memory_info()
     return float(memory_info.rss) / _BYTES_IN_MB
@@ -47,7 +47,7 @@ class CodeEventsTracker(object):
     def _trace_memory_usage(self, frame, event, arg):  #pylint: disable=unused-argument
         """Tracks memory usage when specified events occur."""
         if event == 'line' and frame.f_code in self._all_code:
-            curr_memory = get_memory_usage()
+            curr_memory = _get_memory_usage()
             if (self.events_list and self.events_list[-1][2] == event and
                     self.events_list[-1][0] == frame.f_lineno and
                     self.events_list[-1][1] != curr_memory):
