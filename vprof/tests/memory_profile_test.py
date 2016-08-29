@@ -15,7 +15,7 @@ class GetObjectCountByTypeUnittest(unittest.TestCase):
 
     def testGetObjectByType(self):
         objects = [1, 2, 3, 'a', 'b', 'c', {}, []]
-        obj_count = memory_profile.get_object_count_by_type(objects)
+        obj_count = memory_profile._get_object_count_by_type(objects)
         self.assertEqual(obj_count[int], 3)
         self.assertEqual(obj_count[str], 3)
         self.assertEqual(obj_count[dict], 1)
@@ -28,7 +28,7 @@ class GetObjCountDifferenceUnittest(unittest.TestCase):
         objects1 = [1, 2, 3, 'a', 'b', 'c', {}, []]
         objects2 = [1, 2, 'a', 'b', {}]
         self.assertDictEqual(
-            memory_profile.get_obj_count_difference(objects1, objects2),
+            memory_profile._get_obj_count_difference(objects1, objects2),
             {int: 1, str: 1, list: 1})
 
 

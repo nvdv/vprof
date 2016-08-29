@@ -399,7 +399,7 @@ MemoryChart.prototype.renderHelp_ = function() {
 /** Renders object count table. */
 MemoryChart.prototype.renderObjectsTable_ = function() {
   var tableHeader = this.objectsTable_.append('tr')
-    .attr('class', 'memory-table-header memory-table-row');
+    .attr('class', 'memory-table-header');
 
   tableHeader.append('td')
     .text('Object type');

@@ -13,6 +13,31 @@ from vprof import base_profile
 
 _BYTES_IN_MB = 1024 * 1024
 
+def _remove_duplicates(objects):
+    """Removes duplicate objects.
+
+    Taken from http://www.peterbe.com/plog/uniqifiers-benchmark.
+    """
+    seen, uniq = set(), []
+    for obj in objects:
+        obj_id = id(obj)
+        if obj_id in seen:
+            continue
+        else:
+            seen.add(obj_id)
+            uniq.append(obj)
+    return uniq
+
+
+def _get_in_memory_objects():
+    """Returns all objects in memory."""
+    objects = gc.get_objects()
+    ref_objects = [ref
+                   for obj in objects
+                   for ref in gc.get_referents(obj)]
+    objects.extend(ref_objects)
+    return _remove_duplicates(objects)
+
 
 def _get_memory_usage():
     """Returns memory usage for current process."""
@@ -20,16 +45,16 @@ def _get_memory_usage():
     return float(memory_info.rss) / _BYTES_IN_MB
 
 
-def get_object_count_by_type(objects):
+def _get_object_count_by_type(objects):
     """Counts Python objects by type."""
     objects.sort(key=lambda obj: repr(type(obj)))
     return {k: len(list(g)) for k, g in itertools.groupby(objects, key=type)}
 
 
-def get_obj_count_difference(objs1, objs2):
+def _get_obj_count_difference(objs1, objs2):
     """Returns count difference in two collections of Python objects."""
-    obj_count_1 = get_object_count_by_type(objs1)
-    obj_count_2 = get_object_count_by_type(objs2)
+    obj_count_1 = _get_object_count_by_type(objs1)
+    obj_count_2 = _get_object_count_by_type(objs2)
     return dict(Counter(obj_count_1) - Counter(obj_count_2))
 
 
@@ -142,10 +167,10 @@ class MemoryProfile(base_profile.BaseProfile):
     def run(self):
         """Collects memory stats for specified Python program."""
         run_dispatcher = self.get_run_dispatcher()
-        existing_objects = gc.get_objects()
+        existing_objects = _get_in_memory_objects()
         events_list = run_dispatcher()
-        new_obj_count = get_obj_count_difference(
-            gc.get_objects(), existing_objects)
+        new_obj_count = _get_obj_count_difference(
+            _get_in_memory_objects(), existing_objects)
         pretty_obj_count = _format_obj_count(new_obj_count)
         return {
             'objectName': self._object_name,  # Set on run dispatching.
