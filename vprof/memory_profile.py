@@ -4,6 +4,7 @@ import inspect
 import os
 import operator
 import psutil
+import re
 import sys
 
 from collections import deque
@@ -66,11 +67,13 @@ def _get_obj_count_difference(objs1, objs2):
 def _format_obj_count(obj_count):
     """Formats object count."""
     result = []
+    regex = re.compile(r'<(?P<type>\w+) \'(?P<name>\S+)\'>')
     for obj_type, obj_count in obj_count.items():
-        if obj_count == 0:
-            continue
-        pretty_type = repr(obj_type).split()[1].strip("'>")
-        result.append((pretty_type, obj_count))
+        if obj_count != 0:
+            match = re.findall(regex, repr(obj_type))
+            t, name = match[0]
+            pretty_type = 'instance' if t == 'class' else 'class'
+            result.append(('%s %s' % (pretty_type, name), obj_count))
     return sorted(result, key=operator.itemgetter(1), reverse=True)
 
 
@@ -119,14 +122,21 @@ class CodeEventsTracker(object):
         return self._trace_memory_usage
 
     def get_obj_overhead(self):
-        """Returns all objects that are counted as profiler overhead."""
+        """Returns all objects that are counted as profiler overhead.
+
+        Objects are hardcoded for convenience.
+        """
         overhead = [
             self,
             self.events_list,
             self._all_code,
         ]
         overhead.extend(self.events_list)
-        return _get_object_count_by_type(overhead)
+        overhead_count = _get_object_count_by_type(overhead)
+        # One for reference to __dict__ and one for reference to
+        # the current module.
+        overhead_count[dict] += 2
+        return overhead_count
 
 
 class MemoryProfile(base_profile.BaseProfile):
@@ -194,7 +204,6 @@ class MemoryProfile(base_profile.BaseProfile):
 
         # existing_objects list is also profiler overhead
         result_obj_count[list] -= 1
-
         pretty_obj_count = _format_obj_count(result_obj_count)
         return {
             'objectName': self._object_name,  # Set on run dispatching.
