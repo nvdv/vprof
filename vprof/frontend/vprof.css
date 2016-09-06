@@ -95,15 +95,21 @@ svg {
 }
 
 .memory-objects-table {
+  background: white;
+  display: table;
   font-size: 14px;
+  margin: 10px;
   overflow: scroll;
   width: 25%;
-  margin: 10px;
 }
 
 .memory-table-header {
   background: #BCBCBC;
   font-weight: bold;
+}
+
+.memory-table-row:nth-child(even) {
+  background-color: #F2F2F2
 }
 
 .memory-graph {
