@@ -33,19 +33,23 @@ function MemoryChart(parent, data) {
   this.data_ = data;
   this.parent_ = parent;
 
-  // Memory view div  size should be specified in CSS to render
+  // Memory view div size should be specified in CSS to render
   // SVG graph correctly.
   this.memoryView_ = this.parent_.append('div')
     .attr('class', 'memory-info');
+  this.objectsTable_ = this.memoryView_.append('div')
+    .attr('class', 'memory-table-wrapper') // To display overflow correctly.
+    .append('div')
+    .attr('class', 'memory-objects-table');
   this.memoryUsageGraph_ = this.memoryView_.append('div')
     .attr('class', 'memory-usage-graph');
-  this.objectsTable_ = this.memoryView_.append('div')
-    .attr('class', 'memory-objects-table');
 
+  this.TABLE_WIDTH = this.objectsTable_.node().scrollWidth;
   this.HEIGHT = this.memoryUsageGraph_.node().scrollHeight - this.PAD_SIZE;
   this.WIDTH = this.memoryUsageGraph_.node().scrollWidth - this.PAD_SIZE;
   this.GRAPH_HEIGHT = this.HEIGHT - (this.MARGIN_TOP + this.MARGIN_BOTTOM);
-  this.GRAPH_WIDTH = this.WIDTH - (this.MARGIN_LEFT + this.MARGIN_RIGHT);
+  this.GRAPH_WIDTH = this.TABLE_WIDTH + this.WIDTH - (
+      this.MARGIN_LEFT + this.MARGIN_RIGHT);
   this.AXIS_TEXT_X = this.GRAPH_WIDTH;
   this.AXIS_TEXT_Y = 12;
   this.AXIS_TEXT_Y_OFFSET = 30;
@@ -313,7 +317,7 @@ MemoryChart.prototype.redrawFocus_ = function(canvas, focus, tooltip,
     this.data_.codeEvents[closestIndex]);
   tooltip.attr('class', 'tooltip tooltip-visible')
     .html(tooltipText)
-    .style('left', closestX)
+    .style('left', this.TABLE_WIDTH + closestX)
     .style('top', closestY - this.TOOLTIP_OFFSET);
 
   if (this.currZoomRange_.zoomIndexRange > this.MAX_ZOOM_POINTS) {
@@ -398,6 +402,14 @@ MemoryChart.prototype.renderHelp_ = function() {
 
 /** Renders object count table. */
 MemoryChart.prototype.renderObjectsTable_ = function() {
+  var tableName = this.objectsTable_.append('tr')
+    .attr('class', 'memory-table-name');
+
+  tableName.append('td')
+    .text('Objects left in memory');
+  tableName.append('td')
+    .text('');
+
   var tableHeader = this.objectsTable_.append('tr')
     .attr('class', 'memory-table-header');
 

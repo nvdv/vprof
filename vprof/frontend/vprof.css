@@ -94,18 +94,40 @@ svg {
   width: 75%;
 }
 
-.memory-objects-table {
-  background: white;
-  display: table;
-  font-size: 14px;
-  margin: 10px;
+.memory-table-wrapper {
   overflow: scroll;
   width: 25%;
+}
+
+.memory-objects-table {
+  display: table;
+  background: white;
+  font-size: 14px;
+  margin: 5px;
+  margin-right: 10px;
+  width: 100%;
+}
+
+.memory-objects-table td {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.memory-objects-table tr:hover {
+  background-color: #fd8d3c;
 }
 
 .memory-table-header {
   background: #BCBCBC;
   font-weight: bold;
+}
+
+.memory-table-name {
+  background: #F1F1F1;
+  font-weight: bold;
+  text-align: center;
+  padding: 3px;
+  width: 100%;
 }
 
 .memory-table-row:nth-child(even) {
