@@ -8,12 +8,12 @@ body {
 }
 
 a:link {
-  color: #3182bd;
+  color: #3182BD;
   text-decoration: none;
 }
 
 a:visited {
-  color: #756bb1;
+  color: #756BB1;
   text-decoration: none;
 }
 
@@ -135,29 +135,29 @@ svg {
 }
 
 .memory-graph {
-  fill: #9edae5;
+  fill: #9EDAE5;
   opacity: 0.6;
-  stroke: #17becf;
+  stroke: #17BECF;
   stroke-width: 2px;
 }
 
 .memory-graph-focus {
-  fill: #e6550d;
+  fill: #E6550D;
 }
 
 .memory-graph-dot {
-  fill: #6baed6;
+  fill: #6BAED6;
 }
 
 .focus-line {
-  stroke: #e6550d;
+  stroke: #E6550D;
   stroke-dasharray: 4;
 }
 
 .focus-line-highlight {
-  fill: #fd8d3c;
+  fill: #FD8D3C;
   opacity: 0.3;
-  stroke: #e6550d;
+  stroke: #E6550D;
   stroke-width: 2px;
 }
 
