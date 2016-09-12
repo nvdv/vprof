@@ -76,7 +76,7 @@ def _format_obj_count(obj_count):
     return sorted(result, key=operator.itemgetter(1), reverse=True)
 
 
-class CodeEventsTracker(object):
+class _CodeEventsTracker(object):
     """Tracks specified events during code execution.
 
     Class that contains all logic related to measuring memory usage after
@@ -149,7 +149,7 @@ class MemoryProfile(base_profile.BaseProfile):
         import runpy
         pkg_code = base_profile.get_package_code(
             self._run_object, name_is_path=True)
-        with CodeEventsTracker() as prof:
+        with _CodeEventsTracker() as prof:
             for _, compiled_code in pkg_code.values():
                 prof.add_code(compiled_code)
             try:
@@ -162,7 +162,7 @@ class MemoryProfile(base_profile.BaseProfile):
         """Runs program as module."""
         try:
             with open(self._run_object, 'rb') as srcfile,\
-                CodeEventsTracker() as prof:
+                _CodeEventsTracker() as prof:
                 code = compile(srcfile.read(), self._run_object, 'exec')
                 prof.add_code(code)
                 exec(code, self._globs, None)
@@ -174,7 +174,7 @@ class MemoryProfile(base_profile.BaseProfile):
         """Runs object as package in Python namespace."""
         import runpy
         pkg_code = base_profile.get_package_code(self._run_object)
-        with CodeEventsTracker() as prof:
+        with _CodeEventsTracker() as prof:
             for _, compiled_code in pkg_code.values():
                 prof.add_code(compiled_code)
             try:
@@ -185,7 +185,7 @@ class MemoryProfile(base_profile.BaseProfile):
 
     def run_as_function(self):
         """Runs object as function."""
-        with CodeEventsTracker() as prof:
+        with _CodeEventsTracker() as prof:
             prof.add_code(self._run_object.__code__)
             self._run_object(*self._run_args, **self._run_kwargs)
         return prof

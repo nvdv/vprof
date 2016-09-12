@@ -14,7 +14,7 @@ except ImportError:
 
 class CodeHeatmapCalculator(unittest.TestCase):
     def setUp(self):
-        self._calc = object.__new__(code_heatmap.CodeHeatmapCalculator)
+        self._calc = object.__new__(code_heatmap._CodeHeatmapCalculator)
 
     def testInit(self):
         self._calc.__init__()

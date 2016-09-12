@@ -34,7 +34,7 @@ class GetObjCountDifferenceUnittest(unittest.TestCase):
 
 class CodeEventsTrackerUnittest(unittest.TestCase):
     def setUp(self):
-        self._tracker = object.__new__(memory_profile.CodeEventsTracker)
+        self._tracker = object.__new__(memory_profile._CodeEventsTracker)
 
     def testAddCode(self):
         code = mock.MagicMock()

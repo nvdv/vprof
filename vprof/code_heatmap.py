@@ -8,7 +8,7 @@ from collections import defaultdict
 from vprof import base_profile
 
 
-class CodeHeatmapCalculator(object):
+class _CodeHeatmapCalculator(object):
     """Calculates Python code heatmap.
 
     Class that contains all logic related to calculating execution heatmap
@@ -112,7 +112,7 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
         import runpy
         pkg_code = base_profile.get_package_code(
             self._run_object, name_is_path=True)
-        with CodeHeatmapCalculator() as prof:
+        with _CodeHeatmapCalculator() as prof:
             for _, compiled_code in pkg_code.values():
                 prof.add_code(compiled_code)
             try:
@@ -125,7 +125,7 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
         """Runs program as module."""
         try:
             with open(self._run_object, 'r') as srcfile,\
-                CodeHeatmapCalculator() as prof:
+                _CodeHeatmapCalculator() as prof:
                 src_code = srcfile.read()
                 code = compile(src_code, self._run_object, 'exec')
                 prof.add_code(code)
@@ -145,7 +145,7 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
         """Runs program as package in Python namespace."""
         import runpy
         pkg_code = base_profile.get_package_code(self._run_object)
-        with CodeHeatmapCalculator() as prof:
+        with _CodeHeatmapCalculator() as prof:
             for _, compiled_code in pkg_code.values():
                 prof.add_code(compiled_code)
             try:
@@ -156,7 +156,7 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
 
     def run_as_function(self):
         """Runs object as function."""
-        with CodeHeatmapCalculator() as prof:
+        with _CodeHeatmapCalculator() as prof:
             prof.add_code(self._run_object.__code__)
             self._run_object(*self._run_args, **self._run_kwargs)
         code_lines, start_line = inspect.getsourcelines(self._run_object)
