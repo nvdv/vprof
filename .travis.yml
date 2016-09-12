@@ -10,6 +10,9 @@ addons:
     packages:
       - npm
 
+before_install:
+    - nvm install node
+
 install:
   - python setup.py deps_install
 
