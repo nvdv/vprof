@@ -21,7 +21,7 @@ a:hover {
   text-decoration: underline;
 }
 
-.tab-header {
+.main-tab-header {
   margin: 0;
 }
 
@@ -33,7 +33,7 @@ a:hover {
   display: none;
 }
 
-.tab-content {
+.main-tab-content {
   background: #F1F1F1;
   height: 96%;
 }
@@ -62,7 +62,7 @@ a:hover {
   display: block;
 }
 
-.tab-header li {
+.main-tab-header li {
   border-radius: 5px 5px 0px 0px;
   font-family: 'Tahoma', Geneva, sans-serif;
   font-size: 15px;
@@ -71,11 +71,11 @@ a:hover {
   padding: 3 30px;
 }
 
-.selected {
+.main-tab-selected {
   background: #F1F1F1;
 }
 
-.not-selected {
+.main-tab-not-selected {
   background: #BCBCBC;
 }
 
@@ -84,7 +84,7 @@ svg {
   padding: 5px;
 }
 
-.memory-info {
+.memory-info-container {
   display: flex;
   flex-direction: row;
   height: 100%;
@@ -95,7 +95,8 @@ svg {
 }
 
 .memory-table-wrapper {
-  overflow: scroll;
+  overflow-x: scroll;
+  overflow-y: auto;
   width: 25%;
 }
 
@@ -149,42 +150,42 @@ svg {
   fill: #6BAED6;
 }
 
-.focus-line {
+.memory-graph-focus-line {
   stroke: #E6550D;
   stroke-dasharray: 4;
 }
 
-.focus-line-highlight {
+.memory-graph-focus-line-highlight {
   fill: #FD8D3C;
   opacity: 0.3;
   stroke: #E6550D;
   stroke-width: 2px;
 }
 
-.rect-normal {
+.flame-graph-rect-normal {
   opacity: 0.85;
   stroke: white;
   stroke-width: 2;
 }
 
-.rect-hightlight {
+.flame-graph-rect-hightlight {
   opacity: 0.85;
   stroke: white;
   stroke-width: 4;
 }
 
-.tooltip-visible {
+.content-tooltip-visible {
   display: block;
 }
 
-.tooltip-invisible {
+.content-tooltip-invisible {
   display: none;
 }
 
-.legend {
+.content-legend {
   background: #BCBCBC;
   border: 0px;
-  border-radius: 5px;
+  border-radius: 5px-container;
   font: 15px sans-serif;
   opacity: 0.9;
   padding: 8px;
@@ -193,28 +194,19 @@ svg {
   text-align: center;
 }
 
-.axis {
+.memory-graph-axis {
   fill: none;
   stroke: #636363;
   stroke-width: 2px;
 }
 
-.axis text {
+.memory-graph-axis text {
   fill: black;
   stroke: none;
   text-anchor: end;
 }
 
-.tick text{
-  fill: black;
-  stroke: none;
-}
-
-.bar {
-  fill: #003399;
-}
-
-.tooltip {
+.content-tooltip {
   background: white;
   border: 0px;
   border-radius: 5px;
@@ -237,18 +229,18 @@ p {
   flex-direction: row;
 }
 
-.module-list {
+.heatmap-module-list {
   padding: 8px;
   padding-left: 50px;
   width: 25%;
 }
 
-.module-header {
+.meatmap-module-header {
   font-size: 14px;
   padding-top: 10px;
 }
 
-.module-name {
+.heatmap-module-name {
   direction: ltr;
   font-family: "Lucida Sans Typewriter", "Lucida Console", Monaco;
   font-size: 12px;
@@ -257,40 +249,40 @@ p {
   white-space: pre;
 }
 
-.code-container {
+.heatmap-code-container {
   min-width: 45%;
   overflow-x: auto;
   overflow-y: auto;
   padding: 5px;
 }
 
-.src-file {
+.heatmap-src-file {
   padding-bottom: 15px;
 }
 
-.src-code {
+.heatmap-src-code {
   background: #FBFBFB;
   font-family: "Lucida Sans Typewriter", "Lucida Console", Monaco;
   font-size: 12px;
   white-space: pre;
 }
 
-.src-code-header {
+.heatmap-src-code-header {
   font-family: "Lucida Sans Typewriter", "Lucida Console", Monaco;
   font-size: 12px;
 }
 
-.src-line-normal {
+.heatmap-src-line-normal {
   display: block;
   opacity: 1;
 }
 
-.src-line-highlight {
+.heatmap-src-line-highlight {
   display: block;
   opacity: 0.6;
 }
 
-.src-line-number {
+.heatmap-src-line-number {
   background-color: #D2D7D3;
   display: table-cell;
   text-align: right;
@@ -298,17 +290,17 @@ p {
   width: 28px;
 }
 
-.src-line-code {
+.heatmap-src-line-code {
   display: table-cell;
   padding-left: 5px;
 }
 
-.skip-line {
+.heatmap-skip-line {
   padding: 5px;
   text-align: center;
 }
 
-#progress-indicator {
+#main-progress-indicator {
   background: url('progress.gif') no-repeat center center;
   background-color: #F1F1F1;
   height: 100%;

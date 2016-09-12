@@ -45,21 +45,21 @@ FlameGraph.prototype.render = function() {
     .attr('height', this.HEIGHT);
 
   var tooltip = this.parent_.append('div')
-    .attr('class', 'tooltip tooltip-invisible');
+    .attr('class', 'content-tooltip content-tooltip-invisible');
 
   this.renderLegend_();
   this.renderHelp_();
 
-  var cells = canvas.selectAll(".cell")
+  var cells = canvas.selectAll(".flame-graph-cell")
     .data(this.flameGraph_.nodes(this.data_.callStats))
     .enter()
     .append('g')
-    .attr('class', 'cell');
+    .attr('class', 'flame-graph-cell');
 
   // Render flame graph nodes.
   var self = this;
   var nodes = cells.append('rect')
-    .attr('class', 'rect-normal')
+    .attr('class', 'flame-graph-rect-normal')
     .attr('x', function(d) {
       self.maybeRecalcNode_(d);
       return self.xScale_(d.x); })
@@ -176,11 +176,11 @@ FlameGraph.prototype.redrawTitles_ = function(titles) {
  * @param {Object} node - Object representing function call info.
  */
 FlameGraph.prototype.showTooltip_ = function(element, tooltip, node) {
-  d3.select(element).attr('class', 'rect-highlight');
+  d3.select(element).attr('class', 'flame-graph-rect-highlight');
   var timePercentage = FlameGraph.getTimePercentage_(
       node.cumTime, this.data_.runTime);
   var functionName = node.funcName.replace('<', '[').replace('>',  ']');
-  tooltip.attr('class', 'tooltip tooltip-visible')
+  tooltip.attr('class', 'content-tooltip content-tooltip-visible')
     .html('<p><b>Function name:</b> ' + functionName + '</p>' +
           '<p><b>Location:</b> ' + node.moduleName +'</p>' +
           '<p><b>Line number:</b> ' + node.lineno + '</p>' +
@@ -198,14 +198,14 @@ FlameGraph.prototype.showTooltip_ = function(element, tooltip, node) {
  * @param {Object} tooltip - Element representing tooltip.
  */
 FlameGraph.prototype.hideTooltip_ = function(element, tooltip) {
-  d3.select(element).attr('class', 'rect-normal');
-  tooltip.attr('class', 'tooltip tooltip-invisible');
+  d3.select(element).attr('class', 'flame-graph-rect-normal');
+  tooltip.attr('class', 'content-tooltip content-tooltip-invisible');
 };
 
 /** Renders flame graph legend. */
 FlameGraph.prototype.renderLegend_ = function() {
   this.parent_.append('div')
-    .attr('class', 'legend')
+    .attr('class', 'content-legend')
     .html('<p><b>Object name:</b> ' + this.data_.objectName + '</p>' +
           '<p><b>Total runtime:</b> ' + this.data_.runTime + 's</p>' +
           '<p><b>Total calls:</b> ' + this.data_.totalCalls + '</p>' +

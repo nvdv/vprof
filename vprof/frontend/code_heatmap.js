@@ -41,34 +41,34 @@ CodeHeatmap.prototype.render = function() {
   this.renderHelp_();
 
   var moduleList = pageContainer.append('div')
-    .attr('class', 'module-list');
+    .attr('class', 'heatmap-module-list');
 
   moduleList.append('div')
-    .attr('class', 'module-header')
+    .attr('class', 'heatmap-module-header')
     .html('Inspected modules');
 
-  moduleList.selectAll('.module-name')
+  moduleList.selectAll('.heatmap-module-name')
     .data(this.data_)
     .enter()
     .append('a')
     .attr('href', function(d) { return '#' + d.objectName; })
     .append('div')
-    .attr('class', 'module-name')
+    .attr('class', 'heatmap-module-name')
     .append('text')
     .html(function(d) { return d.objectName; });
 
   var codeContainer = pageContainer.append('div')
-    .attr('class', 'code-container');
+    .attr('class', 'heatmap-code-container');
 
   var heatmapContainer = codeContainer.selectAll('div')
     .data(this.data_)
     .enter()
     .append('div')
-    .attr('class', 'src-file');
+    .attr('class', 'heatmap-src-file');
 
   heatmapContainer.append('a')
     .attr('href', function(d) { return '#' + d.objectName; })
-    .attr('class', 'src-code-header')
+    .attr('class', 'heatmap-src-code-header')
     .attr('id', function(d) { return d.objectName; })
     .append('text')
     .html(function(d) { return d.objectName; });
@@ -81,17 +81,17 @@ CodeHeatmap.prototype.render = function() {
   }
 
   var fileContainers = heatmapContainer.append('div')
-    .attr('class', 'src-code')
+    .attr('class', 'heatmap-src-code')
     .append('text')
     .html(function(_, i) { return renderedSources[i].srcCode; });
 
   var tooltip = pageContainer.append('div')
-    .attr('class', 'tooltip tooltip-invisible');
+    .attr('class', 'content-tooltip content-tooltip-invisible');
 
   var self = this;
-  codeContainer.selectAll('.src-file')
+  codeContainer.selectAll('.heatmap-src-file')
     .each(function(_, i) {
-      d3.select(fileContainers[0][i]).selectAll('.src-line-normal')
+      d3.select(fileContainers[0][i]).selectAll('.heatmap-src-line-normal')
         .on('mouseover', function(_, j) {
           var runCount = renderedSources[i].lineMap[j];
           if(runCount) {
@@ -107,8 +107,8 @@ CodeHeatmap.prototype.render = function() {
  * @param {number} runCount - Number of line runs.
  */
 CodeHeatmap.prototype.showTooltip_ = function(element, tooltip, runCount) {
-  d3.select(element).attr('class', 'src-line-highlight');
-  tooltip.attr('class', 'tooltip tooltip-visible')
+  d3.select(element).attr('class', 'heatmap-src-line-highlight');
+  tooltip.attr('class', 'content-tooltip content-tooltip-visible')
     .html('<b>Execution count: </b>' + runCount)
     .style('left', d3.event.pageX)
     .style('top', d3.event.pageY);
@@ -120,8 +120,8 @@ CodeHeatmap.prototype.showTooltip_ = function(element, tooltip, runCount) {
  * @param {Object} tooltip - Element representing tooltip.
  */
 CodeHeatmap.prototype.hideTooltip_ = function(element, tooltip) {
-  d3.select(element).attr('class', 'src-line-normal');
-  tooltip.attr('class', 'tooltip tooltip-invisible');
+  d3.select(element).attr('class', 'heatmap-src-line-normal');
+  tooltip.attr('class', 'content-tooltip content-tooltip-invisible');
 };
 
 /**
@@ -142,7 +142,8 @@ CodeHeatmap.prototype.renderCode_ = function(srcCode, heatmap) {
       srcIndex++;
     } else if (srcCode[i][0] === 'skip') {
       resultCode.push(
-          "<div class='skip-line'>" + srcCode[i][1] + ' lines skipped</div>');
+          "<div class='heatmap-skip-line'>" + srcCode[i][1] +
+          ' lines skipped</div>');
     }
   }
   return {'srcCode': resultCode.join(''), 'lineMap': lineMap};
@@ -159,10 +160,10 @@ CodeHeatmap.prototype.formatSrcLine_ = function(lineNumber, codeLine, runCount) 
   var highlightedLine = hljs.highlight('python', codeLine).value;
   var backgroundColor = runCount ? this.heatmapScale_(runCount) : '';
   return (
-      "<div class='src-line-normal' style='background-color: " +
+      "<div class='heatmap-src-line-normal' style='background-color: " +
         backgroundColor + "'>" +
-          "<div class='src-line-number'>" + lineNumber + "</div>" +
-          "<div class='src-line-code'>" + highlightedLine + "</div>" +
+          "<div class='heatmap-src-line-number'>" + lineNumber + "</div>" +
+          "<div class='heatmap-src-line-code'>" + highlightedLine + "</div>" +
       "</div>");
 };
 

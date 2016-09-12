@@ -36,7 +36,7 @@ function MemoryChart(parent, data) {
   // Memory view div size should be specified in CSS to render
   // SVG graph correctly.
   this.memoryView_ = this.parent_.append('div')
-    .attr('class', 'memory-info');
+    .attr('class', 'memory-info-container');
   this.objectsTable_ = this.memoryView_.append('div')
     .attr('class', 'memory-table-wrapper') // To display overflow correctly.
     .append('div')
@@ -110,7 +110,7 @@ MemoryChart.prototype.render = function() {
           'translate(' + this.MARGIN_LEFT + ',' + this.MARGIN_TOP + ')');
 
   var tooltip = this.memoryUsageGraph_.append('div')
-    .attr('class', 'tooltip tooltip-invisible');
+    .attr('class', 'content-tooltip content-tooltip-invisible');
 
   this.renderObjectsTable_();
   this.renderLegend_();
@@ -127,13 +127,13 @@ MemoryChart.prototype.render = function() {
     .attr('transform',
           'translate(' + (-100) + ', '  + (-100) + ')');  // Hide focus.
   var focusXLine = canvas.append('line')
-    .attr('class', 'focus-line')
+    .attr('class', 'memory-graph-focus-line')
     .attr('y1', this.GRAPH_HEIGHT);
   var focusYLine = canvas.append('line')
-    .attr('class', 'focus-line')
+    .attr('class', 'memory-graph-focus-line')
     .attr('x1', 0);
   var focusHiglightArc = canvas.append('path')
-    .attr('class', 'focus-line-highlight');
+    .attr('class', 'memory-graph-focus-line-highlight');
 
   var self = this;
   canvas.style('pointer-events', 'all')
@@ -146,7 +146,7 @@ MemoryChart.prototype.render = function() {
 
   // Draw axes.
   canvas.append('g')
-    .attr('class', 'x axis')
+    .attr('class', 'x memory-graph-axis')
     .attr('transform', 'translate(0,' + this.GRAPH_HEIGHT + ')')
     .call(this.xAxis_)
     .append('text')
@@ -156,7 +156,7 @@ MemoryChart.prototype.render = function() {
     .text('Executed lines');
 
   canvas.append('g')
-    .attr('class', 'y axis')
+    .attr('class', 'y memory-graph-axis')
     .call(this.yAxis_)
     .append('text')
     .attr('transform', 'rotate(-90)')
@@ -198,7 +198,7 @@ MemoryChart.prototype.zoomIn_ = function(path, canvas, focus, tooltip,
         this.currZoomRange_.zoomIndexStart,
         this.currZoomRange_.zoomIndexEnd + 1);
     path.attr('d', this.memoryGraph_(eventsSlice));
-    canvas.selectAll('g.x.axis')
+    canvas.selectAll('g.x.memory-graph-axis')
       .call(this.xAxis_);
 
     var closestX = this.xScale_(this.data_.codeEvents[midIndex][0]);
@@ -213,7 +213,7 @@ MemoryChart.prototype.zoomIn_ = function(path, canvas, focus, tooltip,
       .attr('y2', closestY);
     var tooltipText = MemoryChart.generateTooltipText_(
         this.data_.codeEvents[midIndex]);
-    tooltip.attr('class', 'tooltip tooltip-visible')
+    tooltip.attr('class', 'content-tooltip content-tooltip-visible')
       .html(tooltipText)
       .style('left', closestX)
       .style('top', closestY - this.TOOLTIP_OFFSET);
@@ -241,14 +241,14 @@ MemoryChart.prototype.zoomOut_ = function(path, canvas) {
   path.attr('d', this.memoryGraph_(this.data_.codeEvents));
   this.xAxis_.ticks(
       Math.min(this.TICKS_NUMBER, this.data_.codeEvents.length));
-  canvas.selectAll('g.x.axis')
+  canvas.selectAll('g.x.memory-graph-axis')
     .call(this.xAxis_);
 };
 
 /** Renders memory chart legend. */
 MemoryChart.prototype.renderLegend_ = function() {
   this.parent_.append('div')
-    .attr('class', 'legend')
+    .attr('class', 'content-legend')
     .html('<p><b>Object name:</b> ' + this.data_.objectName + '</p>' +
           '<p><b>Total lines executed:</b> ' + this.data_.totalEvents + '</p>')
     .style('left', this.LEGEND_X)
@@ -266,7 +266,7 @@ MemoryChart.prototype.renderLegend_ = function() {
 MemoryChart.prototype.hideFocus_ = function(focus, tooltip, focusXLine,
     focusYLine, focusHiglightArc) {
   focus.style('display', 'none');
-  tooltip.attr('class', 'tooltip tooltip-invisible');
+  tooltip.attr('class', 'content-tooltip content-tooltip-invisible');
   focusXLine.style('display', 'none');
   focusYLine.style('display', 'none');
   focusHiglightArc.style('display', 'none');
@@ -315,7 +315,7 @@ MemoryChart.prototype.redrawFocus_ = function(canvas, focus, tooltip,
     .attr('y2', closestY);
   var tooltipText = MemoryChart.generateTooltipText_(
     this.data_.codeEvents[closestIndex]);
-  tooltip.attr('class', 'tooltip tooltip-visible')
+  tooltip.attr('class', 'content-tooltip content-tooltip-visible')
     .html(tooltipText)
     .style('left', this.TABLE_WIDTH + closestX)
     .style('top', closestY - this.TOOLTIP_OFFSET);

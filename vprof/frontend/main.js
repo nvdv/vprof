@@ -15,13 +15,13 @@ var JSON_URI = 'profile';
 var POLL_INTERVAL = 200;  // msec
 
 /**
- * Creates empty div with specified ID and class tab-content.
+ * Creates empty div with specified ID.
  * @param {string} id - div ID.
  */
 function createTabContent_(id) {
   return d3.select('body')
     .append('div')
-    .attr('class', 'tab-content')
+    .attr('class', 'main-tab-content')
     .attr('id', id);
 }
 
@@ -37,10 +37,10 @@ function createFlameGraphTab_(parent, status) {
     .text('Flame graph')
     .on('click', function(d) {
       d3.selectAll('li')
-        .attr('class', 'not-selected');
+        .attr('class', 'main-tab-not-selected');
       d3.select(this)
-        .attr('class', 'selected');
-      showTab_('flame-graph');
+        .attr('class', 'main-tab-selected');
+      showTab_('flame-graph-tab');
     });
 }
 
@@ -56,10 +56,10 @@ function createMemoryChartTab_(parent, status) {
     .text('Memory stats')
     .on('click', function(d) {
       d3.selectAll('li')
-        .attr('class', 'not-selected');
+        .attr('class', 'main-tab-not-selected');
       d3.select(this)
-        .attr('class', 'selected');
-      showTab_('memory-chart');
+        .attr('class', 'main-tab-selected');
+      showTab_('memory-chart-tab');
     });
 }
 
@@ -75,10 +75,10 @@ function createCodeHeatmapTab_(parent, status) {
     .text('Code heatmap')
     .on('click', function(d) {
       d3.selectAll('li')
-        .attr('class', 'not-selected');
+        .attr('class', 'main-tab-not-selected');
       d3.select(this)
-        .attr('class', 'selected');
-      showTab_('code-heatmap');
+        .attr('class', 'main-tab-selected');
+      showTab_('code-heatmap-tab');
     });
 }
 
@@ -93,29 +93,29 @@ function renderPage(data) {
 
   var tabHeader = d3.select('body')
     .append('ul')
-    .attr('class', 'tab-header');
+    .attr('class', 'main-tab-header');
 
   var props = Object.keys(data);
   props.sort();
   for (var i = 0; i < props.length; i++) {
-    var status = (i === 0) ? 'selected' : 'not-selected';
+    var status = (i === 0) ? 'main-tab-selected' : 'main-tab-not-selected';
     var displayClass = (i === 0) ? 'active-tab' : 'inactive-tab';
     switch (props[i]) {
     case 'c':
       createFlameGraphTab_(tabHeader, status);
-      var flameGraph = createTabContent_('flame-graph');
+      var flameGraph = createTabContent_('flame-graph-tab');
       flameGraphModule.renderFlameGraph(data.c, flameGraph);
       flameGraph.classed(displayClass, true);
       break;
     case 'm':
       createMemoryChartTab_(tabHeader, status);
-      var memoryChart = createTabContent_('memory-chart');
+      var memoryChart = createTabContent_('memory-chart-tab');
       memoryStatsModule.renderMemoryStats(data.m, memoryChart);
       memoryChart.classed(displayClass, true);
       break;
     case 'h':
       createCodeHeatmapTab_(tabHeader, status);
-      var codeHeatmap = createTabContent_('code-heatmap');
+      var codeHeatmap = createTabContent_('code-heatmap-tab');
       codeHeatmapModule.renderCodeHeatmap(data.h, codeHeatmap);
       codeHeatmap.classed(displayClass, true);
       break;
@@ -145,7 +145,7 @@ function handleHelpDisplay(e) {
   * @param {string} tabId - Next active tab identifier.
   */
 function showTab_(tabId) {
-  d3.selectAll('.tab-content')
+  d3.selectAll('.main-tab-content')
    .classed({'active-tab': false, 'inactive-tab': true});
   d3.select('#' + tabId)
    .classed({'active-tab': true, 'inactive-tab': false});
@@ -155,7 +155,7 @@ function showTab_(tabId) {
 function main() {
   var progressIndicator = d3.select('body')
     .append('div')
-    .attr('id', 'progress-indicator');
+    .attr('id', 'main-progress-indicator');
 
   // TODO (nvdv): Simplify this code.
   d3.json(JSON_URI, function(data) {
