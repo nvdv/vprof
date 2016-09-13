@@ -50,7 +50,7 @@ function MemoryChart(parent, data) {
   this.GRAPH_HEIGHT = this.HEIGHT - (this.MARGIN_TOP + this.MARGIN_BOTTOM);
   this.GRAPH_WIDTH = this.TABLE_WIDTH + this.WIDTH - (
       this.MARGIN_LEFT + this.MARGIN_RIGHT);
-  this.AXIS_TEXT_X = this.GRAPH_WIDTH;
+  this.AXIS_TEXT_X = this.GRAPH_WIDTH - this.TABLE_WIDTH;
   this.AXIS_TEXT_Y = 12;
   this.AXIS_TEXT_Y_OFFSET = 30;
   this.LEGEND_X = this.GRAPH_WIDTH - 350;
