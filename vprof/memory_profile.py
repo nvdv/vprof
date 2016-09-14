@@ -108,7 +108,7 @@ class _CodeEventsTracker(object):
         """Tracks memory usage when specified events occur."""
         if event == 'line' and frame.f_code in self._all_code:
             curr_memory = _get_memory_usage()
-            if (self.events_list and self.events_list[-1][2] == event and
+            if (self.events_list and
                     self.events_list[-1][0] == frame.f_lineno and
                     self.events_list[-1][1] != curr_memory):
                 # Update previous if memory usage is greater on the same line.
@@ -116,7 +116,7 @@ class _CodeEventsTracker(object):
                     curr_memory, self.events_list[-1][1])
             else:
                 self.events_list.append(
-                    [frame.f_lineno, curr_memory, event,
+                    [frame.f_lineno, curr_memory,
                      frame.f_code.co_name, frame.f_code.co_filename])
         return self._trace_memory_usage
 
@@ -207,8 +207,8 @@ class MemoryProfile(base_profile.BaseProfile):
         return {
             'objectName': self._object_name,  # Set on run dispatching.
             'codeEvents': [
-                (i + 1, line, mem, event, func, fname)
-                for i, (line, mem, event, func, fname) in enumerate(
+                (i + 1, line, mem, func, fname)
+                for i, (line, mem, func, fname) in enumerate(
                     prof.events_list)],
             'totalEvents': len(prof.events_list),
             'objectsCount': pretty_obj_count

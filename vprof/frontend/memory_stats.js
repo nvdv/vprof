@@ -338,11 +338,11 @@ MemoryChart.prototype.redrawFocus_ = function(canvas, focus, tooltip,
 MemoryChart.generateTooltipText_ = function(stats) {
   var result = '';
   if (stats) {
-    var functionName = stats[4].replace('<', '[').replace('>',  ']');
+    var functionName = stats[3].replace('<', '[').replace('>',  ']');
     result += ('<p><b>Executed line:</b> ' + stats[0] + '</p>' +
                '<p><b>Line number:</b> ' + stats[1] + '</p>' +
                '<p><b>Function name:</b> ' + functionName + '</p>' +
-               '<p><b>Filename:</b> ' + stats[5] + '</p>' +
+               '<p><b>Filename:</b> ' + stats[4] + '</p>' +
                '<p><b>Memory usage:</b> ' + stats[2] + ' MB</p>');
   }
   return result;

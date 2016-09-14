@@ -42,8 +42,7 @@ class MemoryProfileModuleEndToEndTest(unittest.TestCase):
         first_event = stats['codeEvents'][0]
         self.assertEqual(first_event[0], 1)
         self.assertEqual(first_event[1], 1)
-        self.assertEqual(first_event[3], 'line')
-        self.assertEqual(first_event[4], '<module>')
+        self.assertEqual(first_event[3], '<module>')
 
 
 class MemoryProfilePackageAsPathEndToEndTest(unittest.TestCase):
@@ -69,8 +68,7 @@ class MemoryProfilePackageAsPathEndToEndTest(unittest.TestCase):
         first_event = stats['codeEvents'][0]
         self.assertEqual(first_event[0], 1)
         self.assertEqual(first_event[1], 1)
-        self.assertEqual(first_event[3], 'line')
-        self.assertEqual(first_event[4], '<module>')
+        self.assertEqual(first_event[3], '<module>')
 
 
 class MemoryProfileImportedPackageEndToEndTest(unittest.TestCase):
@@ -96,8 +94,7 @@ class MemoryProfileImportedPackageEndToEndTest(unittest.TestCase):
         first_event = stats['codeEvents'][0]
         self.assertEqual(first_event[0], 1)
         self.assertEqual(first_event[1], 1)
-        self.assertEqual(first_event[3], 'line')
-        self.assertEqual(first_event[4], '<module>')
+        self.assertEqual(first_event[3], '<module>')
 
 
 class MemoryProfileFunctionEndToEndTest(unittest.TestCase):
