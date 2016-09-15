@@ -42,28 +42,9 @@ class CodeEventsTrackerUnittest(unittest.TestCase):
         self._tracker.add_code(code)
         self.assertIn(code, self._tracker._all_code)
 
-    def testTraceMemoryUsage_OtherCode(self):
-        frame, event, arg = mock.MagicMock(), 'line', mock.MagicMock()
-        self._tracker._all_code = set()
-        self._tracker.events_list = deque()
-        self._tracker._trace_memory_usage(frame, event, arg)
-        self.assertFalse(self._tracker.events_list)
-
-    @mock.patch('vprof.memory_profile._get_memory_usage')
-    def testTraceMemoryUsage_EmptyEventsList(self, get_memory_mock):
-        frame, event, arg = mock.MagicMock(), 'line', mock.MagicMock()
-        curr_memory = get_memory_mock.return_value
-        lineno, co_name = frame.f_lineno, frame.f_code.co_name
-        code, filename = frame.f_code, frame.f_code.co_filename
-        self._tracker._all_code = set((code,))
-        self._tracker.events_list = deque()
-        self._tracker._trace_memory_usage(frame, event, arg)
-        self.assertListEqual(
-            self._tracker.events_list[-1],
-            [lineno, curr_memory, co_name, filename])
-
-    @mock.patch('vprof.memory_profile._get_memory_usage')
-    def testTraceMemoryUsage_NormalUsage(self, get_memory_mock):
+    @mock.patch('vprof.memory_profile._get_memory_usage_for_process')
+    def testTraceMemoryUsage(self, get_memory_mock):
+        self._tracker._pid = mock.MagicMock()
         event, arg = 'line', mock.MagicMock()
         curr_memory = get_memory_mock.return_value
         frame1, frame2 = mock.MagicMock(), mock.MagicMock()
@@ -77,7 +58,7 @@ class CodeEventsTrackerUnittest(unittest.TestCase):
         fname1, fname2 = code1.co_filename, code2.co_filename
         fname3, fname4 = code3.co_filename, code4.co_filename
         self._tracker._all_code = set((code1, code2, code3, code4))
-        self._tracker.events_list = deque()
+        self._tracker._events_list = deque()
 
         self._tracker._trace_memory_usage(frame1, event, arg)
         self._tracker._trace_memory_usage(frame2, event, arg)
@@ -85,32 +66,54 @@ class CodeEventsTrackerUnittest(unittest.TestCase):
         self._tracker._trace_memory_usage(frame4, event, arg)
 
         self.assertEqual(
-            self._tracker.events_list,
-            deque(([1, curr_memory, name1, fname1],
-                   [2, curr_memory, name2, fname2],
-                   [3, curr_memory, name3, fname3],
-                   [4, curr_memory, name4, fname4])))
+            self._tracker._events_list,
+            deque(((1, curr_memory, name1, fname1),
+                   (2, curr_memory, name2, fname2),
+                   (3, curr_memory, name3, fname3),
+                   (4, curr_memory, name4, fname4))))
 
-    @mock.patch('vprof.memory_profile._get_memory_usage')
-    def testTraceMemoryUsage_SameLine(self, get_memory_mock):
-        event, arg = 'line', mock.MagicMock()
-        get_memory_mock.side_effect = [10, 20, 30, 40]
+    def testCodeEvents_NoDuplicates(self):
+        self._tracker._resulting_events = []
         frame1, frame2 = mock.MagicMock(), mock.MagicMock()
-        frame1.f_lineno, frame2.f_lineno = 1, 2
+        frame3, frame4 = mock.MagicMock(), mock.MagicMock()
+        code1, code2 = frame1.f_code, frame2.f_code
+        code3, code4 = frame3.f_code, frame4.f_code
+        name1, name2 = code1.co_name, code2.co_name
+        name3, name4 = code3.co_name, code4.co_name
+        fname1, fname2 = code1.co_filename, code2.co_filename
+        fname3, fname4 = code3.co_filename, code4.co_filename
+
+        self._tracker._events_list = deque((
+            (1, 1024 * 1024, name1, fname1),
+            (2, 1024 * 1024, name2, fname2),
+            (3, 1024 * 1024, name3, fname3),
+            (4, 1024 * 1024, name4, fname4)))
+
+        self.assertListEqual(
+            self._tracker.code_events,
+            [[1, 1, 1.0, name1, fname1],
+             [2, 2, 1.0, name2, fname2],
+             [3, 3, 1.0, name3, fname3],
+             [4, 4, 1.0, name4, fname4]])
+
+    def testCodeEvents_NoDuplicates(self):
+        self._tracker._resulting_events = []
+        frame1, frame2 = mock.MagicMock(), mock.MagicMock()
         code1, code2 = frame1.f_code, frame2.f_code
         name1, name2 = code1.co_name, code2.co_name
         fname1, fname2 = code1.co_filename, code2.co_filename
-        self._tracker._all_code = set((code1, code2))
-        self._tracker.events_list = deque()
 
-        self._tracker._trace_memory_usage(frame1, event, arg)
-        self._tracker._trace_memory_usage(frame1, event, arg)
-        self._tracker._trace_memory_usage(frame1, event, arg)
-        self._tracker._trace_memory_usage(frame2, event, arg)
+        self._tracker._events_list = deque((
+            (1, 1024 * 1024, name1, fname1),
+            (1, 1024 * 1024 * 2, name1, fname1),
+            (1, 1024 * 1024 * 3, name1, fname1),
+            (2, 1024 * 1024, name2, fname2)))
 
-        self.assertEqual(
-            self._tracker.events_list,
-            deque(([1, 30, name1, fname1],
-                   [2, 40, name2, fname2])))
+        self.assertListEqual(
+            self._tracker.code_events,
+            [[1, 1, 1.0, name1, fname1],
+             [2, 1, 2.0, name1, fname1],
+             [3, 1, 3.0, name1, fname1],
+             [4, 2, 1.0, name2, fname2]])
 
 # pylint: enable=protected-access, missing-docstring, too-many-locals

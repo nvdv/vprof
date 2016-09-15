@@ -44,10 +44,10 @@ def _process_in_memory_objects(objects):
         [obj for obj in objects if not inspect.isframe(obj)])
 
 
-def _get_memory_usage():
-    """Returns memory usage for current process."""
-    memory_info = psutil.Process(os.getpid()).memory_info()
-    return float(memory_info.rss) / _BYTES_IN_MB
+def _get_memory_usage_for_process(pid):
+    """Returns memory usage for process specified by pid."""
+    memory_info = psutil.Process(pid).memory_info()
+    return memory_info.rss
 
 
 def _get_object_count_by_type(objects):
@@ -85,8 +85,10 @@ class _CodeEventsTracker(object):
 
     def __init__(self):
         self._all_code = set()
-        self.events_list = deque()
+        self._events_list = deque()
         self._original_trace_function = sys.gettrace()
+        self._pid = os.getpid()
+        self._resulting_events = []
 
     def add_code(self, code):
         """Recursively adds code to be examined."""
@@ -107,30 +109,41 @@ class _CodeEventsTracker(object):
     def _trace_memory_usage(self, frame, event, arg):  #pylint: disable=unused-argument
         """Tracks memory usage when specified events occur."""
         if event == 'line' and frame.f_code in self._all_code:
-            curr_memory = _get_memory_usage()
-            if (self.events_list and
-                    self.events_list[-1][0] == frame.f_lineno and
-                    self.events_list[-1][1] != curr_memory):
-                # Update previous if memory usage is greater on the same line.
-                self.events_list[-1][1] = max(
-                    curr_memory, self.events_list[-1][1])
-            else:
-                self.events_list.append(
-                    [frame.f_lineno, curr_memory,
-                     frame.f_code.co_name, frame.f_code.co_filename])
+            curr_memory = _get_memory_usage_for_process(self._pid)
+            self._events_list.append(
+                (frame.f_lineno, curr_memory,
+                 frame.f_code.co_name, frame.f_code.co_filename))
         return self._trace_memory_usage
 
-    def get_obj_overhead(self):
+    @property
+    def code_events(self):
+        """Returns processed code events."""
+        if self._resulting_events:
+            return self._resulting_events
+        for i, (lineno, mem, func, fname) in enumerate(self._events_list):
+            mem_in_mb = float(mem) / _BYTES_IN_MB
+            if (self._resulting_events and
+                    self._resulting_events[-1][0] == lineno and
+                    self._resulting_events[-1][2] == func and
+                    self._resulting_events[-1][3] == fname and
+                    self._resulting_events[-1][1] < mem_in_mb):
+                self._resulting_events[-1][1] = mem_in_mb
+            else:
+                self._resulting_events.append(
+                    [i + 1, lineno, mem_in_mb, func, fname])
+        return self._resulting_events
+
+    @property
+    def obj_overhead(self):
         """Returns all objects that are counted as profiler overhead.
 
         Objects are hardcoded for convenience.
         """
         overhead = [
             self,
-            self.events_list,
+            self._events_list,
             self._all_code,
         ]
-        overhead.extend(self.events_list)
         overhead_count = _get_object_count_by_type(overhead)
         # One for reference to __dict__ and one for reference to
         # the current module.
@@ -196,20 +209,16 @@ class MemoryProfile(base_profile.BaseProfile):
         existing_objects = _get_in_memory_objects()
         prof = run_dispatcher()
         new_objects = _get_in_memory_objects()
-        profiler_overhead = prof.get_obj_overhead()
 
         new_obj_count = _get_obj_count_difference(new_objects, existing_objects)
-        result_obj_count = new_obj_count - profiler_overhead
+        result_obj_count = new_obj_count - prof.obj_overhead
 
         # existing_objects list is also profiler overhead
         result_obj_count[list] -= 1
         pretty_obj_count = _format_obj_count(result_obj_count)
         return {
             'objectName': self._object_name,  # Set on run dispatching.
-            'codeEvents': [
-                (i + 1, line, mem, func, fname)
-                for i, (line, mem, func, fname) in enumerate(
-                    prof.events_list)],
-            'totalEvents': len(prof.events_list),
+            'codeEvents': prof.code_events,
+            'totalEvents': len(prof.code_events),
             'objectsCount': pretty_obj_count
         }
