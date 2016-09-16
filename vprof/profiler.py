@@ -5,6 +5,7 @@ from collections import OrderedDict
 from six.moves import urllib
 from vprof import code_heatmap
 from vprof import memory_profile
+from vprof import stats_server
 from vprof import runtime_profile
 
 _PROFILERS = (
@@ -72,5 +73,6 @@ def run(func, options, args=(), kwargs={}, host='localhost', port=8000):  # pyli
         port: Port to send profilers.data.
     """
     run_stats = run_profilers((func, args, kwargs), options)
-    post_data = json.dumps(run_stats).encode('utf-8')
+    post_data = stats_server.compress_data(
+        json.dumps(run_stats).encode('utf-8'))
     urllib.request.urlopen('http://%s:%s' % (host, port), post_data)

@@ -1,16 +1,42 @@
 """Program stats server."""
 import functools
-import io
+import gzip
 import json
+import io
 import os
 import sys
 import webbrowser
 
+from six import BytesIO
 from six.moves import socketserver
 from six.moves import SimpleHTTPServer as http_server
 
 _STATIC_DIR = 'frontend'
 _PROFILE_HTML = '%s/profile.html' % _STATIC_DIR
+
+
+def compress_data(data):
+    """Compresses data with gzip.
+
+    Longer version is needed since gzip.compress is supported
+    in Python 3 only.
+    """
+    out_fileobj = BytesIO()
+    with gzip.GzipFile(fileobj=out_fileobj, mode="w") as f:
+        # Convert to bytes for Python 3
+        if sys.version_info[0] >= 3 and isinstance(data, str):
+            f.write(bytes(data, 'utf-8'))
+        else:
+            f.write(data)
+    return out_fileobj.getvalue()
+
+
+def decompress_data(data):
+    """Decompresses gzipped data."""
+    compressed_file = BytesIO(data)
+    with gzip.GzipFile(fileobj=compressed_file, mode="r") as f:
+        out_data = f.read()
+    return out_data
 
 
 class StatsServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
@@ -24,14 +50,14 @@ class StatsHandler(http_server.SimpleHTTPRequestHandler):
     def __init__(self, profile_json, *args, **kwargs):
         self._profile_json = profile_json
         self.uri_map = {
-            '/': self.handle_root,
-            '/profile': self.handle_profile,
+            '/': self._handle_root,
+            '/profile': self._handle_profile,
         }
         # Since this class is old-style - call parent method directly.
         http_server.SimpleHTTPRequestHandler.__init__(
             self, *args, **kwargs)
 
-    def handle_root(self):
+    def _handle_root(self):
         """Handles index.html requests."""
         res_filename = os.path.join(
             os.path.dirname(__file__), _PROFILE_HTML)
@@ -39,11 +65,11 @@ class StatsHandler(http_server.SimpleHTTPRequestHandler):
             content = res_file.read()
         return content, 'text/html'
 
-    def handle_profile(self):
+    def _handle_profile(self):
         """Handles profile stats requests."""
         return json.dumps(self._profile_json), 'text/json'
 
-    def handle_other(self):
+    def _handle_other(self):
         """Handles static files requests."""
         res_basename = os.path.basename(self.path)
         res_filename = os.path.join(
@@ -56,23 +82,23 @@ class StatsHandler(http_server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
         """Handles HTTP GET requests."""
-        handler = self.uri_map.get(self.path) or self.handle_other
+        handler = self.uri_map.get(self.path) or self._handle_other
         content, content_type = handler()
+        compressed_content = compress_data(content)
         self._send_response(
             200, headers=(('Content-type', '%s; charset=utf-8' % content_type),
-                          ('Content-Length', len(content))))
-        # Convert to bytes for Python 3.
-        if (sys.version_info[0] >= 3) and isinstance(content, str):
-            self.wfile.write(bytes(content, 'utf-8'))
-        else:
-            self.wfile.write(content)
+                          ('Content-Encoding', 'gzip'),
+                          ('Content-Length', len(compressed_content))))
+        self.wfile.write(compressed_content)
 
     def do_POST(self):
         """Handles HTTP POST requests."""
         post_data = self.rfile.read(int(self.headers['Content-Length']))
-        self._profile_json.update(json.loads(post_data.decode('utf-8')))
+        json_data = decompress_data(post_data)
+        self._profile_json.update(json.loads(json_data.decode('utf-8')))
         self._send_response(
             200, headers=(('Content-type', '%s; charset=utf-8' % 'text/json'),
+                          ('Content-Encoding', 'gzip'),
                           ('Content-Length', len(post_data))))
 
     def _send_response(self, http_code, message=None, headers=None):

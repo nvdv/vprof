@@ -47,7 +47,8 @@ class CodeHeatmapModuleEndToEndTest(unittest.TestCase):
     def testRequest(self):
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
-        stats = json.loads(response.read().decode('utf-8'))
+        response_data = stats_server.decompress_data(response.read())
+        stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(len(stats), 1)
         self.assertEqual(stats[0]['objectName'], _MODULE_FILENAME)
         self.assertDictEqual(stats[0]['heatmap'], {'1': 1})
@@ -72,7 +73,8 @@ class CodeHeatmapPackageAsPathEndToEndTest(unittest.TestCase):
     def testRequest(self):
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
-        stats = json.loads(response.read().decode('utf-8'))
+        response_data = stats_server.decompress_data(response.read())
+        stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(len(stats), 2)
         self.assertTrue(
             'vprof/tests/test_pkg/__main__.py' in stats[0]['objectName'])
@@ -100,7 +102,8 @@ class CodeHeatmapImportedPackageEndToEndTest(unittest.TestCase):
     def testRequest(self):
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
-        stats = json.loads(response.read().decode('utf-8'))
+        response_data = stats_server.decompress_data(response.read())
+        stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(len(stats), 2)
         self.assertTrue(
             'vprof/tests/test_pkg/__main__.py' in stats[0]['objectName'])
@@ -134,15 +137,16 @@ class CodeHeatmapFunctionEndToEndTest(unittest.TestCase):
             self._func, 'h', ('foo', 'bar'), host=_HOST, port=_PORT)
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
-        stats = json.loads(response.read().decode('utf-8'))
+        response_data = stats_server.decompress_data(response.read())
+        stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(len(stats), 1)
         self.assertTrue('function _func' in stats['h'][0]['objectName'])
         self.assertDictEqual(
-            stats['h'][0]['heatmap'], {'118': 1, '119': 1})
+            stats['h'][0]['heatmap'], {'121': 1, '122': 1})
         self.assertListEqual(
             stats['h'][0]['srcCode'],
-            [[117, '        def _func(foo, bar):\n'],
-             [118, u'            baz = foo + bar\n'],
-             [119, u'            return baz\n']])
+            [[120, '        def _func(foo, bar):\n'],
+             [121, u'            baz = foo + bar\n'],
+             [122, u'            return baz\n']])
 
 # pylint: enable=missing-docstring, blacklisted-name

@@ -96,7 +96,7 @@ class CodeEventsTrackerUnittest(unittest.TestCase):
              [3, 3, 1.0, name3, fname3],
              [4, 4, 1.0, name4, fname4]])
 
-    def testCodeEvents_NoDuplicates(self):
+    def testCodeEvents_Duplicates(self):
         self._tracker._resulting_events = []
         frame1, frame2 = mock.MagicMock(), mock.MagicMock()
         code1, code2 = frame1.f_code, frame2.f_code

@@ -40,8 +40,7 @@ def _process_in_memory_objects(objects):
 
     Processing is done in separate function to avoid generating overhead.
     """
-    return _remove_duplicates(
-        [obj for obj in objects if not inspect.isframe(obj)])
+    return _remove_duplicates(obj for obj in objects if not inspect.isframe(obj))
 
 
 def _get_memory_usage_for_process(pid):

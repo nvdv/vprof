@@ -36,7 +36,8 @@ class RuntimeProfileModuleEndToEndTest(unittest.TestCase):
     def testRequest(self):
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
-        stats = json.loads(response.read().decode('utf-8'))
+        response_data = stats_server.decompress_data(response.read())
+        stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], '%s (module)' % _MODULE_FILENAME)
         self.assertTrue('primitiveCalls' in stats)
         self.assertTrue('runTime' in stats)
@@ -61,7 +62,8 @@ class RuntimeProfilePackageAsPathEndToEndTest(unittest.TestCase):
     def testRequest(self):
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
-        stats = json.loads(response.read().decode('utf-8'))
+        response_data = stats_server.decompress_data(response.read())
+        stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], '%s (package)' % _PACKAGE_PATH)
         self.assertTrue('primitiveCalls' in stats)
         self.assertTrue('runTime' in stats)
@@ -86,7 +88,8 @@ class RuntimeProfileImportedPackageEndToEndTest(unittest.TestCase):
     def testRequest(self):
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
-        stats = json.loads(response.read().decode('utf-8'))
+        response_data = stats_server.decompress_data(response.read())
+        stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], '%s (package)' % _PACKAGE_NAME)
         self.assertTrue('primitiveCalls' in stats)
         self.assertTrue('runTime' in stats)
@@ -117,7 +120,8 @@ class RuntimeProfileFunctionEndToEndTest(unittest.TestCase):
             self._func, 'c', ('foo', 'bar'), host=_HOST, port=_PORT)
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
-        stats = json.loads(response.read().decode('utf-8'))
+        response_data = stats_server.decompress_data(response.read())
+        stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['c']['objectName'], '_func (function)')
         self.assertEqual(stats['c']['totalCalls'], 2)
 

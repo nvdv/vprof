@@ -36,7 +36,8 @@ class MemoryProfileModuleEndToEndTest(unittest.TestCase):
     def testRequest(self):
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
-        stats = json.loads(response.read().decode('utf-8'))
+        response_data = stats_server.decompress_data(response.read())
+        stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], '%s (module)' % _MODULE_FILENAME)
         self.assertEqual(stats['totalEvents'], 1)
         first_event = stats['codeEvents'][0]
@@ -63,7 +64,8 @@ class MemoryProfilePackageAsPathEndToEndTest(unittest.TestCase):
     def testRequest(self):
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
-        stats = json.loads(response.read().decode('utf-8'))
+        response_data = stats_server.decompress_data(response.read())
+        stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], '%s (package)' % _PACKAGE_PATH)
         first_event = stats['codeEvents'][0]
         self.assertEqual(first_event[0], 1)
@@ -89,7 +91,8 @@ class MemoryProfileImportedPackageEndToEndTest(unittest.TestCase):
     def testRequest(self):
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
-        stats = json.loads(response.read().decode('utf-8'))
+        response_data = stats_server.decompress_data(response.read())
+        stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], '%s (package)' % _PACKAGE_NAME)
         first_event = stats['codeEvents'][0]
         self.assertEqual(first_event[0], 1)
@@ -121,7 +124,8 @@ class MemoryProfileFunctionEndToEndTest(unittest.TestCase):
             self._func, 'm', ('foo', 'bar'), host=_HOST, port=_PORT)
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
-        stats = json.loads(response.read().decode('utf-8'))
+        response_data = stats_server.decompress_data(response.read())
+        stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['m']['objectName'], '_func (function)')
         self.assertEqual(stats['m']['totalEvents'], 2)
 
