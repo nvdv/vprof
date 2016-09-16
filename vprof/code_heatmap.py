@@ -2,6 +2,7 @@
 import inspect
 import operator
 import os
+import runpy
 import sys
 
 from collections import defaultdict
@@ -109,7 +110,6 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
 
     def run_as_package_path(self):
         """Runs program as package specified with file path."""
-        import runpy
         pkg_code = base_profile.get_package_code(
             self._run_object, name_is_path=True)
         with _CodeHeatmapCalculator() as prof:
@@ -143,7 +143,6 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
 
     def run_as_package_in_namespace(self):
         """Runs program as package in Python namespace."""
-        import runpy
         pkg_code = base_profile.get_package_code(self._run_object)
         with _CodeHeatmapCalculator() as prof:
             for _, compiled_code in pkg_code.values():

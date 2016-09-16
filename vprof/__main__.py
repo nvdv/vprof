@@ -1,6 +1,17 @@
 """Main module for visual profiler."""
-import argparse
+# pylint: disable=wrong-import-position
 import os
+import psutil
+
+# Take initial RSS memory size in order to compute profiler rss overhead.
+try:
+    import __builtin__ as builtins
+except ImportError:  # __builtin__ was renamed to builtins in Python 3.
+    import builtins
+builtins.initial_rss_size = psutil.Process(os.getpid()).memory_info().rss
+# pylint: disable=wrong-import-position
+
+import argparse
 import sys
 
 from vprof import stats_server

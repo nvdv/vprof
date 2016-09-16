@@ -5,6 +5,7 @@ import os
 import operator
 import psutil
 import re
+import runpy
 import sys
 
 from collections import deque
@@ -88,6 +89,7 @@ class _CodeEventsTracker(object):
         self._original_trace_function = sys.gettrace()
         self._pid = os.getpid()
         self._resulting_events = []
+        self.mem_overhead = None
 
     def add_code(self, code):
         """Recursively adds code to be examined."""
@@ -120,7 +122,7 @@ class _CodeEventsTracker(object):
         if self._resulting_events:
             return self._resulting_events
         for i, (lineno, mem, func, fname) in enumerate(self._events_list):
-            mem_in_mb = float(mem) / _BYTES_IN_MB
+            mem_in_mb = float(mem - self.mem_overhead) / _BYTES_IN_MB
             if (self._resulting_events and
                     self._resulting_events[-1][0] == lineno and
                     self._resulting_events[-1][2] == func and
@@ -149,6 +151,15 @@ class _CodeEventsTracker(object):
         overhead_count[dict] += 2
         return overhead_count
 
+    def compute_mem_overhead(self):
+        """Computes memory overhead at current time."""
+        try:
+            import __builtin__ as builtins
+        except ImportError:
+            import builtins
+        self.mem_overhead = (_get_memory_usage_for_process(self._pid) -
+                             builtins.initial_rss_size)
+
 
 class MemoryProfile(base_profile.BaseProfile):
     """Memory profiler wrapper.
@@ -158,13 +169,13 @@ class MemoryProfile(base_profile.BaseProfile):
 
     def run_as_package_path(self):
         """Runs program as package specified with file path."""
-        import runpy
         pkg_code = base_profile.get_package_code(
             self._run_object, name_is_path=True)
         with _CodeEventsTracker() as prof:
             for _, compiled_code in pkg_code.values():
                 prof.add_code(compiled_code)
             try:
+                prof.compute_mem_overhead()
                 runpy.run_path(self._run_object, run_name='__main__')
             except SystemExit:
                 pass
@@ -177,6 +188,7 @@ class MemoryProfile(base_profile.BaseProfile):
                 _CodeEventsTracker() as prof:
                 code = compile(srcfile.read(), self._run_object, 'exec')
                 prof.add_code(code)
+                prof.compute_mem_overhead()
                 exec(code, self._globs, None)
         except SystemExit:
             pass
@@ -184,12 +196,12 @@ class MemoryProfile(base_profile.BaseProfile):
 
     def run_as_package_in_namespace(self):
         """Runs object as package in Python namespace."""
-        import runpy
         pkg_code = base_profile.get_package_code(self._run_object)
         with _CodeEventsTracker() as prof:
             for _, compiled_code in pkg_code.values():
                 prof.add_code(compiled_code)
             try:
+                prof.compute_mem_overhead()
                 runpy.run_module(self._run_object, run_name='__main__')
             except SystemExit:
                 pass
@@ -199,6 +211,7 @@ class MemoryProfile(base_profile.BaseProfile):
         """Runs object as function."""
         with _CodeEventsTracker() as prof:
             prof.add_code(self._run_object.__code__)
+            prof.compute_mem_overhead()
             self._run_object(*self._run_args, **self._run_kwargs)
         return prof
 

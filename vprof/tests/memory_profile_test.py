@@ -74,6 +74,7 @@ class CodeEventsTrackerUnittest(unittest.TestCase):
 
     def testCodeEvents_NoDuplicates(self):
         self._tracker._resulting_events = []
+        self._tracker.mem_overhead = 0
         frame1, frame2 = mock.MagicMock(), mock.MagicMock()
         frame3, frame4 = mock.MagicMock(), mock.MagicMock()
         code1, code2 = frame1.f_code, frame2.f_code
@@ -98,6 +99,7 @@ class CodeEventsTrackerUnittest(unittest.TestCase):
 
     def testCodeEvents_Duplicates(self):
         self._tracker._resulting_events = []
+        self._tracker.mem_overhead = 0
         frame1, frame2 = mock.MagicMock(), mock.MagicMock()
         code1, code2 = frame1.f_code, frame2.f_code
         name1, name2 = code1.co_name, code2.co_name

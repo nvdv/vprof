@@ -12,6 +12,13 @@ from vprof import stats_server
 from vprof import profiler
 from vprof.tests import test_pkg # pylint: disable=unused-import
 
+try:
+    import __builtin__ as builtins
+except ImportError:  # __builtin__ was renamed to builtins in Python 3.
+    import builtins
+builtins.initial_rss_size = 0
+
+
 _HOST, _PORT = 'localhost', 12345
 _MODULE_FILENAME = 'vprof/tests/test_pkg/dummy_module.py'
 _PACKAGE_PATH = 'vprof/tests/test_pkg/'

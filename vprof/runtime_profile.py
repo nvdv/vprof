@@ -1,6 +1,7 @@
 """Module for runtime profiling."""
 import cProfile
 import pstats
+import runpy
 
 from vprof import base_profile
 
@@ -57,7 +58,6 @@ class RuntimeProfile(base_profile.BaseProfile):
 
     def run_as_package_path(self, prof):
         """Runs program as package specified with file path."""
-        import runpy
         prof.enable()
         try:
             runpy.run_path(self._run_object, run_name='__main__')
@@ -76,7 +76,6 @@ class RuntimeProfile(base_profile.BaseProfile):
 
     def run_as_package_in_namespace(self, prof):
         """Runs program as package in Python namespace."""
-        import runpy
         prof.enable()
         try:
             runpy.run_module(self._run_object, run_name='__main__')
