@@ -12,6 +12,11 @@ from collections import deque
 from collections import Counter
 from vprof import base_profile
 
+try:
+    import __builtin__ as builtins
+except ImportError:  # __builtin__ was renamed to builtins in Python 3.
+    import builtins
+
 _BYTES_IN_MB = 1024 * 1024
 
 
@@ -142,8 +147,9 @@ class _CodeEventsTracker(object):
         """
         overhead = [
             self,
+            self._resulting_events,
             self._events_list,
-            self._all_code,
+            self._all_code
         ]
         overhead_count = _get_object_count_by_type(overhead)
         # One for reference to __dict__ and one for reference to
@@ -153,10 +159,6 @@ class _CodeEventsTracker(object):
 
     def compute_mem_overhead(self):
         """Computes memory overhead at current time."""
-        try:
-            import __builtin__ as builtins
-        except ImportError:
-            import builtins
         self.mem_overhead = (_get_memory_usage_for_process(self._pid) -
                              builtins.initial_rss_size)
 
