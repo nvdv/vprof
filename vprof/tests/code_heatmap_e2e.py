@@ -145,8 +145,8 @@ class CodeHeatmapFunctionEndToEndTest(unittest.TestCase):
             stats['h'][0]['heatmap'], {'121': 1, '122': 1})
         self.assertListEqual(
             stats['h'][0]['srcCode'],
-            [[120, '        def _func(foo, bar):\n'],
-             [121, u'            baz = foo + bar\n'],
-             [122, u'            return baz\n']])
+            [['line', 120, '        def _func(foo, bar):\n'],
+             ['line', 121, u'            baz = foo + bar\n'],
+             ['line', 122, u'            return baz\n']])
 
 # pylint: enable=missing-docstring, blacklisted-name

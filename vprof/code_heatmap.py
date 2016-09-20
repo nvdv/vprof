@@ -163,7 +163,7 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
 
         source_lines = []
         for line in code_lines:
-            source_lines.append((start_line, line))
+            source_lines.append(('line', start_line, line))
             start_line += 1
 
         object_name = 'function %s @ %s' % (
