@@ -12,7 +12,7 @@ expected.
 
 ## Screenshots
 ![flame-graph](http://i.imgur.com/ijC7wmj.png?1)
-![memory-stats](http://i.imgur.com/fSYpqnp.png?1)
+![memory-stats](http://i.imgur.com/3uUeWA2.png?1)
 ![code-heatmap](http://i.imgur.com/08umZI8.png?1)
 
 ## Contributing
@@ -57,9 +57,17 @@ vprof <modes> <test_program>
 ```
 Supported modes:
 
-* `c` - flame graph. Renders running time visualization for `<test_program>`.
-* `m` - memory graph. Shows memory usage during execution of each line of `<test_program>`.
-* `h` - code heatmap. Shows number of executions of each line of code.
+* `c` - CPU flame graph.
+
+Shows CPU flame graph for `<test_program>`.
+
+* `m` - memory graph.
+
+Shows objects that are tracked by CPython GC and left in memory after code execution. Also shows process memory usage during execution of each line of `<test_program>`.
+
+* `h` - code heatmap.
+
+Displays all executed code of `<test_program>` with line execution count.
 
 `<test_program>` can be Python source file (e.g. `testscript.py`), installed Python package (e.g. `runpy`) or path to package (e.g. `myproject/test_package`).
 

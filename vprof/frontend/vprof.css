@@ -91,13 +91,13 @@ svg {
 }
 
 .memory-usage-graph {
-  width: 75%;
+  width: 70%;
 }
 
 .memory-table-wrapper {
   overflow-x: scroll;
   overflow-y: auto;
-  width: 25%;
+  width: 30%;
 }
 
 .memory-objects-table {
