@@ -1,4 +1,19 @@
 """Module that contains vprof runtime logic."""
+# pylint: disable=wrong-import-position
+import os
+import psutil
+
+try:
+    import __builtin__ as builtins
+except ImportError:  # __builtin__ was renamed to builtins in Python 3.
+    import builtins
+
+# Take initial RSS in order to compute profiler memory overhead
+# when profiling single functions.
+if not hasattr(builtins, 'initial_rss_size'):
+    builtins.initial_rss_size = psutil.Process(os.getpid()).memory_info().rss
+# pylint: disable=wrong-import-position
+
 import json
 
 from collections import OrderedDict

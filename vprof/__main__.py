@@ -3,7 +3,7 @@
 import os
 import psutil
 
-# Take initial RSS memory size in order to compute profiler rss overhead.
+# Take process RSS in order to compute profiler memory overhead.
 try:
     import __builtin__ as builtins
 except ImportError:  # __builtin__ was renamed to builtins in Python 3.
