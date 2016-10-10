@@ -15,7 +15,6 @@ from vprof.tests import test_pkg # pylint: disable=unused-import
 _HOST, _PORT = 'localhost', 12345
 _MODULE_FILENAME = 'vprof/tests/test_pkg/dummy_module.py'
 _PACKAGE_PATH = 'vprof/tests/test_pkg/'
-_PACKAGE_NAME = 'vprof.tests.test_pkg'
 _DUMMY_MODULE_SOURCELINES = [
     ['line', 1, 'def dummy_fib(n):'],
     ['line', 2, '    if n < 2:'],
@@ -55,40 +54,11 @@ class CodeHeatmapModuleEndToEndTest(unittest.TestCase):
         self.assertListEqual(stats[0]['srcCode'], _DUMMY_MODULE_SOURCELINES)
 
 
-class CodeHeatmapPackageAsPathEndToEndTest(unittest.TestCase):
+class CodeHeatmapPackageEndToEndTest(unittest.TestCase):
 
     def setUp(self):
         program_stats = code_heatmap.CodeHeatmapProfile(
             _PACKAGE_PATH).run()
-        stats_handler = functools.partial(
-            stats_server.StatsHandler, program_stats)
-        self.server = stats_server.StatsServer(
-            (_HOST, _PORT), stats_handler)
-        threading.Thread(target=self.server.serve_forever).start()
-
-    def tearDown(self):
-        self.server.shutdown()
-        self.server.server_close()
-
-    def testRequest(self):
-        response = urllib.request.urlopen(
-            'http://%s:%s/profile' % (_HOST, _PORT))
-        response_data = stats_server.decompress_data(response.read())
-        stats = json.loads(response_data.decode('utf-8'))
-        self.assertEqual(len(stats), 2)
-        self.assertTrue(
-            'vprof/tests/test_pkg/__main__.py' in stats[0]['objectName'])
-        self.assertTrue(
-            'vprof/tests/test_pkg/dummy_module.py' in stats[1]['objectName'])
-        self.assertListEqual(stats[0]['srcCode'], _MAIN_MODULE_SOURCELINES)
-        self.assertListEqual(stats[1]['srcCode'], _DUMMY_MODULE_SOURCELINES)
-
-
-class CodeHeatmapImportedPackageEndToEndTest(unittest.TestCase):
-
-    def setUp(self):
-        program_stats = code_heatmap.CodeHeatmapProfile(
-            _PACKAGE_NAME).run()
         stats_handler = functools.partial(
             stats_server.StatsHandler, program_stats)
         self.server = stats_server.StatsServer(
@@ -142,11 +112,11 @@ class CodeHeatmapFunctionEndToEndTest(unittest.TestCase):
         self.assertEqual(len(stats), 1)
         self.assertTrue('function _func' in stats['h'][0]['objectName'])
         self.assertDictEqual(
-            stats['h'][0]['heatmap'], {'121': 1, '122': 1})
+            stats['h'][0]['heatmap'], {'91': 1, '92': 1})
         self.assertListEqual(
             stats['h'][0]['srcCode'],
-            [['line', 120, '        def _func(foo, bar):\n'],
-             ['line', 121, u'            baz = foo + bar\n'],
-             ['line', 122, u'            return baz\n']])
+            [['line', 90, '        def _func(foo, bar):\n'],
+             ['line', 91, u'            baz = foo + bar\n'],
+             ['line', 92, u'            return baz\n']])
 
 # pylint: enable=missing-docstring, blacklisted-name

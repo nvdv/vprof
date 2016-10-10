@@ -18,11 +18,9 @@ except ImportError:  # __builtin__ was renamed to builtins in Python 3.
     import builtins
 builtins.initial_rss_size = 0
 
-
 _HOST, _PORT = 'localhost', 12345
 _MODULE_FILENAME = 'vprof/tests/test_pkg/dummy_module.py'
 _PACKAGE_PATH = 'vprof/tests/test_pkg/'
-_PACKAGE_NAME = 'vprof.tests.test_pkg'
 
 
 class MemoryProfileModuleEndToEndTest(unittest.TestCase):
@@ -53,7 +51,7 @@ class MemoryProfileModuleEndToEndTest(unittest.TestCase):
         self.assertEqual(first_event[3], '<module>')
 
 
-class MemoryProfilePackageAsPathEndToEndTest(unittest.TestCase):
+class MemoryProfilePackageEndToEndTest(unittest.TestCase):
 
     def setUp(self):
         program_stats = memory_profile.MemoryProfile(
@@ -74,33 +72,6 @@ class MemoryProfilePackageAsPathEndToEndTest(unittest.TestCase):
         response_data = stats_server.decompress_data(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], '%s (package)' % _PACKAGE_PATH)
-        first_event = stats['codeEvents'][0]
-        self.assertEqual(first_event[0], 1)
-        self.assertEqual(first_event[1], 1)
-        self.assertEqual(first_event[3], '<module>')
-
-
-class MemoryProfileImportedPackageEndToEndTest(unittest.TestCase):
-
-    def setUp(self):
-        program_stats = memory_profile.MemoryProfile(
-            _PACKAGE_NAME).run()
-        stats_handler = functools.partial(
-            stats_server.StatsHandler, program_stats)
-        self.server = stats_server.StatsServer(
-            (_HOST, _PORT), stats_handler)
-        threading.Thread(target=self.server.serve_forever).start()
-
-    def tearDown(self):
-        self.server.shutdown()
-        self.server.server_close()
-
-    def testRequest(self):
-        response = urllib.request.urlopen(
-            'http://%s:%s/profile' % (_HOST, _PORT))
-        response_data = stats_server.decompress_data(response.read())
-        stats = json.loads(response_data.decode('utf-8'))
-        self.assertEqual(stats['objectName'], '%s (package)' % _PACKAGE_NAME)
         first_event = stats['codeEvents'][0]
         self.assertEqual(first_event[0], 1)
         self.assertEqual(first_event[1], 1)

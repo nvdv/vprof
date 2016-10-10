@@ -169,10 +169,9 @@ class MemoryProfile(base_profile.BaseProfile):
     Runs memory profiler and processes all obtained stats.
     """
 
-    def run_as_package_path(self):
-        """Runs program as package specified with file path."""
-        pkg_code = base_profile.get_package_code(
-            self._run_object, name_is_path=True)
+    def run_as_package(self):
+        """Runs program as package."""
+        pkg_code = base_profile.get_package_code(self._run_object)
         with _CodeEventsTracker() as prof:
             for _, compiled_code in pkg_code.values():
                 prof.add_code(compiled_code)
@@ -194,19 +193,6 @@ class MemoryProfile(base_profile.BaseProfile):
                 exec(code, self._globs, None)
         except SystemExit:
             pass
-        return prof
-
-    def run_as_package_in_namespace(self):
-        """Runs object as package in Python namespace."""
-        pkg_code = base_profile.get_package_code(self._run_object)
-        with _CodeEventsTracker() as prof:
-            for _, compiled_code in pkg_code.values():
-                prof.add_code(compiled_code)
-            try:
-                prof.compute_mem_overhead()
-                runpy.run_module(self._run_object, run_name='__main__')
-            except SystemExit:
-                pass
         return prof
 
     def run_as_function(self):

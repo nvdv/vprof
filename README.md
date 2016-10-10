@@ -69,7 +69,7 @@ Shows objects that are tracked by CPython GC and left in memory after code execu
 
 Displays all executed code of `<test_program>` with line execution count.
 
-`<test_program>` can be Python source file (e.g. `testscript.py`), installed Python package (e.g. `runpy`) or path to package (e.g. `myproject/test_package`).
+`<test_program>` can be Python source file (e.g. `testscript.py`) or path to package (e.g. `myproject/test_package`).
 
 Use double quotes to run scripts with arguments:
 
