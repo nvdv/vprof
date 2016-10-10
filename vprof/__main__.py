@@ -12,6 +12,7 @@ builtins.initial_rss_size = psutil.Process(os.getpid()).memory_info().rss
 # pylint: disable=wrong-import-position
 
 import argparse
+import json
 import sys
 
 from vprof import stats_server
@@ -70,6 +71,8 @@ def main():
     parser.add_argument('-n', '--no-browser', dest='dont_start_browser',
                         action='store_true', default=False,
                         help="don't start browser automatically")
+    parser.add_argument('-o', '--output-file', dest='output_file',
+                        type=str, default='', help='save profile to file')
     parser.add_argument('--debug', dest='debug_mode',
                         action='store_true', default=False,
                         help="don't suppress error messages")
@@ -98,10 +101,16 @@ def main():
             sys.exit(_ERROR_MSG['bad option']['code'])
 
     if not args.debug_mode:
-        sys.stderr = open(os.devnull, "w")
-    print('Starting HTTP server...')
-    stats_server.start(
-        args.host, args.port, program_stats, args.dont_start_browser)
+        sys.stderr = open(os.devnull, 'w')
+
+    if args.output_file:
+        with open(args.output_file, 'w') as outfile:
+            program_stats['version'] = __version__
+            outfile.write(json.dumps(program_stats, indent=2))
+    else:
+        print('Starting HTTP server...')
+        stats_server.start(
+            args.host, args.port, program_stats, args.dont_start_browser)
 
 if __name__ == "__main__":
     main()
