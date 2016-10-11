@@ -110,7 +110,7 @@ class StatsHandler(http_server.SimpleHTTPRequestHandler):
             self.end_headers()
 
 
-def start(host, port, profile_stats, dont_start_browser):
+def start(host, port, profile_stats, dont_start_browser, debug_mode):
     """Starts HTTP server with specified parameters.
 
     Args:
@@ -118,8 +118,12 @@ def start(host, port, profile_stats, dont_start_browser):
         port: Server port.
         profile_stats: Dict with collected progran stats.
         dont_start_browser: Whether to start browser after profiling.
+        debug_mode: Whether to redirect stderr to /dev/null.
     """
     stats_handler = functools.partial(StatsHandler, profile_stats)
+    if not debug_mode:
+        sys.stderr = open(os.devnull, 'w')
+    print('Starting HTTP server...')
     if not dont_start_browser:
         webbrowser.open('http://{}:{}/'.format(host, port))
     try:
