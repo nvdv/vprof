@@ -26,7 +26,7 @@ The required dependencies to build ```vprof``` from source code:
  * `pip`
  * `npm` >= 3.3.12
 
-`npm` is needed to build `vprof` from sources only.
+`npm` is required to build `vprof` from sources only.
 
 ## Dependencies
 All Python and `npm` module dependencies are listed in `package.json` and `requirements.txt`.
@@ -53,37 +53,37 @@ python setup.py deps_install
 ## Usage
 
 ```sh
-vprof <modes> <test_program>
+vprof -c <modes> <program>
 ```
-Supported modes:
+`<modes>` is a combination of supported modes:
 
 * `c` - CPU flame graph.
 
-Shows CPU flame graph for `<test_program>`.
+Shows CPU flame graph for `<program>`.
 
 * `m` - memory graph.
 
-Shows objects that are tracked by CPython GC and left in memory after code execution. Also shows process memory usage during execution of each line of `<test_program>`.
+Shows objects that are tracked by CPython GC and left in memory after code execution. Also shows process memory usage during execution of each line of `<program>`.
 
 * `h` - code heatmap.
 
-Displays all executed code of `<test_program>` with line execution count.
+Displays all executed code of `<program>` with line execution count.
 
-`<test_program>` can be Python source file (e.g. `testscript.py`) or path to package (e.g. `myproject/test_package`).
+`<program>` can be Python source file (e.g. `testscript.py`) or path to package (e.g. `myproject/test_package`).
 
 Use double quotes to run scripts with arguments:
 
 ```sh
-vprof -c cmh -s "testscript.py --foo --bar"
+vprof -c cmh "testscript.py --foo --bar"
 ```
 
-Modes can be combined:
+Modes can be combined
 
 ```sh
-vprof -c cm -s testscript.py
+vprof -c cm testscript.py
 ```
 
-`vprof` can also profile single functions. In order to do this,
+`vprof` can also profile functions. In order to do this,
 launch `vprof` in remote mode:
 
 ```sh
@@ -92,7 +92,7 @@ vprof -r
 
 `vprof` will open new tab in default web browser and then wait for stats.
 
-To profile a function you can do:
+To profile a function run
 
 ```python
 from vprof import profiler
@@ -105,7 +105,20 @@ profiler.run(foo, 'cmh', args=(arg1, arg2), host='localhost', port=8000)
 
 where `cmh` is profiling mode, `host` and `port` are hostname and port of `vprof` server launched in remote mode. Obtained stats will be rendered in new tab of default web browser, opened by `vprof -r` command.
 
-You can check `vprof -h` for full list of supported parameters.
+`vprof` can save profile to file and render profile from file.
+
+```sh
+vprof -c cmh --output-file profile.json
+```
+
+writes profile to file and
+
+```sh
+vprof --input-file profile.json
+```
+renders visualizations from previously saved file.
+
+Check `vprof -h` for full list of supported parameters.
 
 To show UI help, press `h` when visualizations are displayed in browser.
 
