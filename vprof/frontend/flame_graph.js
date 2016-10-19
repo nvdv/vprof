@@ -20,22 +20,19 @@ function FlameGraph(parent, data) {
   this.TEXT_CUTOFF = 0.075 * this.WIDTH;
   this.LEGEND_X = this.WIDTH - 400;
   this.LEGEND_Y = 100;
-  this.TIME_CUTOFF = 0.5;
   this.HELP_MESSAGE = (
     '<p>&#8226 Hover to see node stats</p>' +
     '<p>&#8226 Click on node to zoom</p>'+
     '<p>&#8226 Double click to restore original scale</p>');
 
   this.data_ = data;
-  FlameGraph.pruneNodes_(
-      this.data_.callStats, this.TIME_CUTOFF, this.data_.runTime);
   this.parent_ = parent;
   this.xScale_ = d3.scale.linear().domain([0, 1]).range([0, this.WIDTH]);
   this.yScale_ = d3.scale.linear().range([0, this.HEIGHT]);
   this.color_ = d3.scale.category10();
   this.flameGraph_ = d3.layout.partition()
     .sort(null)
-    .value(function(d) { return d.cumTime; });
+    .value(function(d) { return d.sampleCount; });
 }
 
 /** Renders flame graph. */
@@ -61,13 +58,13 @@ FlameGraph.prototype.render = function() {
   var nodes = cells.append('rect')
     .attr('class', 'flame-graph-rect-normal')
     .attr('x', function(d) {
-      self.maybeRecalcNode_(d);
+      self.recalcNode_(d);
       return self.xScale_(d.x); })
     .attr('y', function(d) { return self.yScale_(1 - d.y - d.dy); })
     .attr('width', function(d) { return self.xScale_(d.dx); })
     .attr('height', function(d) { return self.yScale_(d.dy); })
     .style('fill', function(d) {
-      return self.color_(FlameGraph.getNodeName_(d) + d.depth); })
+      return self.color_(FlameGraph.getNodeName_(d)); })
     .on('mouseover', function(d) { self.showTooltip_(this, tooltip, d); })
     .on('mouseout', function() { self.hideTooltip_(this, tooltip); });
 
@@ -121,35 +118,17 @@ FlameGraph.prototype.zoomOut_ = function(allNodes, titles) {
 };
 
 /**
- * Recalculates node horizontal position and width if necessary.
- * Since d3 does not provide ability to customize partition calculation.
+ * Recalculates node horizontal position and width, because
+ * d3 partition width is not customizable.
  * @param {Object} node - Current flame graph node.
  */
-FlameGraph.prototype.maybeRecalcNode_ = function(node) {
+FlameGraph.prototype.recalcNode_ = function(node) {
   if (node.children) {
-    // Recalculate children nodes.
     var currX = node.x;
     for (var i = 0; i < node.children.length; i++) {
       node.children[i].x = currX;
-      node.children[i].dx = node.children[i].cumTime / this.data_.runTime;
+      node.children[i].dx = node.children[i].sampleCount / this.data_.totalSamples;
       currX += node.children[i].dx;
-    }
-
-    // In some cases width of children might be larger than
-    // parent width - we need to fix this.
-    var childrenWidth = 0;
-    node.children.forEach(function(child) { childrenWidth += child.dx; });
-    var scale = 1;
-    if (childrenWidth > node.dx) {
-      scale = node.dx / childrenWidth;
-    }
-
-    // Rescale children.
-    currX = node.x;
-    for (var j = 0; j < node.children.length; j++) {
-      node.children[j].x = currX;
-      node.children[j].dx *= scale;
-      currX += node.children[j].dx;
     }
   }
 };
@@ -171,30 +150,30 @@ FlameGraph.prototype.redrawTitles_ = function(titles) {
 };
 
 /**
- * Shows tooltip and flame graph rectangle highlighting.
- * @param {Object} element - Element representing flame graph rectangle.
+ * Shows tooltip and flame graph node highlighting.
+ * @param {Object} element - Element representing flame graph node.
  * @param {Object} tooltip - Element representing tooltip.
  * @param {Object} node - Object representing function call info.
  */
 FlameGraph.prototype.showTooltip_ = function(element, tooltip, node) {
   d3.select(element).attr('class', 'flame-graph-rect-highlight');
-  var timePercentage = FlameGraph.getTimePercentage_(
-      node.cumTime, this.data_.runTime);
-  var functionName = node.funcName.replace('<', '[').replace('>',  ']');
+  var percentage = FlameGraph.getPercentage_(
+      node.sampleCount, this.data_.totalSamples);
+  var functionName = node.stack[0].replace('<', '[').replace('>', ']');
+  var filename = node.stack[1];
+  var lineno = node.stack[2];
   tooltip.attr('class', 'content-tooltip content-tooltip-visible')
     .html('<p><b>Function name:</b> ' + functionName + '</p>' +
-          '<p><b>Location:</b> ' + node.moduleName +'</p>' +
-          '<p><b>Line number:</b> ' + node.lineno + '</p>' +
-          '<p><b>Time percentage:</b> ' + timePercentage + ' %</p>' +
-          '<p><b>Cumulative time:</b> ' + node.cumTime + ' s</p>' +
-          '<p><b>Time per call:</b> ' + node.timePerCall + ' s</p>' +
-          '<p><b>Primitive calls:</b> ' + node.primCalls + '</p>')
+          '<p><b>Line number:</b> ' + lineno +'</p>' +
+          '<p><b>Filename:</b> ' + filename +'</p>' +
+          '<p><b>Sample count:</b> ' + node.sampleCount + '</p>' +
+          '<p><b>Percentage:</b> ' + percentage +'</p>')
     .style('left', d3.event.pageX)
     .style('top', d3.event.pageY);
 };
 
 /**
- * Hides tooltip and removes rect highlighting.
+ * Hides tooltip and removes node highlighting.
  * @param {Object} element - Element representing highlighted rectangle.
  * @param {Object} tooltip - Element representing tooltip.
  */
@@ -208,9 +187,9 @@ FlameGraph.prototype.renderLegend_ = function() {
   this.parent_.append('div')
     .attr('class', 'content-legend')
     .html('<p><b>Object name:</b> ' + this.data_.objectName + '</p>' +
-          '<p><b>Total runtime:</b> ' + this.data_.runTime + 's</p>' +
-          '<p><b>Total calls:</b> ' + this.data_.totalCalls + '</p>' +
-          '<p><b>Primitive calls:</b> ' + this.data_.primitiveCalls + '</p>')
+          '<p><b>Run time:</b> ' + this.data_.runTime + ' s</p>' +
+          '<p><b>Total samples:</b> ' + this.data_.totalSamples + '</p>' +
+          '<p><b>Sample interval:</b> ' + this.data_.sampleInterval + ' s</p>')
     .style('left', this.LEGEND_X)
     .style('top', this.LEGEND_Y);
 };
@@ -229,9 +208,7 @@ FlameGraph.prototype.renderHelp_ = function() {
  * @returns {string}
  */
 FlameGraph.getNodeName_ = function(d) {
-  var tokens = d.moduleName.split('/');
-  var filename = tokens[tokens.length - 1];
-  return filename + ':' + d.lineno + '(' + d.funcName + ')';
+  return d.stack[0] + ':' + d.stack[2] + ' (' + d.stack[1] + ')';
 };
 
 /**
@@ -253,35 +230,10 @@ FlameGraph.getTruncatedNodeName_ = function(d, rectLength) {
 };
 
 /**
- * Returns percentage that cumTime takes in totalTime.
- * @static
- * @param {number} cumTime - Function cumulative run time.
- * @param {number} totalTime - Program run time.
- * @returns {number}
+ * Returns percentage that val takes in total.
  */
-FlameGraph.getTimePercentage_ = function(cumTime, totalTime) {
-  return 100 * Math.round(cumTime / totalTime * 1000) / 1000;
-};
-
-/**
- * Removes call graph nodes if their cumulative time is lower
- * than cutoff percenteag.
- * @static
- * @param {object} node - Current call graph node.
- * @param {number} cutoff - Percentage cutoff.
- * @param {number} totalRuntime - Program run time.
- */
-FlameGraph.pruneNodes_ = function(node, cutoff, totalRuntime) {
-  var i = node.children.length;
-  while (i--) {
-    if (FlameGraph.getTimePercentage_(
-          node.children[i].cumTime, totalRuntime) < cutoff) {
-      node.children.splice(i, 1);
-    }
-  }
-  for (var j = 0; j < node.children.length; j++) {
-    FlameGraph.pruneNodes_(node.children[j], cutoff, totalRuntime);
-  }
+FlameGraph.getPercentage_ = function(val, total) {
+  return 100 * Math.round(val / total * 1000) / 1000;
 };
 
 /**

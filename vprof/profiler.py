@@ -24,7 +24,7 @@ from vprof import stats_server
 from vprof import runtime_profile
 
 _PROFILERS = (
-    ('c', runtime_profile.RuntimeProfile),
+    ('c', runtime_profile.FlameGraphWrapper),
     ('m', memory_profile.MemoryProfile),
     ('h', code_heatmap.CodeHeatmapProfile),
 )
