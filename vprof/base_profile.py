@@ -1,5 +1,7 @@
 """Base class for a profile wrapper."""
+import importlib
 import os
+import pkgutil
 import sys
 
 
@@ -13,8 +15,6 @@ def get_package_code(package_name, name_is_path=False):
         A dict containing non-compiled and compiled code for package
         specified by package name.
     """
-    import importlib
-    import pkgutil
 
     if not name_is_path:
         package = importlib.import_module(package_name)

@@ -91,7 +91,8 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
             skips.append((prev_line, num_lines - prev_line))
         return skips
 
-    def _skip_lines(self, src_code, skip_map):
+    @staticmethod
+    def _skip_lines(src_code, skip_map):
         """Skips lines in src_code specified by skip map."""
         if not skip_map:
             return [['line', j + 1, l] for j, l in enumerate(src_code)]
@@ -124,8 +125,7 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
     def run_as_module(self):
         """Runs program as module."""
         try:
-            with open(self._run_object, 'r') as srcfile,\
-                _CodeHeatmapCalculator() as prof:
+            with open(self._run_object, 'r') as srcfile, _CodeHeatmapCalculator() as prof:
                 src_code = srcfile.read()
                 code = compile(src_code, self._run_object, 'exec')
                 prof.add_code(code)
