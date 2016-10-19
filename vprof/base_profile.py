@@ -1,26 +1,18 @@
 """Base class for a profile wrapper."""
-import importlib
 import os
 import pkgutil
 import sys
 
 
-def get_package_code(package_name, name_is_path=False):
+def get_package_code(package_path):
     """Returns package source code.
+
     Args:
-        package_name: Path to package or package name in Python namespace.
-        name_is_path: True if package_name variable contains package name in
-            Python namespace, False if package name is path to package.
+        package_path: Path to Python package.
     Returns:
         A dict containing non-compiled and compiled code for package
         specified by package name.
     """
-
-    if not name_is_path:
-        package = importlib.import_module(package_name)
-        package_path = os.path.dirname(package.__file__)
-    else:
-        package_path = package_name
 
     all_code = {}
     for fobj, modname, _ in pkgutil.iter_modules(path=[package_path]):
@@ -42,19 +34,17 @@ class BaseProfile(object):
         Args:
             run_object: object that will be run under profiler.
         """
-        self._is_run_obj_function, self._is_run_obj_package_dir = False, False
-        self._is_run_obj_module, self._is_run_obj_imported_pkg = False, False
+        self._is_run_obj_function, self._is_run_obj_package = False, False
+        self._is_run_obj_module = False
         if isinstance(run_object, tuple):
             self._run_object, self._run_args, self._run_kwargs = run_object
             self._is_run_obj_function = True
         else:
             self._run_object, _, self._run_args = run_object.partition(' ')
             if os.path.isdir(self._run_object):
-                self._is_run_obj_package_dir = True
+                self._is_run_obj_package = True
             elif os.path.isfile(self._run_object):
                 self._is_run_obj_module = True
-            else:
-                self._is_run_obj_imported_pkg = True
 
         if self._is_run_obj_module:
             self._globs = {
@@ -76,19 +66,11 @@ class BaseProfile(object):
         else:
             sys.argv[:] = [self._run_object]
 
-    def run_as_package_path(self):
-        """Runs object as package specified with filesystem path.
+    def run_as_package(self):
+        """Runs object as package specified by filesystem path.
 
         Runs object specified by self._run_object as package specified by
         path in filesystem. Must be overridden in child classes.
-        """
-        raise NotImplementedError
-
-    def run_as_package_in_namespace(self):
-        """Runs object as package in Python namespace.
-
-        Runs object specified by self._run_object as package in Python
-        namespace. Must be overridden in child classes.
         """
         raise NotImplementedError
 
@@ -113,14 +95,11 @@ class BaseProfile(object):
         if self._is_run_obj_function:
             self._object_name = '%s (function)' % self._run_object.__name__
             return self.run_as_function
-        elif self._is_run_obj_package_dir:
+        elif self._is_run_obj_package:
             self._object_name = '%s (package)' % self._run_object
-            return self.run_as_package_path
-        elif self._is_run_obj_module:
-            self._object_name = '%s (module)' % self._run_object
-            return self.run_as_module
-        self._object_name = '%s (package)' % self._run_object
-        return self.run_as_package_in_namespace
+            return self.run_as_package
+        self._object_name = '%s (module)' % self._run_object
+        return self.run_as_module
 
     def run(self):
         """Runs profiler and returns collect stats."""

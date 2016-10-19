@@ -56,8 +56,8 @@ class RuntimeProfile(base_profile.BaseProfile):
         return self._build_call_tree(
             root, stats.all_callees, stats.stats[root][:-1])
 
-    def run_as_package_path(self, prof):
-        """Runs program as package specified with file path."""
+    def run_as_package(self, prof):
+        """Runs program as package."""
         prof.enable()
         try:
             runpy.run_path(self._run_object, run_name='__main__')
@@ -73,16 +73,6 @@ class RuntimeProfile(base_profile.BaseProfile):
             prof.runctx(code, self._globs, None)
         except SystemExit:
             pass
-
-    def run_as_package_in_namespace(self, prof):
-        """Runs program as package in Python namespace."""
-        prof.enable()
-        try:
-            runpy.run_module(self._run_object, run_name='__main__')
-        except SystemExit:
-            pass
-        finally:
-            prof.disable()
 
     def run_as_function(self, prof):
         """Runs object as function."""

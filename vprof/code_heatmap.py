@@ -109,10 +109,9 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
             ['line', i + j + 1, l] for j, l in enumerate(src_code[i:]))
         return code_with_skips
 
-    def run_as_package_path(self):
-        """Runs program as package specified with file path."""
-        pkg_code = base_profile.get_package_code(
-            self._run_object, name_is_path=True)
+    def run_as_package(self):
+        """Runs program as Python package."""
+        pkg_code = base_profile.get_package_code(self._run_object)
         with _CodeHeatmapCalculator() as prof:
             for _, compiled_code in pkg_code.values():
                 prof.add_code(compiled_code)
@@ -140,18 +139,6 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
             'heatmap': heatmap,
             'srcCode': self._skip_lines(sources, skip_map)
         }]
-
-    def run_as_package_in_namespace(self):
-        """Runs program as package in Python namespace."""
-        pkg_code = base_profile.get_package_code(self._run_object)
-        with _CodeHeatmapCalculator() as prof:
-            for _, compiled_code in pkg_code.values():
-                prof.add_code(compiled_code)
-            try:
-                runpy.run_module(self._run_object)
-            except SystemExit:
-                pass
-        return self._consodalidate_stats(pkg_code, prof)
 
     def run_as_function(self):
         """Runs object as function."""

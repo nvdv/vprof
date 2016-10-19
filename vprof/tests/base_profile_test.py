@@ -29,7 +29,7 @@ class BaseProfileUnittest(unittest.TestCase):
         self.assertDictEqual(self._profile._run_kwargs, {'bar': 'baz'})
 
     @mock.patch('os.path.isdir')
-    def testInit_RunObjPackagePath(self, isdir_mock):
+    def testInit_RunObjPackage(self, isdir_mock):
         isdir_mock.return_value = True
         self._profile.__init__('test/test_pkg')
         self.assertEqual(self._profile._run_object, 'test/test_pkg')
@@ -54,17 +54,6 @@ class BaseProfileUnittest(unittest.TestCase):
             '__package__': None
         })
 
-    @mock.patch('os.path.isdir')
-    @mock.patch('os.path.isfile')
-    def testInit_RunObjImportedPackage(self, isfile_mock, isdir_mock):
-        isfile_mock.return_value, isdir_mock.return_value = False, False
-        self._profile.__init__('test_pkg')
-        self.assertEqual(self._profile._run_object, 'test_pkg')
-        self.assertEqual(self._profile._run_args, '')
-        self._profile.__init__('test_pkg --bar --baz')
-        self.assertEqual(self._profile._run_object, 'test_pkg')
-        self.assertEqual(self._profile._run_args, '--bar --baz')
-
     def testRun(self):
         with self.assertRaises(NotImplementedError):
             self._profile.run()
@@ -73,13 +62,9 @@ class BaseProfileUnittest(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             self._profile.run_as_module()
 
-    def testRunAsPackageInNamespace(self):
+    def testRunAsPackage(self):
         with self.assertRaises(NotImplementedError):
-            self._profile.run_as_package_in_namespace()
-
-    def testRunAsPackagePath(self):
-        with self.assertRaises(NotImplementedError):
-            self._profile.run_as_package_path()
+            self._profile.run_as_package()
 
     def testRunAsFunction(self):
         with self.assertRaises(NotImplementedError):
@@ -94,21 +79,16 @@ class BaseProfileUnittest(unittest.TestCase):
             self._profile.run_as_function)
 
         self._profile._is_run_obj_function = False
-        self._profile._is_run_obj_package_dir = True
+        self._profile._is_run_obj_package = True
         self.assertEqual(
             self._profile.get_run_dispatcher(),
-            self._profile.run_as_package_path)
+            self._profile.run_as_package)
 
-        self._profile._is_run_obj_package_dir = False
+        self._profile._is_run_obj_package = False
         self._profile._is_run_obj_module = True
         self.assertEqual(
             self._profile.get_run_dispatcher(),
             self._profile.run_as_module)
-
-        self._profile._is_run_obj_module = False
-        self.assertEqual(
-            self._profile.get_run_dispatcher(),
-            self._profile.run_as_package_in_namespace)
 
     def testReplaceSysargs(self):
         self._profile._run_object = mock.MagicMock()
