@@ -156,7 +156,8 @@ CodeHeatmap.prototype.renderCode_ = function(srcCode, heatmap) {
  * @param {number} runCount - Number of line runs.
  * @returns {string}
  */
-CodeHeatmap.prototype.formatSrcLine_ = function(lineNumber, codeLine, runCount) {
+CodeHeatmap.prototype.formatSrcLine_ = function(lineNumber, codeLine,
+                                                runCount) {
   var highlightedLine = hljs.highlight('python', codeLine).value;
   var backgroundColor = runCount ? this.heatmapScale_(runCount) : '';
   return (

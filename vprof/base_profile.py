@@ -1,6 +1,5 @@
 """Base class for a profile wrapper."""
 import os
-import pkgutil
 import sys
 
 
@@ -13,6 +12,7 @@ def get_package_code(package_path):
         A dict containing non-compiled and compiled code for package
         specified by package name.
     """
+    import pkgutil
 
     all_code = {}
     for fobj, modname, _ in pkgutil.iter_modules(path=[package_path]):

@@ -37,7 +37,7 @@ class _CodeHeatmapCalculator(object):
         """Disables heatmap calculator."""
         sys.settrace(self._original_trace_function)
 
-    def _calc_heatmap(self, frame, event, arg):  #pylint: disable=unused-argument
+    def _calc_heatmap(self, frame, event, arg):  # pylint: disable=unused-argument
         """Calculates code heatmap."""
         if event == 'line' and frame.f_code in self._all_code:
             abs_filename = os.path.abspath(frame.f_code.co_filename)
@@ -100,7 +100,8 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
         for line, length in skip_map:
             code_with_skips.extend(
                 ['line', i + j + 1, l] for j, l in enumerate(src_code[i:line]))
-            if code_with_skips and code_with_skips[-1][0] == 'skip':  # Merge skips.
+            if (code_with_skips
+                    and code_with_skips[-1][0] == 'skip'):  # Merge skips.
                 code_with_skips[-1][1] += length
             else:
                 code_with_skips.append(['skip', length])
@@ -124,7 +125,8 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
     def run_as_module(self):
         """Runs program as module."""
         try:
-            with open(self._run_object, 'r') as srcfile, _CodeHeatmapCalculator() as prof:
+            with open(self._run_object, 'r') as srcfile, \
+                    _CodeHeatmapCalculator() as prof:
                 src_code = srcfile.read()
                 code = compile(src_code, self._run_object, 'exec')
                 prof.add_code(code)

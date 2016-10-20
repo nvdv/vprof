@@ -12,5 +12,6 @@
     "no-cond-assign": ["error", "always"],
     "strict": ["error", "global"],
     "semi": "error",
+    "max-len": ["error", 80, { "ignoreComments": true }],
   },
 }
