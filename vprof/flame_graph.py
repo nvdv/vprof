@@ -11,7 +11,10 @@ _SAMPLE_INTERVAL = 0.001
 
 
 class _StatProfiler(object):
-    """Statistical profiler."""
+    """Statistical profiler.
+
+    Samples call stack at regulal interval specified by _SAMPLE_INTERVAL.
+    """
 
     def __init__(self):
         self._call_tree = {}
@@ -32,12 +35,12 @@ class _StatProfiler(object):
         self.run_time = time.time() - self._start_time
         signal.setitimer(signal.ITIMER_PROF, 0)
 
-    def sample(self, _, frame):
+    def sample(self, signum, frame):  #pylint: disable=unused-argument
         """Callback that samples current stack and stores result in
-        self._stats dictionary.
+        self._stats.
 
         Args:
-            _: Signal that activated handler.
+            signum: Signal that activated handler.
             frame: Current frame when signal is handled.
         """
         stack = []
@@ -51,13 +54,13 @@ class _StatProfiler(object):
         signal.setitimer(signal.ITIMER_PROF, _SAMPLE_INTERVAL)
 
     def _insert_stack(self, stack, sample_count, call_tree):
-        """Inserts stack with sample count creating all necessary nodes in the
+        """Inserts stack with sample count creating all intermediate nodes in the
         call tree.
 
         Args:
             stack: Stack to insert into call_tree.
             sample_count: Sample count for stack.
-            call_tree: dict representing call tree.
+            call_tree: Dict representing call tree.
         """
         curr_level = call_tree
         for func in stack:
@@ -76,7 +79,7 @@ class _StatProfiler(object):
         curr_level['sampleCount'] = sample_count
 
     def _fill_sample_count(self, node):
-        """Fills sample counts inside call tree."""
+        """Fills proper sample counts inside call tree."""
         node['sampleCount'] += sum(
             self._fill_sample_count(child) for child in node['children'])
         return node['sampleCount']
@@ -97,7 +100,7 @@ class _StatProfiler(object):
 
 
 class FlameGraphProfiler(base_profile.BaseProfile):
-    """Flame graph wrapper.
+    """Flame graph profiler wrapper.
 
     Runs statistical profiler and processes obtained stats.
     """
