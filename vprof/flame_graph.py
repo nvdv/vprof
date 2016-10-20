@@ -96,7 +96,7 @@ class _StatProfiler(object):
         return self._call_tree
 
 
-class FlameGraphWrapper(base_profile.BaseProfile):
+class FlameGraphProfiler(base_profile.BaseProfile):
     """Flame graph wrapper.
 
     Runs statistical profiler and processes obtained stats.
@@ -113,8 +113,7 @@ class FlameGraphWrapper(base_profile.BaseProfile):
 
     def run_as_module(self):
         """Runs program as a Python module."""
-        with open(self._run_object, 'rb') as srcfile,\
-            _StatProfiler() as prof:
+        with open(self._run_object, 'rb') as srcfile, _StatProfiler() as prof:
             code = compile(srcfile.read(), self._run_object, 'exec')
             prof.base_frame = inspect.currentframe()
             try:

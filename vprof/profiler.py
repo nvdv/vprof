@@ -19,12 +19,12 @@ import json
 from collections import OrderedDict
 from six.moves import urllib
 from vprof import code_heatmap
+from vprof import flame_graph
 from vprof import memory_profile
 from vprof import stats_server
-from vprof import runtime_profile
 
 _PROFILERS = (
-    ('c', runtime_profile.FlameGraphWrapper),
+    ('c', flame_graph.FlameGraphProfiler),
     ('m', memory_profile.MemoryProfile),
     ('h', code_heatmap.CodeHeatmapProfile),
 )

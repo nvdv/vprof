@@ -1,12 +1,13 @@
 # pylint: disable=protected-access, missing-docstring
 import unittest
 
-from vprof import runtime_profile
+from vprof import flame_graph
 
 
 class StatProrilerUnittest(unittest.TestCase):
+
     def setUp(self):
-        self._profiler = object.__new__(runtime_profile._StatProfiler)
+        self._profiler = object.__new__(flame_graph._StatProfiler)
 
     def testCallTreeProperty(self):
         self.maxDiff = None
