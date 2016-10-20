@@ -7,7 +7,7 @@ import unittest
 
 from six.moves import urllib
 
-from vprof import runtime_profile
+from vprof import flame_graph
 from vprof import stats_server
 from vprof import profiler
 from vprof.tests import test_pkg # pylint: disable=unused-import
@@ -17,10 +17,10 @@ _MODULE_FILENAME = 'vprof/tests/test_pkg/dummy_module.py'
 _PACKAGE_PATH = 'vprof/tests/test_pkg/'
 
 
-class RuntimeProfileModuleEndToEndTest(unittest.TestCase):
+class FlameGraphModuleEndToEndTest(unittest.TestCase):
 
     def setUp(self):
-        program_stats = runtime_profile.RuntimeProfile(
+        program_stats = flame_graph.FlameGraphProfiler(
             _MODULE_FILENAME).run()
         stats_handler = functools.partial(
             stats_server.StatsHandler, program_stats)
@@ -38,15 +38,15 @@ class RuntimeProfileModuleEndToEndTest(unittest.TestCase):
         response_data = stats_server.decompress_data(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], '%s (module)' % _MODULE_FILENAME)
-        self.assertTrue('primitiveCalls' in stats)
+        self.assertTrue('sampleInterval' in stats)
         self.assertTrue('runTime' in stats)
-        self.assertTrue('totalCalls' in stats)
+        self.assertTrue('totalSamples' in stats)
 
 
-class RuntimeProfilePackageEndToEndTest(unittest.TestCase):
+class FlameGraphPackageEndToEndTest(unittest.TestCase):
 
     def setUp(self):
-        program_stats = runtime_profile.RuntimeProfile(
+        program_stats = flame_graph.FlameGraphProfiler(
             _PACKAGE_PATH).run()
         stats_handler = functools.partial(
             stats_server.StatsHandler, program_stats)
@@ -64,12 +64,12 @@ class RuntimeProfilePackageEndToEndTest(unittest.TestCase):
         response_data = stats_server.decompress_data(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], '%s (package)' % _PACKAGE_PATH)
-        self.assertTrue('primitiveCalls' in stats)
+        self.assertTrue('sampleInterval' in stats)
         self.assertTrue('runTime' in stats)
-        self.assertTrue('totalCalls' in stats)
+        self.assertTrue('totalSamples' in stats)
 
 
-class RuntimeProfileFunctionEndToEndTest(unittest.TestCase):
+class FlameGraphFunctionEndToEndTest(unittest.TestCase):
 
     def setUp(self):
 
@@ -96,6 +96,9 @@ class RuntimeProfileFunctionEndToEndTest(unittest.TestCase):
         response_data = stats_server.decompress_data(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['c']['objectName'], '_func (function)')
-        self.assertEqual(stats['c']['totalCalls'], 2)
+        self.assertTrue('sampleInterval' in stats['c'])
+        self.assertTrue('runTime' in stats['c'])
+        self.assertTrue('totalSamples' in stats['c'])
+
 
 # pylint: enable=missing-docstring, blacklisted-name
