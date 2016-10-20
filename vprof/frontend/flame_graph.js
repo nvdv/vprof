@@ -20,6 +20,7 @@ function FlameGraph(parent, data) {
   this.TEXT_CUTOFF = 0.075 * this.WIDTH;
   this.LEGEND_X = this.WIDTH - 400;
   this.LEGEND_Y = 100;
+  this.MIN_TEXT_HEIGHT = 18;
   this.HELP_MESSAGE = (
     '<p>&#8226 Hover to see node stats</p>' +
     '<p>&#8226 Click on node to zoom</p>'+
@@ -74,7 +75,10 @@ FlameGraph.prototype.render = function() {
       return self.yScale_(1 - d.y - d.dy) + self.TEXT_OFFSET_Y; })
     .text(function(d) {
       var nodeWidth = this.previousElementSibling.getAttribute('width');
-      return FlameGraph.getTruncatedNodeName_(d, nodeWidth);
+      return FlameGraph.getTruncatedNodeName_(d, nodeWidth); })
+    .attr('visibility', function(d) {
+      var nodeHeight = this.previousElementSibling.getAttribute('height');
+      return nodeHeight > self.MIN_TEXT_HEIGHT ? 'visible': 'hidden';
     });
 
   // Zoom.
@@ -145,7 +149,10 @@ FlameGraph.prototype.redrawTitles_ = function(titles) {
       return self.yScale_(1 - d.y - d.dy) + self.TEXT_OFFSET_Y; })
     .text(function(d) {
       var nodeWidth = self.xScale_(d.x + d.dx) - self.xScale_(d.x);
-      return FlameGraph.getTruncatedNodeName_(d, nodeWidth);
+      return FlameGraph.getTruncatedNodeName_(d, nodeWidth); })
+    .attr('visibility', function(d) {
+      var nodeHeight = this.previousElementSibling.getAttribute('height');
+      return (nodeHeight > self.MIN_TEXT_HEIGHT) ? 'visible': 'hidden';
     });
 };
 
@@ -160,7 +167,7 @@ FlameGraph.prototype.showTooltip_ = function(element, tooltip, node) {
   var percentage = FlameGraph.getPercentage_(
       node.sampleCount, this.data_.totalSamples);
   var functionName = node.stack[0].replace('<', '[').replace('>', ']');
-  var filename = node.stack[1];
+  var filename = node.stack[1].replace('<', '[').replace('>', ']');
   var lineno = node.stack[2];
   tooltip.attr('class', 'content-tooltip content-tooltip-visible')
     .html('<p><b>Function name:</b> ' + functionName + '</p>' +
