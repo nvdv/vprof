@@ -100,7 +100,8 @@ def main():
                 outfile.write(json.dumps(program_stats, indent=2))
         else:
             stats_server.start(
-                args.host, args.port, program_stats, args.dont_start_browser, args.debug_mode)
+                args.host, args.port, program_stats,
+                args.dont_start_browser, args.debug_mode)
 
 if __name__ == "__main__":
     main()

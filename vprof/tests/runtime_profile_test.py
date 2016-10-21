@@ -74,6 +74,7 @@ class RuntimeProfileUnittest(unittest.TestCase):
         self.assertEqual(result['cumTime'], _CALL_GRAPH['cumTime'])
         self.assertListEqual(
             sorted(result['children'], key=operator.itemgetter('funcName')),
-            sorted(_CALL_GRAPH['children'], key=operator.itemgetter('funcName')))
+            sorted(_CALL_GRAPH['children'],
+                   key=operator.itemgetter('funcName')))
 
 # pylint:  enable=protected-access, missing-docstring

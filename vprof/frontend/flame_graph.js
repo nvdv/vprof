@@ -160,7 +160,8 @@ FlameGraph.prototype.maybeRecalcNode_ = function(node) {
  */
 FlameGraph.prototype.redrawTitles_ = function(titles) {
   var self = this;
-  titles.attr('x', function(d) { return self.xScale_(d.x) + self.TEXT_OFFSET_X; })
+  titles.attr('x', function(d) {
+    return self.xScale_(d.x) + self.TEXT_OFFSET_X; })
     .attr('y', function(d) {
       return self.yScale_(1 - d.y - d.dy) + self.TEXT_OFFSET_Y; })
     .text(function(d) {

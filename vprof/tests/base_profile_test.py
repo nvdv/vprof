@@ -100,7 +100,10 @@ class BaseProfileUnittest(unittest.TestCase):
         self._profile._run_args = '-s foo -a bar -e baz'
         with mock.patch.object(sys, 'argv', []):
             self._profile._replace_sysargs()
-            self.assertEqual(sys.argv, [self._profile._run_object, '-s', 'foo', '-a',
-                                        'bar', '-e', 'baz'])
+            self.assertEqual(
+                sys.argv,
+                [self._profile._run_object,
+                 '-s', 'foo', '-a', 'bar', '-e', 'baz']
+            )
 
 # pylint: enable=protected-access, missing-docstring
