@@ -94,7 +94,7 @@ FlameGraph.prototype.render = function() {
  */
 FlameGraph.prototype.zoomIn_ = function(node, allNodes, titles) {
   this.xScale_.domain([node.x, node.x + node.dx]);
-  this.yScale_.domain([0, 1 - node.y]).range([0, this.HEIGHT]);
+  this.yScale_.domain([0, 1 - node.y]);
   var self = this;
   allNodes.attr('x', function(d) { return self.xScale_(d.x); })
     .attr('y', function(d) { return self.yScale_(1 - d.y - d.dy); })
