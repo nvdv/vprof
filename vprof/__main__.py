@@ -15,8 +15,8 @@ import argparse
 import json
 import sys
 
+from vprof import runner
 from vprof import stats_server
-from vprof import profiler
 
 __version__ = '0.33'
 
@@ -84,13 +84,12 @@ def main():
     else:
         config, source = args.config
         try:
-            program_stats = profiler.run_profilers(
-                source, config, verbose=True)
-        except profiler.AmbiguousConfigurationError:
-            print('Profiler configuration %s is ambiguous. '
-                  'Please, remove duplicates.' % config)
-            sys.exit(_ERR_CODES['ambiguous_configuration'])
-        except profiler.BadOptionError as exc:
+            program_stats = runner.run_profilers(  # pylint: disable=redefined-variable-type
+                args.source[0], args.config, verbose=True)
+        except runner.AmbiguousConfigurationError:
+            print(_ERROR_MSG['ambiguous configuration']['msg'])
+            sys.exit(_ERROR_MSG['ambiguous configuration']['code'])
+        except runner.BadOptionError as exc:
             print(exc)
             sys.exit(_ERR_CODES['bad_option'])
 
