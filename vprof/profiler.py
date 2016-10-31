@@ -1,5 +1,6 @@
 """Module for Python profiler wrapper."""
 import cProfile
+import operator
 import pstats
 import runpy
 
@@ -36,14 +37,16 @@ class Profiler(base_profile.BaseProfile):
         self._run_object(*self._run_args, **self._run_kwargs)
         prof.disable()
 
-    def _transform_stats(self, stats):
+    def _transform_stats(self, prof):
         """Processes profiler stats."""
-        result = []
-        for info, params in stats.items():
-            modname, funcname, lineno = info
+        records = []
+        for info, params in prof.stats.items():
+            filename, lineno, funcname = info
             cum_calls, num_calls, time_per_call, cum_time, callers = params
-            result.append(info)
-        return result
+            percentage = round(100 * (cum_time / prof.total_tt), 4)
+            records.append(
+                (filename, lineno, funcname, cum_time, percentage))
+        return sorted(records, key=operator.itemgetter(4), reverse=True)
 
     def run(self):
         """Collects CProfile stats for specified Python program."""
@@ -54,5 +57,6 @@ class Profiler(base_profile.BaseProfile):
         prof_stats.calc_callees()
         return {
             'objectName': self._object_name,
-            'callStats': self._transform_stats(prof_stats.stats)
+            'callStats': self._transform_stats(prof_stats),
+            'totalTime': prof_stats.total_tt
         }

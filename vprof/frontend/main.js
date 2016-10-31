@@ -7,9 +7,10 @@
 
 'use strict';
 var d3 = require('d3');
+var codeHeatmapModule = require('./code_heatmap.js');
 var flameGraphModule = require('./flame_graph.js');
 var memoryStatsModule = require('./memory_stats.js');
-var codeHeatmapModule = require('./code_heatmap.js');
+var profilerModule = require('./profiler.js');
 
 var JSON_URI = 'profile';
 var POLL_INTERVAL = 200;  // msec
@@ -83,6 +84,25 @@ function createCodeHeatmapTab_(parent, status) {
 }
 
 /**
+ *  Creates profiler tab header with specified status and
+ *  appends it to the parent node.
+ *  @param {Object} parent - Parent element to append tab to.
+ *  @param {status} status - Specified tab status.
+ */
+function createProfilerTab_(parent, status) {
+  parent.append('li')
+    .attr('class', status)
+    .text('Profiler')
+    .on('click', function(d) {
+      d3.selectAll('li')
+        .attr('class', 'main-tab-not-selected');
+      d3.select(this)
+        .attr('class', 'main-tab-selected');
+      showTab_('profiler-tab');
+    });
+}
+
+/**
  * Renders stats page.
  * @param {Object} data - Data for page rendering.
  */
@@ -118,6 +138,12 @@ function renderPage(data) {
       var codeHeatmap = createTabContent_('code-heatmap-tab');
       codeHeatmapModule.renderCodeHeatmap(data.h, codeHeatmap);
       codeHeatmap.classed(displayClass, true);
+      break;
+    case 'p':
+      createProfilerTab_(tabHeader, status);
+      var profilerOutput = createTabContent_('profiler-tab');
+      profilerModule.renderProfilerOutput(data.p, profilerOutput);
+      profilerOutput.classed(displayClass, true);
       break;
     }
   }

@@ -182,6 +182,21 @@ svg {
   display: none;
 }
 
+.profiler-content {
+  height: 100%;
+  padding-left: 50px;
+  padding-right: 10px;
+  overflow-y: scroll;
+}
+
+.profiler-record {
+  background: #BCBCBC;
+  border-radius: 4px;
+  margin: 1.5px;
+  padding-left: 10px;
+  width: 70%;
+}
+
 .content-legend {
   background: #BCBCBC;
   border: 0px;
