@@ -45,7 +45,8 @@ class Profiler(base_profile.BaseProfile):
             cum_calls, num_calls, time_per_call, cum_time, callers = params
             percentage = round(100 * (cum_time / prof.total_tt), 4)
             records.append(
-                (filename, lineno, funcname, cum_time, percentage))
+                (filename, lineno, funcname, cum_time, percentage, num_calls,
+                 cum_calls, time_per_call))
         return sorted(records, key=operator.itemgetter(4), reverse=True)
 
     def run(self):
