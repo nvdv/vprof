@@ -44,6 +44,8 @@ class Profiler(base_profile.BaseProfile):
             filename, lineno, funcname = info
             cum_calls, num_calls, time_per_call, cum_time, callers = params
             percentage = round(100 * (cum_time / prof.total_tt), 4)
+            funcname = funcname.replace('<', '[').replace('>', ']')
+            filename = filename.replace('<', '[').replace('>', ']')
             records.append(
                 (filename, lineno, funcname, cum_time, percentage, num_calls,
                  cum_calls, time_per_call))

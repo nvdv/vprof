@@ -45,19 +45,13 @@ Profiler.prototype.render = function() {
  */
 Profiler.prototype.showTooltip_ = function(element, tooltip, node) {
   d3.select(element).attr('class', 'profiler-record-highlight');
-  var filename = node[0].replace('<', '[').replace('>', ']');
-  var lineno = node[1];
-  var cumulativeTime = node[3];
-  var numberOfCalls = node[5];
-  var cumulativeCalls = node[6];
-  var timePerCall = node[7];
   tooltip.attr('class', 'content-tooltip content-tooltip-visible')
-    .html('<p><b>Line number:</b> ' + lineno +'</p>' +
-          '<p><b>Filename:</b> ' + filename +'</p>' +
-          '<p><b>Cumulative time:</b> ' + cumulativeTime +'s</p>' +
-          '<p><b>Number of calls:</b> ' + numberOfCalls +'</p>' +
-          '<p><b>Cumulative calls:</b> ' + cumulativeCalls +'</p>' +
-          '<p><b>Time per call:</b> ' + timePerCall +'s</p>')
+    .html('<p><b>Line number:</b> ' + node[1] +'</p>' +
+          '<p><b>Filename:</b> ' + node[0] +'</p>' +
+          '<p><b>Cumulative time:</b> ' + node[3] +'s</p>' +
+          '<p><b>Number of calls:</b> ' + node[5] +'</p>' +
+          '<p><b>Cumulative calls:</b> ' + node[6] +'</p>' +
+          '<p><b>Time per call:</b> ' + node[7] +'s</p>')
     .style('left', d3.event.pageX)
     .style('top', d3.event.pageY);
 };
@@ -74,8 +68,7 @@ Profiler.prototype.hideTooltip_ = function(element, tooltip) {
 
 /** Formats profiler record. */
 Profiler.formatProfilerRecord_ = function(data) {
-  var functionName = data[2].replace('<', '[').replace('>', ']');
-  return '<p>' + data[4] + '% '+ functionName + '</p>';
+  return '<p>' + data[4] + '% '+ data[2] + '</p>';
 };
 
 /**
