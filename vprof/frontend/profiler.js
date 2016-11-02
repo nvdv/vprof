@@ -25,16 +25,16 @@ Profiler.prototype.render = function() {
     .attr('class', 'content-tooltip content-tooltip-invisible');
 
   var self = this;
-  content.selectAll('.profiler-record')
+  var records = content.selectAll('.profiler-record-normal')
     .data(this.data_.callStats)
     .enter()
     .append('div')
-    .attr('class', 'profiler-record')
-    .append('text')
-    .html(Profiler.formatProfilerRecord_)
+    .attr('class', 'profiler-record-normal')
     .on('mouseover', function(d) { self.showTooltip_(this, tooltip, d); })
     .on('mouseout', function() { self.hideTooltip_(this, tooltip); });
 
+  records.append('text')
+    .html(Profiler.formatProfilerRecord_);
 };
 
 /**
@@ -44,6 +44,7 @@ Profiler.prototype.render = function() {
  * @param {Object} node - Object with profiler record info.
  */
 Profiler.prototype.showTooltip_ = function(element, tooltip, node) {
+  d3.select(element).attr('class', 'profiler-record-highlight');
   var filename = node[0].replace('<', '[').replace('>', ']');
   var lineno = node[1];
   var cumulativeTime = node[3];
@@ -67,6 +68,7 @@ Profiler.prototype.showTooltip_ = function(element, tooltip, node) {
  * @param {Object} tooltip - Element representing tooltip.
  */
 Profiler.prototype.hideTooltip_ = function(element, tooltip) {
+  d3.select(element).attr('class', 'profiler-record-normal');
   tooltip.attr('class', 'content-tooltip content-tooltip-invisible');
 };
 

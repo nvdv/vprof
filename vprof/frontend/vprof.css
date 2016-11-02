@@ -189,8 +189,16 @@ svg {
   overflow-y: scroll;
 }
 
-.profiler-record {
+.profiler-record-normal {
   background: #BCBCBC;
+  border-radius: 4px;
+  margin: 1.5px;
+  padding-left: 10px;
+  width: 70%;
+}
+
+.profiler-record-highlight {
+  background: #DDDDDD;
   border-radius: 4px;
   margin: 1.5px;
   padding-left: 10px;
@@ -250,7 +258,7 @@ p {
   width: 25%;
 }
 
-.meatmap-module-header {
+.heatmap-module-header {
   font-size: 14px;
   padding-top: 10px;
 }
