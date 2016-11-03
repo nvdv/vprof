@@ -61,5 +61,7 @@ class Profiler(base_profile.BaseProfile):
         return {
             'objectName': self._object_name,
             'callStats': self._transform_stats(prof_stats),
-            'totalTime': prof_stats.total_tt
+            'totalTime': prof_stats.total_tt,
+            'primitiveCalls': prof_stats.prim_calls,
+            'totalCalls': prof_stats.total_calls
         }

@@ -24,6 +24,8 @@ Profiler.prototype.render = function() {
   var tooltip = this.parent_.append('div')
     .attr('class', 'content-tooltip content-tooltip-invisible');
 
+  this.renderLegend_(content);
+
   var self = this;
   var records = content.selectAll('.profiler-record-normal')
     .data(this.data_.callStats)
@@ -69,6 +71,17 @@ Profiler.prototype.hideTooltip_ = function(element, tooltip) {
 /** Formats profiler record. */
 Profiler.formatProfilerRecord_ = function(data) {
   return '<p>' + data[4] + '% '+ data[2] + '</p>';
+};
+
+/** Renders profiler tab legend. */
+Profiler.prototype.renderLegend_ = function(parent) {
+  parent.append('div')
+    .attr('class', 'profiler-header')
+    .append('text')
+    .html('<p><b>Object name:</b> ' + this.data_.objectName + '</p>' +
+          '<p><b>Total time:</b> ' + this.data_.totalTime + 's</p>' +
+          '<p><b>Primitive calls:</b> ' + this.data_.primitiveCalls + '</p>' +
+          '<p><b>Total calls:</b> ' + this.data_.totalCalls + '</p>');
 };
 
 /**
