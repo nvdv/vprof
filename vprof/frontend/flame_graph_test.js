@@ -19,10 +19,4 @@ describe('CPU flame graph test suite', function() {
       .toBe('foo:10 (bar.py)');
   });
 
-  it('Check getPercentage_', function() {
-    expect(flameGraphModule.FlameGraph.getPercentage_(25, 50)).toBe(50);
-    expect(flameGraphModule.FlameGraph.getPercentage_(0, 100)).toBe(0);
-    expect(flameGraphModule.FlameGraph.getPercentage_(
-      88.8, 88.8)).toBe(100);
-  });
 });

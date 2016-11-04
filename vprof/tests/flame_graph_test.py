@@ -13,25 +13,25 @@ class StatProrilerUnittest(unittest.TestCase):
         self.maxDiff = None
         self._profiler._call_tree = {}
         self._profiler._stats = {
-            (('baz', 3, 'f'), ('bar', 2, 'f'), ('foo', 1, 'f')): 10,
-            (('bar', 2, 'f'), ('foo', 1, 'f')): 20,
-            (('foo', 1, 'f'),): 30,
-            (('0', 4, 'e'), ('baz', 3, 'f'), ('bar', 2, 'f'), ('foo', 1, 'f')): 40,
+            (('baz', 'f', 3), ('bar', 'f', 2), ('foo', 'f', 1)): 10,
+            (('bar', 'f', 2), ('foo', 'f', 1)): 20,
+            (('foo', 'f', 1),): 30,
+            (('0', 'e', 4), ('baz', 'f', 3), ('bar', 'f', 2), ('foo', 'f', 1)): 40,
         }
         expected_result = {
-            'stack': ('base', 1, ''),
+            'stack': ('base', '', 1, 100.0),
             'sampleCount': 100,
             'children': [{
-                'stack': ('foo', 1, 'f'),
+                'stack': ('foo', 'f', 1, 100.0),
                 'sampleCount': 100,
                 'children': [{
-                    'stack': ('bar', 2, 'f'),
+                    'stack': ('bar', 'f', 2, 70.0),
                     'sampleCount': 70,
                     'children': [{
-                        'stack': ('baz', 3, 'f'),
+                        'stack': ('baz', 'f', 3, 50.0),
                         'sampleCount': 50,
                         'children': [{
-                            'stack': ('0', 4, 'e'),
+                            'stack': ('0', 'e', 4, 40.0),
                             'sampleCount': 40,
                             'children': []
                         }]

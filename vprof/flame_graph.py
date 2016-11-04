@@ -84,19 +84,33 @@ class _StatProfiler(object):
             self._fill_sample_count(child) for child in node['children'])
         return node['sampleCount']
 
+    def _reformat_tree(self, node, total_samples):
+        """Preprocesses call tree for UI."""
+        funcname, filename, lineno = node['stack']
+        funcname = funcname.replace('<', '[').replace('>', ']')
+        filename = filename.replace('<', '[').replace('>', ']')
+        percentage = 100 * round(float(node['sampleCount']) / total_samples, 3)
+        return {
+            'stack': (funcname, filename, lineno, percentage),
+            'children': [self._reformat_tree(child, total_samples)
+                         for child in node['children']],
+            'sampleCount': node['sampleCount']
+        }
+
     @property
     def call_tree(self):
         """Fills and returns the call tree obtained from profiler run."""
         if self._call_tree:
             return self._call_tree
         self._call_tree = {
-            'stack': ('base', 1, ''),
+            'stack': ('base', '', 1),
             'children': [],
             'sampleCount': 0}
         for stack, sample_count in self._stats.items():
             self._insert_stack(reversed(stack), sample_count, self._call_tree)
         self._fill_sample_count(self._call_tree)
-        return self._call_tree
+        return self._reformat_tree(
+            self._call_tree, self._call_tree['sampleCount'])
 
 
 class FlameGraphProfiler(base_profile.BaseProfile):

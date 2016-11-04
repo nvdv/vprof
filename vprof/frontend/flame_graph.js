@@ -164,17 +164,12 @@ FlameGraph.prototype.redrawTitles_ = function(titles) {
  */
 FlameGraph.prototype.showTooltip_ = function(element, tooltip, node) {
   d3.select(element).attr('class', 'flame-graph-rect-highlight');
-  var percentage = FlameGraph.getPercentage_(
-      node.sampleCount, this.data_.totalSamples);
-  var functionName = node.stack[0].replace('<', '[').replace('>', ']');
-  var filename = node.stack[1].replace('<', '[').replace('>', ']');
-  var lineno = node.stack[2];
   tooltip.attr('class', 'content-tooltip content-tooltip-visible')
-    .html('<p><b>Function name:</b> ' + functionName + '</p>' +
-          '<p><b>Line number:</b> ' + lineno +'</p>' +
-          '<p><b>Filename:</b> ' + filename +'</p>' +
+    .html('<p><b>Function name:</b> ' + node.stack[0] + '</p>' +
+          '<p><b>Line number:</b> ' + node.stack[2] +'</p>' +
+          '<p><b>Filename:</b> ' + node.stack[1] +'</p>' +
           '<p><b>Sample count:</b> ' + node.sampleCount + '</p>' +
-          '<p><b>Percentage:</b> ' + percentage +'</p>')
+          '<p><b>Percentage:</b> ' + node.stack[3] +'%</p>')
     .style('left', d3.event.pageX)
     .style('top', d3.event.pageY);
 };
@@ -234,13 +229,6 @@ FlameGraph.getTruncatedNodeName_ = function(d, rectLength) {
     return fullname.substr(0, maxSymbols) + '...';
   }
   return fullname;
-};
-
-/**
- * Returns percentage that val takes in total.
- */
-FlameGraph.getPercentage_ = function(val, total) {
-  return 100 * Math.round(val / total * 1000) / 1000;
 };
 
 /**
