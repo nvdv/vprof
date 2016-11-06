@@ -71,8 +71,8 @@ def run_profilers(run_object, prof_config, verbose=False):
 
     run_stats = OrderedDict()
     present_profilers = ((o, p) for o, p in _PROFILERS if o in prof_config)
-    for option, profiler in present_profilers:
-        curr_profiler = profiler(run_object)
+    for option, prof in present_profilers:
+        curr_profiler = prof(run_object)
         if verbose:
             print('Running %s...' % curr_profiler.__class__.__name__)
         run_stats[option] = curr_profiler.run()
