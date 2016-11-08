@@ -35,7 +35,7 @@ Profiler.prototype.render = function() {
     .on('mouseover', function(d) { self.showTooltip_(this, tooltip, d); })
     .on('mouseout', function() { self.hideTooltip_(this, tooltip); });
 
-  records.append('text')
+  records//.append('text')
     .html(Profiler.formatProfilerRecord_);
 };
 
@@ -70,7 +70,12 @@ Profiler.prototype.hideTooltip_ = function(element, tooltip) {
 
 /** Formats profiler record. */
 Profiler.formatProfilerRecord_ = function(data) {
-  return '<p>' + data[4] + '% '+ data[2] + '</p>';
+  return (
+      '<div class="profiler-record-percentage">' + data[4] + '%</div>' +
+      '<div class="profiler-record-funcname">' + data[2] + '</div>' +
+      '<div class="profiler-record-filename">' + data[8] + '</div>' + '@' +
+      '<div class="profiler-record-lineno">' + data[1] + '</div>' +
+      '<div class="profiler-record-cumtime">' + data[3] + 's</div>');
 };
 
 /** Renders profiler tab legend. */

@@ -192,6 +192,7 @@ svg {
 .profiler-record-normal {
   background: #BCBCBC;
   border-radius: 4px;
+  font-size: 15px;
   margin: 1.5px;
   padding-left: 10px;
   width: 70%;
@@ -200,9 +201,33 @@ svg {
 .profiler-record-highlight {
   background: #DDDDDD;
   border-radius: 4px;
+  font-size: 15px;
   margin: 1.5px;
   padding-left: 10px;
   width: 70%;
+}
+
+.profiler-record-percentage {
+  display: inline-block;
+  padding-right: 7px;
+}
+
+.profiler-record-funcname {
+  display: inline-block;
+  padding-right: 5px;
+}
+
+.profiler-record-filename {
+  display: inline-block;
+}
+
+.profiler-record-lineno {
+  display: inline-block;
+  padding-right: 15px;
+}
+
+.profiler-record-cumtime {
+  display: inline-block;
 }
 
 .content-legend {
