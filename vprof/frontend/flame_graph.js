@@ -124,6 +124,7 @@ FlameGraph.prototype.zoomOut_ = function(allNodes, titles) {
 /**
  * Recalculates node horizontal position and width, because
  * d3 partition width is not customizable.
+ * TODO(nvdv): This step is won't be required in d3 4.0. Remove it.
  * @param {Object} node - Current flame graph node.
  */
 FlameGraph.prototype.recalcNode_ = function(node) {
