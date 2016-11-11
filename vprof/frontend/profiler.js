@@ -24,19 +24,23 @@ Profiler.prototype.render = function() {
   var tooltip = this.parent_.append('div')
     .attr('class', 'content-tooltip content-tooltip-invisible');
 
+  var recordsTable = content.append('div')
+    .attr('class', 'profiler-record-table-wrapper')
+    .append('div')
+    .attr('class', 'profiler-record-table');
+
   this.renderLegend_(content);
 
   var self = this;
-  var records = content.selectAll('.profiler-record-normal')
+  var records = recordsTable.selectAll('.profiler-record-normal')
     .data(this.data_.callStats)
     .enter()
-    .append('div')
+    .append('tr')
     .attr('class', 'profiler-record-normal')
     .on('mouseover', function(d) { self.showTooltip_(this, tooltip, d); })
     .on('mouseout', function() { self.hideTooltip_(this, tooltip); });
 
-  records//.append('text')
-    .html(Profiler.formatProfilerRecord_);
+  records.html(Profiler.formatProfilerRecord_);
 };
 
 /**
@@ -68,20 +72,25 @@ Profiler.prototype.hideTooltip_ = function(element, tooltip) {
   tooltip.attr('class', 'content-tooltip content-tooltip-invisible');
 };
 
-/** Formats profiler record. */
+/**
+ * Formats profiler record.
+ * @static
+ * */
 Profiler.formatProfilerRecord_ = function(data) {
   return (
-      '<div class="profiler-record-percentage">' + data[4] + '%</div>' +
-      '<div class="profiler-record-funcname">' + data[2] + '</div>' +
-      '<div class="profiler-record-filename">' + data[8] + '</div>' + '@' +
-      '<div class="profiler-record-lineno">' + data[1] + '</div>' +
-      '<div class="profiler-record-cumtime">' + data[3] + 's</div>');
+      '<td class="profiler-record-percentage">' + data[4] + '%</td>' +
+      '<td class="profiler-record-name">' +
+        '<span class="profiler-record-funcname">' + data[2] + '</span>' + ' ' +
+        '<span class="profiler-record-filename">' + data[8] + '</span>' + ':' +
+        '<span class="profiler-record-lineno">' + data[1] + '</span>' +
+      '</td>' +
+      '<td class="profiler-record-cumtime">' + data[3] + 's</td>');
 };
 
 /** Renders profiler tab legend. */
 Profiler.prototype.renderLegend_ = function(parent) {
   parent.append('div')
-    .attr('class', 'profiler-header')
+    .attr('class', 'profiler-legend')
     .append('text')
     .html('<p><b>Object name:</b> ' + this.data_.objectName + '</p>' +
           '<p><b>Total time:</b> ' + this.data_.totalTime + 's</p>' +
