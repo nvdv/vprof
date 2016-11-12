@@ -25,7 +25,7 @@ def get_package_code(package_path):
     return all_code
 
 
-class BaseProfile(object):
+class BaseProfiler(object):
     """Base class for a profile wrapper."""
 
     def __init__(self, run_object):

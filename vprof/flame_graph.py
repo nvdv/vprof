@@ -5,7 +5,7 @@ import signal
 import time
 
 from collections import defaultdict
-from vprof import base_profile
+from vprof import base_profiler
 
 _SAMPLE_INTERVAL = 0.001
 
@@ -113,7 +113,7 @@ class _StatProfiler(object):
             self._call_tree, self._call_tree['sampleCount'])
 
 
-class FlameGraphProfiler(base_profile.BaseProfile):
+class FlameGraphProfiler(base_profiler.BaseProfiler):
     """Flame graph profiler wrapper.
 
     Runs statistical profiler and processes obtained stats.

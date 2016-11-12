@@ -5,10 +5,10 @@ import os
 import pstats
 import runpy
 
-from vprof import base_profile
+from vprof import base_profiler
 
 
-class Profiler(base_profile.BaseProfile):
+class Profiler(base_profiler.BaseProfiler):
     """Python profiler wrapper.
 
     Runs profiler and post-processes obtained stats.

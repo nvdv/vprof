@@ -10,7 +10,7 @@ import sys
 
 from collections import deque
 from collections import Counter
-from vprof import base_profile
+from vprof import base_profiler
 
 try:
     import __builtin__ as builtins
@@ -164,7 +164,7 @@ class _CodeEventsTracker(object):
                              builtins.initial_rss_size)
 
 
-class MemoryProfiler(base_profile.BaseProfile):
+class MemoryProfiler(base_profiler.BaseProfiler):
     """Memory profiler wrapper.
 
     Runs memory profiler and processes all obtained stats.
@@ -172,7 +172,7 @@ class MemoryProfiler(base_profile.BaseProfile):
 
     def run_as_package(self):
         """Runs program as package."""
-        pkg_code = base_profile.get_package_code(self._run_object)
+        pkg_code = base_profiler.get_package_code(self._run_object)
         with _CodeEventsTracker() as prof:
             for _, compiled_code in pkg_code.values():
                 prof.add_code(compiled_code)

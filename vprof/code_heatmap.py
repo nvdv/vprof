@@ -6,7 +6,7 @@ import runpy
 import sys
 
 from collections import defaultdict
-from vprof import base_profile
+from vprof import base_profiler
 
 
 class _CodeHeatmapCalculator(object):
@@ -45,7 +45,7 @@ class _CodeHeatmapCalculator(object):
         return self._calc_heatmap
 
 
-class CodeHeatmapProfile(base_profile.BaseProfile):
+class CodeHeatmapProfile(base_profiler.BaseProfiler):
     """Code heatmap wrapper.
 
     Contains all logic related to heatmap calculation and processing.
@@ -112,7 +112,7 @@ class CodeHeatmapProfile(base_profile.BaseProfile):
 
     def run_as_package(self):
         """Runs program as Python package."""
-        pkg_code = base_profile.get_package_code(self._run_object)
+        pkg_code = base_profiler.get_package_code(self._run_object)
         with _CodeHeatmapCalculator() as prof:
             for _, compiled_code in pkg_code.values():
                 prof.add_code(compiled_code)

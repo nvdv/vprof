@@ -2,7 +2,7 @@
 import sys
 import unittest
 
-from vprof import base_profile
+from vprof import base_profiler
 
 # For Python 2 and Python 3 compatibility.
 try:
@@ -19,7 +19,7 @@ class GetPackageCodeUnittest(unittest.TestCase):
 
 class BaseProfileUnittest(unittest.TestCase):
     def setUp(self):
-        self._profile = object.__new__(base_profile.BaseProfile)
+        self._profile = object.__new__(base_profiler.BaseProfiler)
 
     def testInit_RunObjFunction(self):
         _func = lambda foo: foo
