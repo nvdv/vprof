@@ -51,7 +51,7 @@ class CodeHeatmapCalculator(unittest.TestCase):
 
 class CodeHeatmapProfileUnitTest(unittest.TestCase):
     def setUp(self):
-        self._profile = object.__new__(code_heatmap.CodeHeatmapProfile)
+        self._profile = object.__new__(code_heatmap.CodeHeatmapProfiler)
 
     def testCalcSkips(self):
         heatmap = {1: 1, 2: 1, 3: 1}

@@ -31,7 +31,7 @@ _MAIN_MODULE_SOURCELINES = [
 class CodeHeatmapModuleEndToEndTest(unittest.TestCase):
 
     def setUp(self):
-        program_stats = code_heatmap.CodeHeatmapProfile(
+        program_stats = code_heatmap.CodeHeatmapProfiler(
             _MODULE_FILENAME).run()
         stats_handler = functools.partial(
             stats_server.StatsHandler, program_stats)
@@ -57,7 +57,7 @@ class CodeHeatmapModuleEndToEndTest(unittest.TestCase):
 class CodeHeatmapPackageEndToEndTest(unittest.TestCase):
 
     def setUp(self):
-        program_stats = code_heatmap.CodeHeatmapProfile(
+        program_stats = code_heatmap.CodeHeatmapProfiler(
             _PACKAGE_PATH).run()
         stats_handler = functools.partial(
             stats_server.StatsHandler, program_stats)

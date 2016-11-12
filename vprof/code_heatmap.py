@@ -45,7 +45,7 @@ class _CodeHeatmapCalculator(object):
         return self._calc_heatmap
 
 
-class CodeHeatmapProfile(base_profiler.BaseProfiler):
+class CodeHeatmapProfiler(base_profiler.BaseProfiler):
     """Code heatmap wrapper.
 
     Contains all logic related to heatmap calculation and processing.
