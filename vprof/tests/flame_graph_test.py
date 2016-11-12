@@ -4,7 +4,7 @@ import unittest
 from vprof import flame_graph
 
 
-class StatProrilerUnittest(unittest.TestCase):
+class StatProfilerUnittest(unittest.TestCase):
 
     def setUp(self):
         self._profiler = object.__new__(flame_graph._StatProfiler)

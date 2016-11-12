@@ -9,7 +9,7 @@ from six.moves import urllib
 
 from vprof import memory_profiler
 from vprof import stats_server
-from vprof import profiler
+from vprof import runner
 from vprof.tests import test_pkg # pylint: disable=unused-import
 
 try:
@@ -23,7 +23,7 @@ _MODULE_FILENAME = 'vprof/tests/test_pkg/dummy_module.py'
 _PACKAGE_PATH = 'vprof/tests/test_pkg/'
 
 
-class MemoryProfileModuleEndToEndTest(unittest.TestCase):
+class MemoryProfilerModuleEndToEndTest(unittest.TestCase):
 
     def setUp(self):
         program_stats = memory_profiler.MemoryProfiler(
@@ -51,7 +51,7 @@ class MemoryProfileModuleEndToEndTest(unittest.TestCase):
         self.assertEqual(first_event[3], '<module>')
 
 
-class MemoryProfilePackageEndToEndTest(unittest.TestCase):
+class MemoryProfilerPackageEndToEndTest(unittest.TestCase):
 
     def setUp(self):
         program_stats = memory_profiler.MemoryProfiler(
@@ -78,7 +78,7 @@ class MemoryProfilePackageEndToEndTest(unittest.TestCase):
         self.assertEqual(first_event[3], '<module>')
 
 
-class MemoryProfileFunctionEndToEndTest(unittest.TestCase):
+class MemoryProfilerFunctionEndToEndTest(unittest.TestCase):
 
     def setUp(self):
 
@@ -98,7 +98,7 @@ class MemoryProfileFunctionEndToEndTest(unittest.TestCase):
         self.server.server_close()
 
     def testRequest(self):
-        profiler.run(
+        runner.run(
             self._func, 'm', ('foo', 'bar'), host=_HOST, port=_PORT)
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))

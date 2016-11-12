@@ -89,7 +89,11 @@ class _StatProfiler(object):
         funcname, filename, lineno = node['stack']
         funcname = funcname.replace('<', '[').replace('>', ']')
         filename = filename.replace('<', '[').replace('>', ']')
-        percentage = 100 * round(float(node['sampleCount']) / total_samples, 3)
+        if total_samples != 0:
+            percentage = 100 * round(
+                float(node['sampleCount']) / total_samples, 3)
+        else:
+            percentage = 0
         return {
             'stack': (funcname, filename, lineno, percentage),
             'children': [self._reformat_tree(child, total_samples)

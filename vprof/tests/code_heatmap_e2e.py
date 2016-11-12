@@ -9,7 +9,7 @@ from six.moves import urllib
 
 from vprof import code_heatmap
 from vprof import stats_server
-from vprof import profiler
+from vprof import runner
 from vprof.tests import test_pkg # pylint: disable=unused-import
 
 _HOST, _PORT = 'localhost', 12345
@@ -103,7 +103,7 @@ class CodeHeatmapFunctionEndToEndTest(unittest.TestCase):
         self.server.server_close()
 
     def testRequest(self):
-        profiler.run(
+        runner.run(
             self._func, 'h', ('foo', 'bar'), host=_HOST, port=_PORT)
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
