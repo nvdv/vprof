@@ -7,7 +7,7 @@ import unittest
 
 from six.moves import urllib
 
-from vprof import memory_profile
+from vprof import memory_profiler
 from vprof import stats_server
 from vprof import profiler
 from vprof.tests import test_pkg # pylint: disable=unused-import
@@ -26,7 +26,7 @@ _PACKAGE_PATH = 'vprof/tests/test_pkg/'
 class MemoryProfileModuleEndToEndTest(unittest.TestCase):
 
     def setUp(self):
-        program_stats = memory_profile.MemoryProfile(
+        program_stats = memory_profiler.MemoryProfiler(
             _MODULE_FILENAME).run()
         stats_handler = functools.partial(
             stats_server.StatsHandler, program_stats)
@@ -54,7 +54,7 @@ class MemoryProfileModuleEndToEndTest(unittest.TestCase):
 class MemoryProfilePackageEndToEndTest(unittest.TestCase):
 
     def setUp(self):
-        program_stats = memory_profile.MemoryProfile(
+        program_stats = memory_profiler.MemoryProfiler(
             _PACKAGE_PATH).run()
         stats_handler = functools.partial(
             stats_server.StatsHandler, program_stats)

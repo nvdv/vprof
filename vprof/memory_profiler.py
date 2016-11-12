@@ -164,7 +164,7 @@ class _CodeEventsTracker(object):
                              builtins.initial_rss_size)
 
 
-class MemoryProfile(base_profile.BaseProfile):
+class MemoryProfiler(base_profile.BaseProfile):
     """Memory profiler wrapper.
 
     Runs memory profiler and processes all obtained stats.

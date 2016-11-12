@@ -20,13 +20,13 @@ from collections import OrderedDict
 from six.moves import urllib
 from vprof import code_heatmap
 from vprof import flame_graph
-from vprof import memory_profile
+from vprof import memory_profiler
 from vprof import profiler
 from vprof import stats_server
 
 _PROFILERS = (
     ('c', flame_graph.FlameGraphProfiler),
-    ('m', memory_profile.MemoryProfile),
+    ('m', memory_profiler.MemoryProfiler),
     ('h', code_heatmap.CodeHeatmapProfile),
     ('p', profiler.Profiler)
 )
