@@ -22,7 +22,7 @@ function FlameGraph(parent, data) {
   this.LEGEND_Y = 100;
   this.MIN_TEXT_HEIGHT = 18;
   this.HELP_MESSAGE = (
-    '<p>&#8226 Hover to see node stats</p>' +
+    '<p>&#8226 Hover over node to see node stats</p>' +
     '<p>&#8226 Click on node to zoom</p>'+
     '<p>&#8226 Double click to restore original scale</p>');
 

@@ -24,7 +24,7 @@ function CodeHeatmap(parent, data) {
   this.MAX_RUN_COLOR = '#47d147';
   this.COLOR_SCALE_POWER = 0.25;
   this.HELP_MESSAGE = (
-    '<p>&#8226 Hover to see line execution count.</p>');
+    '<p>&#8226 Hover over line to see line execution count.</p>');
 
   this.data_ = data;
   this.parent_ = parent;

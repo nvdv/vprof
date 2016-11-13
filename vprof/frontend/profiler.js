@@ -12,6 +12,9 @@ var d3 = require('d3');
  * @param {Object} data - Data for rendering.
  */
 function Profiler(parent, data) {
+  this.HELP_MESSAGE = (
+    '<p>&#8226 Hover over record to see detailed stats</p>');
+
   this.data_ = data;
   this.parent_ = parent;
 }
@@ -30,6 +33,7 @@ Profiler.prototype.render = function() {
     .attr('class', 'profiler-record-table');
 
   this.renderLegend_(content);
+  this.renderHelp_();
 
   var self = this;
   var records = recordsTable.selectAll('.profiler-record-normal')
@@ -96,6 +100,13 @@ Profiler.prototype.renderLegend_ = function(parent) {
           '<p><b>Total time:</b> ' + this.data_.totalTime + 's</p>' +
           '<p><b>Primitive calls:</b> ' + this.data_.primitiveCalls + '</p>' +
           '<p><b>Total calls:</b> ' + this.data_.totalCalls + '</p>');
+};
+
+/** Renders profiler output help. */
+Profiler.prototype.renderHelp_ = function() {
+  this.parent_.append('div')
+    .attr('class', 'tabhelp inactive-tabhelp')
+    .html(this.HELP_MESSAGE);
 };
 
 /**
