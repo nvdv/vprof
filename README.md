@@ -61,6 +61,10 @@ vprof -c <modes> <program>
 
 Shows CPU flame graph for `<program>`.
 
+* `p` - profiler.
+
+Runs profiler against `<test_program>` and shows result.
+
 * `m` - memory graph.
 
 Shows objects that are tracked by CPython GC and left in memory after code execution. Also shows process memory usage during execution of each line of `<program>`.
