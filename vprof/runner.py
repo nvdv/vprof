@@ -25,8 +25,8 @@ from vprof import profiler
 from vprof import stats_server
 
 _PROFILERS = (
-    ('c', flame_graph.FlameGraphProfiler),
     ('m', memory_profiler.MemoryProfiler),
+    ('c', flame_graph.FlameGraphProfiler),
     ('h', code_heatmap.CodeHeatmapProfiler),
     ('p', profiler.Profiler)
 )
