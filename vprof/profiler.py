@@ -11,11 +11,11 @@ from vprof import base_profiler
 class Profiler(base_profiler.BaseProfiler):
     """Python profiler wrapper.
 
-    Runs profiler and post-processes obtained stats.
+    Runs cProfile against specified program and returns obtained stats.
     """
 
     def run_as_package(self, prof):
-        """Runs program as package."""
+        """Runs program as a Python package."""
         prof.enable()
         try:
             runpy.run_path(self._run_object, run_name='__main__')
@@ -24,7 +24,7 @@ class Profiler(base_profiler.BaseProfiler):
         prof.disable()
 
     def run_as_module(self, prof):
-        """Runs program as module."""
+        """Runs program as Python module."""
         try:
             with open(self._run_object, 'rb') as srcfile:
                 code = compile(srcfile.read(), self._run_object, 'exec')
@@ -33,13 +33,13 @@ class Profiler(base_profiler.BaseProfiler):
             pass
 
     def run_as_function(self, prof):
-        """Runs object as function."""
+        """Runs object as a Python function."""
         prof.enable()
         self._run_object(*self._run_args, **self._run_kwargs)
         prof.disable()
 
     def _transform_stats(self, prof):
-        """Processes profiler stats."""
+        """Post-processes obtained stats for UI."""
         records = []
         for info, params in prof.stats.items():
             filename, lineno, funcname = info
@@ -55,7 +55,7 @@ class Profiler(base_profiler.BaseProfiler):
         return sorted(records, key=operator.itemgetter(4), reverse=True)
 
     def run(self):
-        """Collects CProfile stats for specified Python program."""
+        """Runs cProfile and retunrs obtained stats."""
         prof = cProfile.Profile()
         run_dispatcher = self.get_run_dispatcher()
         run_dispatcher(prof)

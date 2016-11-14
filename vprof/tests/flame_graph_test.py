@@ -9,6 +9,21 @@ class StatProfilerUnittest(unittest.TestCase):
     def setUp(self):
         self._profiler = object.__new__(flame_graph._StatProfiler)
 
+    def testExtractStackParams(self):
+        total_samples = 100
+        node = {
+            'stack': ('<funcname>', '<filename>', 10),
+            'sampleCount': 100
+        }
+        self.assertEqual(
+            self._profiler._extract_stack_params(node, total_samples),
+            ('[funcname]', '[filename]', 10, 100.0))
+
+        total_samples = 0
+        self.assertEqual(
+            self._profiler._extract_stack_params(node, total_samples),
+            ('[funcname]', '[filename]', 10, 0.0))
+
     def testCallTreeProperty(self):
         self.maxDiff = None
         self._profiler._call_tree = {}
@@ -20,22 +35,18 @@ class StatProfilerUnittest(unittest.TestCase):
              ('bar', 'f', 2), ('foo', 'f', 1)): 40,
         }
         expected_result = {
-            'stack': ('base', '', 1, 100.0),
+            'stack': ('foo', 'f', 1, 100.0),
             'sampleCount': 100,
             'children': [{
-                'stack': ('foo', 'f', 1, 100.0),
-                'sampleCount': 100,
+                'stack': ('bar', 'f', 2, 70.0),
+                'sampleCount': 70,
                 'children': [{
-                    'stack': ('bar', 'f', 2, 70.0),
-                    'sampleCount': 70,
+                    'stack': ('baz', 'f', 3, 50.0),
+                    'sampleCount': 50,
                     'children': [{
-                        'stack': ('baz', 'f', 3, 50.0),
-                        'sampleCount': 50,
-                        'children': [{
-                            'stack': ('0', 'e', 4, 40.0),
-                            'sampleCount': 40,
-                            'children': []
-                        }]
+                        'stack': ('0', 'e', 4, 40.0),
+                        'sampleCount': 40,
+                        'children': []
                     }]
                 }]
             }]

@@ -10,10 +10,11 @@ from vprof import base_profiler
 _SAMPLE_INTERVAL = 0.001
 
 
+#TODO(nvdv): Some of class methods look complicated. Consider refactoring them.
 class _StatProfiler(object):
     """Statistical profiler.
 
-    Samples call stack at regulal interval specified by _SAMPLE_INTERVAL.
+    Samples call stack at regulal intervals specified by _SAMPLE_INTERVAL.
     """
 
     def __init__(self):
@@ -24,24 +25,25 @@ class _StatProfiler(object):
         self.run_time = None
 
     def __enter__(self):
-        """Enables profiler."""
+        """Enables statistical profiler."""
         signal.signal(signal.SIGPROF, self.sample)
         signal.setitimer(signal.ITIMER_PROF, _SAMPLE_INTERVAL)
         self._start_time = time.time()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tbf):
-        """Disables profiler."""
+        """Disables statistical profiler."""
         self.run_time = time.time() - self._start_time
         signal.setitimer(signal.ITIMER_PROF, 0)
 
     def sample(self, signum, frame):  #pylint: disable=unused-argument
-        """Callback that samples current stack and stores result in
-        self._stats.
+        """Samples current stack and stores result in self._stats.
+
+        Used as callback.
 
         Args:
-            signum: Signal that activated handler.
-            frame: Current frame when signal is handled.
+            signum: Signal that activates handler.
+            frame: Frame on top of the stack when signal is handled.
         """
         stack = []
         while frame and frame != self.base_frame:
@@ -54,14 +56,14 @@ class _StatProfiler(object):
         signal.setitimer(signal.ITIMER_PROF, _SAMPLE_INTERVAL)
 
     def _insert_stack(self, stack, sample_count, call_tree):
-        """Inserts stack with sample count .
+        """Inserts stack into the call tree.
 
         Also creates all intermediate nodes in the call tree.
 
         Args:
-            stack: Stack to insert into call_tree.
-            sample_count: Sample count for stack.
-            call_tree: Dict representing call tree.
+            stack: Call stack to be inserted.
+            sample_count: Sample count for call stack.
+            call_tree: Python dict representing the call tree.
         """
         curr_level = call_tree
         for func in stack:
@@ -80,13 +82,13 @@ class _StatProfiler(object):
         curr_level['sampleCount'] = sample_count
 
     def _fill_sample_count(self, node):
-        """Fills proper sample counts inside call tree."""
+        """Counts and fills sample counts inside call tree."""
         node['sampleCount'] += sum(
             self._fill_sample_count(child) for child in node['children'])
         return node['sampleCount']
 
-    def _reformat_tree(self, node, total_samples):
-        """Preprocesses call tree for UI."""
+    def _extract_stack_params(self, node, total_samples):
+        """Extracts and processes stack parameters from call tree node."""
         funcname, filename, lineno = node['stack']
         funcname = funcname.replace('<', '[').replace('>', ']')
         filename = filename.replace('<', '[').replace('>', ']')
@@ -94,9 +96,13 @@ class _StatProfiler(object):
             percentage = 100 * round(
                 float(node['sampleCount']) / total_samples, 3)
         else:
-            percentage = 0
+            percentage = 0.0
+        return funcname, filename, lineno, percentage
+
+    def _reformat_tree(self, node, total_samples):
+        """Reformats call tree for the UI."""
         return {
-            'stack': (funcname, filename, lineno, percentage),
+            'stack': self._extract_stack_params(node, total_samples),
             'children': [self._reformat_tree(child, total_samples)
                          for child in node['children']],
             'sampleCount': node['sampleCount']
@@ -104,24 +110,31 @@ class _StatProfiler(object):
 
     @property
     def call_tree(self):
-        """Fills and returns the call tree obtained from profiler run."""
+        """Returns call tree from statistical profiler."""
         if self._call_tree:
             return self._call_tree
-        self._call_tree = {
+
+        # Add base node to call tree for convenience,
+        call_tree = {
             'stack': ('base', '', 1),
             'children': [],
             'sampleCount': 0}
         for stack, sample_count in self._stats.items():
-            self._insert_stack(reversed(stack), sample_count, self._call_tree)
-        self._fill_sample_count(self._call_tree)
-        return self._reformat_tree(
-            self._call_tree, self._call_tree['sampleCount'])
+            self._insert_stack(reversed(stack), sample_count, call_tree)
+        self._fill_sample_count(call_tree)
+        call_tree = self._reformat_tree(
+            call_tree, call_tree['sampleCount'])
+
+        # Omit base node in results.
+        if call_tree['children']:
+            self._call_tree = call_tree['children'][0]
+        return self._call_tree
 
 
 class FlameGraphProfiler(base_profiler.BaseProfiler):
     """Flame graph profiler wrapper.
 
-    Runs statistical profiler and processes obtained stats.
+    Runs statistical profiler and returns obtained stats.
     """
 
     def run_as_package(self):
@@ -151,13 +164,14 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
         return prof
 
     def run(self):
-        """Runs stat profiler and returns processed stats."""
+        """Runs statistical profiler and returns stats."""
         run_dispatcher = self.get_run_dispatcher()
         prof = run_dispatcher()
+        sample_count = prof.call_tree.get('sampleCount') or 0
         return {
             'objectName': self._object_name,
             'sampleInterval': _SAMPLE_INTERVAL,
             'runTime': prof.run_time,
             'callStats': prof.call_tree,
-            'totalSamples': prof.call_tree['sampleCount'],
+            'totalSamples': sample_count,
         }
