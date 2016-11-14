@@ -16,7 +16,8 @@ class StatProfilerUnittest(unittest.TestCase):
             (('baz', 'f', 3), ('bar', 'f', 2), ('foo', 'f', 1)): 10,
             (('bar', 'f', 2), ('foo', 'f', 1)): 20,
             (('foo', 'f', 1),): 30,
-            (('0', 'e', 4), ('baz', 'f', 3), ('bar', 'f', 2), ('foo', 'f', 1)): 40,
+            (('0', 'e', 4), ('baz', 'f', 3),
+             ('bar', 'f', 2), ('foo', 'f', 1)): 40,
         }
         expected_result = {
             'stack': ('base', '', 1, 100.0),

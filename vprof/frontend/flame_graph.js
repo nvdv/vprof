@@ -132,7 +132,8 @@ FlameGraph.prototype.recalcNode_ = function(node) {
     var currX = node.x;
     for (var i = 0; i < node.children.length; i++) {
       node.children[i].x = currX;
-      node.children[i].dx = node.children[i].sampleCount / this.data_.totalSamples;
+      node.children[i].dx = (node.children[i].sampleCount /
+                             this.data_.totalSamples);
       currX += node.children[i].dx;
     }
   }

@@ -54,8 +54,9 @@ class _StatProfiler(object):
         signal.setitimer(signal.ITIMER_PROF, _SAMPLE_INTERVAL)
 
     def _insert_stack(self, stack, sample_count, call_tree):
-        """Inserts stack with sample count creating all intermediate nodes in the
-        call tree.
+        """Inserts stack with sample count .
+
+        Also creates all intermediate nodes in the call tree.
 
         Args:
             stack: Stack to insert into call_tree.
