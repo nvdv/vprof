@@ -25,6 +25,8 @@ function FlameGraph(parent, data) {
     '<p>&#8226 Hover over node to see node stats</p>' +
     '<p>&#8226 Click on node to zoom</p>'+
     '<p>&#8226 Double click to restore original scale</p>');
+  this.NO_DATA_MESSAGE = (
+    'Sorry, no samples. Seems like run time is less than sampling interval.');
 
   this.data_ = data;
   this.parent_ = parent;
@@ -47,6 +49,12 @@ FlameGraph.prototype.render = function() {
 
   this.renderLegend_();
   this.renderHelp_();
+
+  // Display message and stop if callStats is empty.
+  if (Object.keys(this.data_.callStats).length === 0) {
+    this.renderNoDataMessage_();
+    return;
+  }
 
   var cells = canvas.selectAll(".flame-graph-cell")
     .data(this.flameGraph_.nodes(this.data_.callStats))
@@ -203,6 +211,13 @@ FlameGraph.prototype.renderHelp_ = function() {
   this.parent_.append('div')
     .attr('class', 'tabhelp inactive-tabhelp')
     .html(this.HELP_MESSAGE);
+};
+
+/** Renders message when callStats is empty. */
+FlameGraph.prototype.renderNoDataMessage_ = function() {
+  this.parent_.append('div')
+    .attr('class', 'flame-graph-no-data-message')
+    .html(this.NO_DATA_MESSAGE);
 };
 
 /**

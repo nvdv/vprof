@@ -26,7 +26,7 @@ import jinja2
 import flask
 import sqlite3
 
-from vprof import profiler
+from vprof import runner
 
 DB = '/tmp/guestbook.db'
 DB_SCHEMA = """
@@ -111,10 +111,10 @@ def profiler_handler(uri):
     """Profiler handler."""
     # HTTP method should be GET.
     if uri == 'main':
-        profiler.run(show_guestbook, 'cmh')
+        runner.run(show_guestbook, 'cmhp')
     # In this case HTTP method should be POST singe add_entry uses POST
     elif uri == 'add':
-        profiler.run(add_entry, 'cmh')
+        runner.run(add_entry, 'cmhp')
     return flask.redirect('/')
 
 

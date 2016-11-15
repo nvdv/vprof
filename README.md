@@ -99,15 +99,15 @@ vprof -r
 To profile a function run
 
 ```python
-from vprof import profiler
+from vprof import runner
 
 def foo(arg1, arg2):
     ...
 
-profiler.run(foo, 'cmh', args=(arg1, arg2), host='localhost', port=8000)
+runner.run(foo, 'cmhp', args=(arg1, arg2), host='localhost', port=8000)
 ```
 
-where `cmh` is profiling mode, `host` and `port` are hostname and port of `vprof` server launched in remote mode. Obtained stats will be rendered in new tab of default web browser, opened by `vprof -r` command.
+where `cmhp` is profiling mode, `host` and `port` are hostname and port of `vprof` server launched in remote mode. Obtained stats will be rendered in new tab of default web browser, opened by `vprof -r` command.
 
 `vprof` can save profile to file and render profile from file.
 
