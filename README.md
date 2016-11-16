@@ -11,9 +11,7 @@ The project is in active development and some of its features might not work as
 expected.
 
 ## Screenshots
-![flame-graph](http://i.imgur.com/ijC7wmj.png?1)
-![memory-stats](http://i.imgur.com/3uUeWA2.png?1)
-![code-heatmap](http://i.imgur.com/08umZI8.png?1)
+![vprof-gif](http://i.imgur.com/danegsM.gif)
 
 ## Contributing
 All contributions are highly encouraged! You can add new features,
@@ -57,19 +55,19 @@ vprof -c <modes> <program>
 ```
 `<modes>` is a combination of supported modes:
 
-* `c` - CPU flame graph.
+* `c` - CPU flame graph
 
 Shows CPU flame graph for `<program>`.
 
-* `p` - profiler.
+* `p` - profiler
 
-Runs profiler against `<test_program>` and shows result.
+Runs Python profiler on `<test_program>` and shows result.
 
-* `m` - memory graph.
+* `m` - memory graph
 
-Shows objects that are tracked by CPython GC and left in memory after code execution. Also shows process memory usage during execution of each line of `<program>`.
+Shows objects that are tracked by CPython GC and left in memory after code execution. Also shows process memory usage after execution of each line of `<program>`.
 
-* `h` - code heatmap.
+* `h` - code heatmap
 
 Displays all executed code of `<program>` with line execution count.
 
@@ -109,7 +107,7 @@ runner.run(foo, 'cmhp', args=(arg1, arg2), host='localhost', port=8000)
 
 where `cmhp` is profiling mode, `host` and `port` are hostname and port of `vprof` server launched in remote mode. Obtained stats will be rendered in new tab of default web browser, opened by `vprof -r` command.
 
-`vprof` can save profile to file and render profile from file.
+`vprof` is able to save profile stats to file and render vizualitations from previously saved file.
 
 ```sh
 vprof -c cmh --output-file profile.json
@@ -124,7 +122,7 @@ renders visualizations from previously saved file.
 
 Check `vprof -h` for full list of supported parameters.
 
-To show UI help, press `h` when visualizations are displayed in browser.
+To show UI help, press `h` when visualizations are displayed.
 
 Also you can check `examples` directory for more profiling examples.
 
