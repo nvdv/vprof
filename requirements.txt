@@ -1,2 +1,2 @@
-psutil>=5.0.0
+psutil>=3
 six>=1.10.0
