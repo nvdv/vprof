@@ -78,8 +78,8 @@ function MemoryChart(parent, data) {
 
   this.yRange_ = d3.extent(this.data_.codeEvents, function(d) { return d[2]; });
   this.yScale_ = d3.scale.linear()
-    .domain([this.MIN_RANGE_C * this.yRange_[0],
-             this.MAX_RANGE_C * this.yRange_[1]])
+    .domain([
+      this.MIN_RANGE_C * this.yRange_[0], this.MAX_RANGE_C * this.yRange_[1]])
     .range([this.GRAPH_HEIGHT, 0]);
   this.yAxis_ = d3.svg.axis()
       .scale(this.yScale_)
@@ -191,9 +191,9 @@ MemoryChart.prototype.zoomIn_ = function(path, canvas, focus, tooltip,
     if (this.currZoomRange_.zoomIndexRange < this.TICKS_NUMBER) {
       this.xAxis_.ticks(this.currZoomRange_.zoomIndexRange);
     }
-    this.xScale_.domain(
-      [this.data_.codeEvents[this.currZoomRange_.zoomIndexStart][0],
-       this.data_.codeEvents[this.currZoomRange_.zoomIndexEnd][0]]);
+    this.xScale_.domain([
+      this.data_.codeEvents[this.currZoomRange_.zoomIndexStart][0],
+      this.data_.codeEvents[this.currZoomRange_.zoomIndexEnd][0]]);
     var eventsSlice = this.data_.codeEvents.slice(
         this.currZoomRange_.zoomIndexStart,
         this.currZoomRange_.zoomIndexEnd + 1);

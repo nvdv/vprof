@@ -51,29 +51,29 @@ python setup.py deps_install
 ## Usage
 
 ```sh
-vprof -c <modes> <program>
+vprof -c <config> <src>
 ```
-`<modes>` is a combination of supported modes:
+`<config>` is a combination of supported modes:
 
 * `c` - CPU flame graph
 
-Shows CPU flame graph for `<program>`.
+Shows CPU flame graph for `<src>`.
 
 * `p` - profiler
 
-Runs Python profiler on `<test_program>` and shows result.
+Runs Python profiler on `<src>` and displays results.
 
 * `m` - memory graph
 
-Shows objects that are tracked by CPython GC and left in memory after code execution. Also shows process memory usage after execution of each line of `<program>`.
+Shows objects that are tracked by CPython GC and left in memory after code execution. Also shows process memory usage after execution of each line of `<src>`.
 
 * `h` - code heatmap
 
-Displays all executed code of `<program>` with line execution count.
+Displays all executed code of `<src>` with line execution count.
 
-`<program>` can be Python source file (e.g. `testscript.py`) or path to package (e.g. `myproject/test_package`).
+`<src>` can be Python source file (e.g. `testscript.py`) or path to package (e.g. `myproject/test_package`).
 
-Use double quotes to run scripts with arguments:
+To run scripts with arguments use double quotes
 
 ```sh
 vprof -c cmh "testscript.py --foo --bar"
@@ -107,10 +107,10 @@ runner.run(foo, 'cmhp', args=(arg1, arg2), host='localhost', port=8000)
 
 where `cmhp` is profiling mode, `host` and `port` are hostname and port of `vprof` server launched in remote mode. Obtained stats will be rendered in new tab of default web browser, opened by `vprof -r` command.
 
-`vprof` is able to save profile stats to file and render vizualitations from previously saved file.
+`vprof` is able to save profile stats to file and render visualizations from previously saved file.
 
 ```sh
-vprof -c cmh --output-file profile.json
+vprof -c cmh src.py --output-file profile.json
 ```
 
 writes profile to file and
