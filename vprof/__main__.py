@@ -72,7 +72,7 @@ def main():
             saved_stats = json.loads(ifile.read())
             if saved_stats['version'] != __version__:
                 print('Incorrect profile version - %s. %s is required.' % (
-                    saved_stats, __version__))
+                    saved_stats['version'], __version__))
                 sys.exit(_ERR_CODES['input_file_error'])
             stats_server.start(args.host, args.port, saved_stats,
                                args.dont_start_browser, args.debug_mode)
