@@ -1,0 +1,77 @@
+.memory-info-container {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+}
+
+.memory-usage-graph {
+  width: 70%;
+}
+
+.memory-table-wrapper {
+  overflow-x: scroll;
+  overflow-y: auto;
+  width: 30%;
+}
+
+.memory-objects-table {
+  display: table;
+  background: white;
+  font-size: 14px;
+  margin: 5px;
+  margin-right: 10px;
+  width: 100%;
+}
+
+.memory-objects-table td {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.memory-objects-table tr:hover {
+  background-color: #FD8D3C;
+}
+
+.memory-table-header {
+  background: #BCBCBC;
+  font-weight: bold;
+}
+
+.memory-table-name {
+  background: #F1F1F1;
+  font-weight: bold;
+  text-align: center;
+  padding: 3px;
+  width: 100%;
+}
+
+.memory-table-row:nth-child(even) {
+  background-color: #F2F2F2
+}
+
+.memory-graph {
+  fill: #9EDAE5;
+  opacity: 0.6;
+  stroke: #17BECF;
+  stroke-width: 2px;
+}
+
+.memory-graph-focus {
+  fill: #E6550D;
+}
+
+.memory-graph-dot {
+  fill: #6BAED6;
+}
+
+.memory-graph-focus-line {
+  stroke: #E6550D;
+  stroke-dasharray: 4;
+}
+
+.memory-graph-focus-line-highlight {
+  fill: #FD8D3C;
+  opacity: 0.3;
+  stroke: #E6550D;
+  stroke-width: 2px;
+}

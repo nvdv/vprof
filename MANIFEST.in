@@ -1,5 +1,9 @@
 include vprof/frontend/profile.html
 include vprof/frontend/vprof_min.js
+include vprof/frontend/code_heatmap.css
+include vprof/frontend/flame_graph.css
+include vprof/frontend/memory_stats.css
+include vprof/frontend/profiler.css
 include vprof/frontend/vprof.css
 include vprof/frontend/progress.gif
 include vprof/frontend/favicon.ico

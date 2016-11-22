@@ -1,0 +1,66 @@
+.profiler-content {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  padding-left: 220px;
+}
+
+.profiler-record-table {
+  display: table;
+  font-size: 15px;
+}
+
+.profiler-record-table-wrapper {
+  height: 100%;
+  overflow-y: scroll;
+  width: 50%;
+}
+
+.profiler-record-normal {
+  background: #C9C9C9;
+}
+
+.profiler-record-highlight {
+  background: #FD8D3C;
+}
+
+.profiler-record-percentage {
+  font-size: 14px;
+  padding-left: 8px;
+  width: 5%
+}
+
+.profiler-record-name {
+  padding-left: 8px;
+}
+
+.profiler-record-filename {
+  color: #3C3C3C;
+  font-size: 14px;
+}
+
+.profiler-record-lineno {
+  color: #3C3C3C;
+  font-size: 14px;
+}
+
+.profiler-record-cumtime {
+  padding-right: 15px;
+  width: 5%;
+}
+
+.profiler-legend {
+  background: #BCBCBC;
+  border: 0px;
+  border-radius: 5px-container;
+  font: 15px sans-serif;
+  margin-left: 25px;
+  margin-top: 20px;
+  opacity: 0.9;
+  padding: 8px;
+  pointer-events: none;
+  position: absolute;
+  text-align: center;
+}
+
+

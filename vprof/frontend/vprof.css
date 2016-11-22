@@ -1,3 +1,8 @@
+@import "code_heatmap.css";
+@import "flame_graph.css";
+@import "memory_stats.css";
+@import "profiler.css";
+
 body {
   background: #4C4C4C;
   font-family: 'Tahoma', Geneva, sans-serif;
@@ -84,179 +89,12 @@ svg {
   padding: 5px;
 }
 
-.memory-info-container {
-  display: flex;
-  flex-direction: row;
-  height: 100%;
-}
-
-.memory-usage-graph {
-  width: 70%;
-}
-
-.memory-table-wrapper {
-  overflow-x: scroll;
-  overflow-y: auto;
-  width: 30%;
-}
-
-.memory-objects-table {
-  display: table;
-  background: white;
-  font-size: 14px;
-  margin: 5px;
-  margin-right: 10px;
-  width: 100%;
-}
-
-.memory-objects-table td {
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-.memory-objects-table tr:hover {
-  background-color: #FD8D3C;
-}
-
-.memory-table-header {
-  background: #BCBCBC;
-  font-weight: bold;
-}
-
-.memory-table-name {
-  background: #F1F1F1;
-  font-weight: bold;
-  text-align: center;
-  padding: 3px;
-  width: 100%;
-}
-
-.memory-table-row:nth-child(even) {
-  background-color: #F2F2F2
-}
-
-.memory-graph {
-  fill: #9EDAE5;
-  opacity: 0.6;
-  stroke: #17BECF;
-  stroke-width: 2px;
-}
-
-.memory-graph-focus {
-  fill: #E6550D;
-}
-
-.memory-graph-dot {
-  fill: #6BAED6;
-}
-
-.memory-graph-focus-line {
-  stroke: #E6550D;
-  stroke-dasharray: 4;
-}
-
-.memory-graph-focus-line-highlight {
-  fill: #FD8D3C;
-  opacity: 0.3;
-  stroke: #E6550D;
-  stroke-width: 2px;
-}
-
-.flame-graph-rect-normal {
-  opacity: 0.85;
-  stroke: white;
-  stroke-width: 2;
-}
-
-.flame-graph-rect-hightlight {
-  opacity: 0.85;
-  stroke: white;
-  stroke-width: 4;
-}
-
-.flame-graph-no-data-message {
-  background: #BCBCBC;
-  border-radius: 5px;
-  font-size: 16px;
-  top: 50%;
-  left: 50%;
-  opacity: 0.9;
-  transform: translate(-50%, -50%);
-  padding: 15px;
-  position: fixed;
-}
-
 .content-tooltip-visible {
   display: block;
 }
 
 .content-tooltip-invisible {
   display: none;
-}
-
-.profiler-content {
-  display: flex;
-  flex-direction: row;
-  height: 100%;
-  padding-left: 220px;
-}
-
-.profiler-record-table {
-  display: table;
-  font-size: 15px;
-}
-
-.profiler-record-table-wrapper {
-  height: 100%;
-  overflow-y: scroll;
-  width: 50%;
-}
-
-.profiler-record-normal {
-  background: #C9C9C9;
-}
-
-.profiler-record-highlight {
-  background: #FD8D3C;
-}
-
-.profiler-record-percentage {
-  font-size: 14px;
-  padding-left: 8px;
-  width: 5%
-}
-
-.profiler-record-name {
-  padding-left: 8px;
-}
-
-.profiler-record-filename {
-  color: #3C3C3C;
-  font-size: 14px;
-}
-
-.profiler-record-lineno {
-  color: #3C3C3C;
-  font-size: 14px;
-}
-
-.profiler-record-cumtime {
-  padding-right: 15px;
-  width: 5%;
-}
-
-.profiler-legend {
-  background: #BCBCBC;
-  border: 0px;
-  border-radius: 5px-container;
-  font: 15px sans-serif;
-  margin-left: 25px;
-  margin-top: 20px;
-  opacity: 0.9;
-  padding: 8px;
-  pointer-events: none;
-  position: absolute;
-  text-align: center;
 }
 
 .content-legend {
@@ -298,83 +136,6 @@ svg {
 p {
   margin: 0px;
   text-align: left;
-}
-
-#heatmap-layout {
-  display: flex;
-  height: 99%;
-  flex-direction: row;
-}
-
-.heatmap-module-list {
-  padding: 8px;
-  padding-left: 50px;
-  width: 25%;
-}
-
-.heatmap-module-header {
-  font-size: 14px;
-  padding-top: 10px;
-}
-
-.heatmap-module-name {
-  direction: ltr;
-  font-family: "Lucida Sans Typewriter", "Lucida Console", Monaco;
-  font-size: 12px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: pre;
-}
-
-.heatmap-code-container {
-  min-width: 45%;
-  overflow-x: auto;
-  overflow-y: auto;
-  padding: 5px;
-}
-
-.heatmap-src-file {
-  padding-bottom: 15px;
-}
-
-.heatmap-src-code {
-  background: #FBFBFB;
-  font-family: "Lucida Sans Typewriter", "Lucida Console", Monaco;
-  font-size: 12px;
-  white-space: pre;
-}
-
-.heatmap-src-code-header {
-  font-family: "Lucida Sans Typewriter", "Lucida Console", Monaco;
-  font-size: 12px;
-}
-
-.heatmap-src-line-normal {
-  display: block;
-  opacity: 1;
-}
-
-.heatmap-src-line-highlight {
-  display: block;
-  opacity: 0.6;
-}
-
-.heatmap-src-line-number {
-  background-color: #D2D7D3;
-  display: table-cell;
-  text-align: right;
-  padding-right: 8px;
-  width: 28px;
-}
-
-.heatmap-src-line-code {
-  display: table-cell;
-  padding-left: 5px;
-}
-
-.heatmap-skip-line {
-  padding: 5px;
-  text-align: center;
 }
 
 #main-progress-indicator {
