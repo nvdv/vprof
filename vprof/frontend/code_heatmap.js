@@ -3,7 +3,9 @@
  */
 
 'use strict';
-var d3 = require('d3');
+var d3scale = require('d3-scale');
+var d3select = require('d3-selection');
+
 var hljs = require('highlight.js');
 require('./highlight.css');  // Includes code highlighter CSS.
 
@@ -28,7 +30,7 @@ function CodeHeatmap(parent, data) {
 
   this.data_ = data;
   this.parent_ = parent;
-  this.heatmapScale_ = d3.scale.log()
+  this.heatmapScale_ = d3scale.scaleLog()
     .domain([this.MIN_RUN_COUNT, this.MAX_RUN_COUNT])
     .range([this.MIN_RUN_COLOR, this.MAX_RUN_COLOR]);
 }
@@ -83,7 +85,8 @@ CodeHeatmap.prototype.render = function() {
   var fileContainers = heatmapContainer.append('div')
     .attr('class', 'heatmap-src-code')
     .append('text')
-    .html(function(_, i) { return renderedSources[i].srcCode; });
+    .html(function(_, i) { return renderedSources[i].srcCode; })
+    .nodes();
 
   var tooltip = pageContainer.append('div')
     .attr('class', 'content-tooltip content-tooltip-invisible');
@@ -91,7 +94,7 @@ CodeHeatmap.prototype.render = function() {
   var self = this;
   codeContainer.selectAll('.heatmap-src-file')
     .each(function(_, i) {
-      d3.select(fileContainers[0][i]).selectAll('.heatmap-src-line-normal')
+      d3select.select(fileContainers[i]).selectAll('.heatmap-src-line-normal')
         .on('mouseover', function(_, j) {
           var runCount = renderedSources[i].lineMap[j];
           if(runCount) {
@@ -107,11 +110,11 @@ CodeHeatmap.prototype.render = function() {
  * @param {number} runCount - Number of line runs.
  */
 CodeHeatmap.prototype.showTooltip_ = function(element, tooltip, runCount) {
-  d3.select(element).attr('class', 'heatmap-src-line-highlight');
+  d3select.select(element).attr('class', 'heatmap-src-line-highlight');
   tooltip.attr('class', 'content-tooltip content-tooltip-visible')
     .html('<b>Execution count: </b>' + runCount)
-    .style('left', d3.event.pageX)
-    .style('top', d3.event.pageY);
+    .style('left', d3select.event.pageX)
+    .style('top', d3select.event.pageY);
 };
 
 /**
@@ -120,7 +123,7 @@ CodeHeatmap.prototype.showTooltip_ = function(element, tooltip, runCount) {
  * @param {Object} tooltip - Element representing tooltip.
  */
 CodeHeatmap.prototype.hideTooltip_ = function(element, tooltip) {
-  d3.select(element).attr('class', 'heatmap-src-line-normal');
+  d3select.select(element).attr('class', 'heatmap-src-line-normal');
   tooltip.attr('class', 'content-tooltip content-tooltip-invisible');
 };
 

@@ -109,18 +109,6 @@ svg {
   text-align: center;
 }
 
-.memory-graph-axis {
-  fill: none;
-  stroke: #636363;
-  stroke-width: 2px;
-}
-
-.memory-graph-axis text {
-  fill: black;
-  stroke: none;
-  text-anchor: end;
-}
-
 .content-tooltip {
   background: white;
   border: 0px;

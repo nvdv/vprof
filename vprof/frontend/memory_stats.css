@@ -56,6 +56,19 @@
   stroke-width: 2px;
 }
 
+.memory-graph-axis {
+  fill: none;
+  stroke: #636363;
+  stroke-width: 2px;
+}
+
+.memory-graph-axis text {
+  font-size: 13px;
+  fill: black;
+  stroke: none;
+  text-anchor: end;
+}
+
 .memory-graph-focus {
   fill: #E6550D;
 }

@@ -3,7 +3,12 @@
  */
 
 'use strict';
-var d3 = require('d3');
+var d3array = require('d3-array');
+var d3axis = require('d3-axis');
+var d3format = require('d3-format');
+var d3shape = require('d3-shape');
+var d3select = require('d3-selection');
+var d3scale = require('d3-scale');
 
 /**
  * Represents memory chart.
@@ -56,39 +61,39 @@ function MemoryChart(parent, data) {
   this.LEGEND_X = this.GRAPH_WIDTH - 350;
   this.LEGEND_Y = 100;
 
-  this.xScale_ = d3.scale.linear()
-    .domain(d3.extent(this.data_.codeEvents, function(d) { return d[0]; }))
+  this.xScale_ = d3scale.scaleLinear()
+    .domain(d3array.extent(this.data_.codeEvents, function(d) { return d[0]; }))
     .range([0, this.GRAPH_WIDTH]);
 
-  this.xAxis_ = d3.svg.axis()
+  this.xAxis_ = d3axis.axisBottom()
     .scale(this.xScale_)
-    .orient('bottom')
-    .ticks(3)
-    .tickFormat(d3.format(',.0f'));
+    .ticks(this.TICKS_NUMBER)
+    .tickFormat(d3format.format(',.0f'));
 
   // Since axis.ticks(n) is only a recommendation, set tick values
   // explicitly when their number is low.
   if (this.data_.codeEvents.length < this.TICKS_NUMBER) {
     var tickValues = Array.apply(null, Array(this.data_.codeEvents.length)).map(
-      function (_, i) {return i + 1; });
+      function (_, i) { return i + 1; });
     this.xAxis_.tickValues(tickValues);
   } else {
     this.xAxis_.ticks(this.TICKS_NUMBER);
   }
 
-  this.yRange_ = d3.extent(this.data_.codeEvents, function(d) { return d[2]; });
-  this.yScale_ = d3.scale.linear()
+  this.yRange_ = d3array.extent(
+      this.data_.codeEvents, function(d) { return d[2]; });
+  this.yScale_ = d3scale.scaleLinear()
     .domain([
       this.MIN_RANGE_C * this.yRange_[0], this.MAX_RANGE_C * this.yRange_[1]])
     .range([this.GRAPH_HEIGHT, 0]);
-  this.yAxis_ = d3.svg.axis()
-      .scale(this.yScale_)
-      .orient('left');
+  this.yAxis_ = d3axis.axisLeft()
+      .scale(this.yScale_);
 
-  this.memoryGraph_ = d3.svg.area()
-    .x(function(d) { return this.xScale_(d[0]); })
-    .y0(this.GRAPH_HEIGHT)
-    .y1(function(d) { return this.yScale_(d[2]); });
+  var self = this;
+  this.memoryGraph_ = d3shape.area()
+    .x(function(d) { return self.xScale_(d[0]); })
+    .y0(self.GRAPH_HEIGHT)
+    .y1(function(d) { return self.yScale_(d[2]); });
 
   this.currZoomRange_ = {
     'highlightStartIndex': 0,
@@ -184,7 +189,7 @@ MemoryChart.prototype.render = function() {
  */
 MemoryChart.prototype.zoomIn_ = function(path, canvas, focus, tooltip,
     focusXLine, focusYLine, focusHiglightArc) {
-  var crds = d3.mouse(canvas.node());
+  var crds = d3select.mouse(canvas.node());
   var midIndex = Math.round(this.xScale_.invert(crds[0])) - 1;
   this.updateZoomRangeParams_(midIndex);
   if (this.currZoomRange_.zoomIndexStart < this.currZoomRange_.zoomIndexEnd) {
@@ -237,7 +242,7 @@ MemoryChart.prototype.zoomIn_ = function(path, canvas, focus, tooltip,
 MemoryChart.prototype.zoomOut_ = function(path, canvas) {
   this.resetZoomRangeParams_();
   this.xScale_.domain(
-      d3.extent(this.data_.codeEvents, function(d) { return d[0]; }));
+      d3array.extent(this.data_.codeEvents, function(d) { return d[0]; }));
   path.attr('d', this.memoryGraph_(this.data_.codeEvents));
   this.xAxis_.ticks(
       Math.min(this.TICKS_NUMBER, this.data_.codeEvents.length));
@@ -301,7 +306,7 @@ MemoryChart.prototype.showFocus_ = function(focus, focusXLine,
  */
 MemoryChart.prototype.redrawFocus_ = function(canvas, focus, tooltip,
     focusXLine, focusYLine, focusHiglightArc) {
-  var crds = d3.mouse(canvas.node());
+  var crds = d3select.mouse(canvas.node());
   var closestIndex = Math.round(this.xScale_.invert(crds[0])) - 1;
   var closestX = this.xScale_(this.data_.codeEvents[closestIndex][0]);
   var closestY = this.yScale_(this.data_.codeEvents[closestIndex][2]);

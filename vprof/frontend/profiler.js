@@ -3,7 +3,7 @@
  */
 
 'use strict';
-var d3 = require('d3');
+var d3select = require('d3-selection');
 
 /**
  * Represents Python profiler output.
@@ -54,7 +54,7 @@ Profiler.prototype.render = function() {
  * @param {Object} node - Object with profiler record info.
  */
 Profiler.prototype.showTooltip_ = function(element, tooltip, node) {
-  d3.select(element).attr('class', 'profiler-record-highlight');
+  d3select.select(element).attr('class', 'profiler-record-highlight');
   tooltip.attr('class', 'content-tooltip content-tooltip-visible')
     .html('<p><b>Line number:</b> ' + node[1] +'</p>' +
           '<p><b>Filename:</b> ' + node[0] +'</p>' +
@@ -62,8 +62,8 @@ Profiler.prototype.showTooltip_ = function(element, tooltip, node) {
           '<p><b>Number of calls:</b> ' + node[5] +'</p>' +
           '<p><b>Cumulative calls:</b> ' + node[6] +'</p>' +
           '<p><b>Time per call:</b> ' + node[7] +'s</p>')
-    .style('left', d3.event.pageX)
-    .style('top', d3.event.pageY);
+    .style('left', d3select.event.pageX)
+    .style('top', d3select.event.pageY);
 };
 
 /**
@@ -72,7 +72,7 @@ Profiler.prototype.showTooltip_ = function(element, tooltip, node) {
  * @param {Object} tooltip - Element representing tooltip.
  */
 Profiler.prototype.hideTooltip_ = function(element, tooltip) {
-  d3.select(element).attr('class', 'profiler-record-normal');
+  d3select.select(element).attr('class', 'profiler-record-normal');
   tooltip.attr('class', 'content-tooltip content-tooltip-invisible');
 };
 
