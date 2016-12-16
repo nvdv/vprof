@@ -26,6 +26,7 @@ _MAIN_MODULE_SOURCELINES = [
     ['line', 2, ''],
     ['line', 3, 'dummy_module.dummy_fib(5)'],
     ['line', 4, '']]
+_POLL_INTERVAL = 0.05
 
 
 class CodeHeatmapModuleEndToEndTest(unittest.TestCase):
@@ -37,7 +38,9 @@ class CodeHeatmapModuleEndToEndTest(unittest.TestCase):
             stats_server.StatsHandler, program_stats)
         self.server = stats_server.StatsServer(
             (_HOST, _PORT), stats_handler)
-        threading.Thread(target=self.server.serve_forever).start()
+        threading.Thread(
+            target=self.server.serve_forever,
+            kwargs={'poll_interval': _POLL_INTERVAL}).start()
 
     def tearDown(self):
         self.server.shutdown()
@@ -63,7 +66,9 @@ class CodeHeatmapPackageEndToEndTest(unittest.TestCase):
             stats_server.StatsHandler, program_stats)
         self.server = stats_server.StatsServer(
             (_HOST, _PORT), stats_handler)
-        threading.Thread(target=self.server.serve_forever).start()
+        threading.Thread(
+            target=self.server.serve_forever,
+            kwargs={'poll_interval': _POLL_INTERVAL}).start()
 
     def tearDown(self):
         self.server.shutdown()
@@ -96,7 +101,9 @@ class CodeHeatmapFunctionEndToEndTest(unittest.TestCase):
             stats_server.StatsHandler, {})
         self.server = stats_server.StatsServer(
             (_HOST, _PORT), stats_handler)
-        threading.Thread(target=self.server.serve_forever).start()
+        threading.Thread(
+            target=self.server.serve_forever,
+            kwargs={'poll_interval': _POLL_INTERVAL}).start()
 
     def tearDown(self):
         self.server.shutdown()
@@ -112,11 +119,11 @@ class CodeHeatmapFunctionEndToEndTest(unittest.TestCase):
         self.assertEqual(len(stats), 1)
         self.assertTrue('function _func' in stats['h'][0]['objectName'])
         self.assertDictEqual(
-            stats['h'][0]['heatmap'], {'91': 1, '92': 1})
+            stats['h'][0]['heatmap'], {'96': 1, '97': 1})
         self.assertListEqual(
             stats['h'][0]['srcCode'],
-            [['line', 90, '        def _func(foo, bar):\n'],
-             ['line', 91, u'            baz = foo + bar\n'],
-             ['line', 92, u'            return baz\n']])
+            [['line', 95, '        def _func(foo, bar):\n'],
+             ['line', 96, u'            baz = foo + bar\n'],
+             ['line', 97, u'            return baz\n']])
 
 # pylint: enable=missing-docstring, blacklisted-name

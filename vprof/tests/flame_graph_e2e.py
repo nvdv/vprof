@@ -3,6 +3,7 @@
 import json
 import functools
 import threading
+# import multiprocessing
 import unittest
 
 from six.moves import urllib
@@ -15,6 +16,7 @@ from vprof.tests import test_pkg # pylint: disable=unused-import
 _HOST, _PORT = 'localhost', 12345
 _MODULE_FILENAME = 'vprof/tests/test_pkg/dummy_module.py'
 _PACKAGE_PATH = 'vprof/tests/test_pkg/'
+_POLL_INTERVAL = 0.05
 
 
 class FlameGraphModuleEndToEndTest(unittest.TestCase):
@@ -26,7 +28,9 @@ class FlameGraphModuleEndToEndTest(unittest.TestCase):
             stats_server.StatsHandler, program_stats)
         self.server = stats_server.StatsServer(
             (_HOST, _PORT), stats_handler)
-        threading.Thread(target=self.server.serve_forever).start()
+        threading.Thread(
+            target=self.server.serve_forever,
+            kwargs={'poll_interval': _POLL_INTERVAL}).start()
 
     def tearDown(self):
         self.server.shutdown()
@@ -52,7 +56,9 @@ class FlameGraphPackageEndToEndTest(unittest.TestCase):
             stats_server.StatsHandler, program_stats)
         self.server = stats_server.StatsServer(
             (_HOST, _PORT), stats_handler)
-        threading.Thread(target=self.server.serve_forever).start()
+        threading.Thread(
+            target=self.server.serve_forever,
+            kwargs={'poll_interval': _POLL_INTERVAL}).start()
 
     def tearDown(self):
         self.server.shutdown()
@@ -82,7 +88,9 @@ class FlameGraphFunctionEndToEndTest(unittest.TestCase):
             stats_server.StatsHandler, {})
         self.server = stats_server.StatsServer(
             (_HOST, _PORT), stats_handler)
-        threading.Thread(target=self.server.serve_forever).start()
+        threading.Thread(
+            target=self.server.serve_forever,
+            kwargs={'poll_interval': _POLL_INTERVAL}).start()
 
     def tearDown(self):
         self.server.shutdown()
