@@ -172,7 +172,6 @@ function handleHelpDisplay(e) {
   * @param {string} tabId - Next active tab identifier.
   */
 function showTab_(tabId) {
-  console.log(tabId);
   d3select.selectAll('.main-tab-content')
    .classed('active-tab', false)
    .classed('inactive-tab', true);

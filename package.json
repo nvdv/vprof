@@ -13,7 +13,7 @@
     "d3-selection": "1.0.3",
     "eslint": "latest",
     "uglify-js": "latest",
-    "browserify": "12",
+    "browserify": "13",
     "browserify-css": "latest",
     "karma": "latest",
     "karma-jasmine": "latest",
