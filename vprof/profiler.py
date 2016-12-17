@@ -44,7 +44,10 @@ class Profiler(base_profiler.BaseProfiler):
         for info, params in prof.stats.items():
             filename, lineno, funcname = info
             cum_calls, num_calls, time_per_call, cum_time, _ = params
-            percentage = round(100 * (cum_time / prof.total_tt), 4)
+            if prof.total_tt == 0:
+                percentage = 0
+            else:
+                percentage = round(100 * (cum_time / prof.total_tt), 4)
             cum_time = round(cum_time, 4)
             funcname = funcname.replace('<', '[').replace('>', ']')
             filename = filename.replace('<', '[').replace('>', ']')
