@@ -26,7 +26,7 @@ _MAIN_MODULE_SOURCELINES = [
     ['line', 2, ''],
     ['line', 3, 'dummy_module.dummy_fib(5)'],
     ['line', 4, '']]
-_POLL_INTERVAL = 0.05
+_POLL_INTERVAL = 0.01
 
 
 class CodeHeatmapModuleEndToEndTest(unittest.TestCase):

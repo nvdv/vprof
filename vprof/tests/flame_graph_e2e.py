@@ -1,9 +1,8 @@
 """Runtime profile end to end tests."""
-# pylint: disable=missing-docstring, blacklisted-name
+# pylint: disable=missing-docstring, blacklisted-name, protected-access
 import json
 import functools
 import threading
-# import multiprocessing
 import unittest
 
 from six.moves import urllib
@@ -16,7 +15,7 @@ from vprof.tests import test_pkg # pylint: disable=unused-import
 _HOST, _PORT = 'localhost', 12345
 _MODULE_FILENAME = 'vprof/tests/test_pkg/dummy_module.py'
 _PACKAGE_PATH = 'vprof/tests/test_pkg/'
-_POLL_INTERVAL = 0.05
+_POLL_INTERVAL = 0.01
 
 
 class FlameGraphModuleEndToEndTest(unittest.TestCase):
@@ -42,8 +41,9 @@ class FlameGraphModuleEndToEndTest(unittest.TestCase):
         response_data = stats_server.decompress_data(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], '%s (module)' % _MODULE_FILENAME)
-        self.assertTrue('sampleInterval' in stats)
+        self.assertEqual(stats['sampleInterval'], flame_graph._SAMPLE_INTERVAL)
         self.assertTrue('runTime' in stats)
+        self.assertTrue('callStats' in stats)
         self.assertTrue('totalSamples' in stats)
 
 
@@ -70,8 +70,9 @@ class FlameGraphPackageEndToEndTest(unittest.TestCase):
         response_data = stats_server.decompress_data(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], '%s (package)' % _PACKAGE_PATH)
-        self.assertTrue('sampleInterval' in stats)
+        self.assertEqual(stats['sampleInterval'], flame_graph._SAMPLE_INTERVAL)
         self.assertTrue('runTime' in stats)
+        self.assertTrue('callStats' in stats)
         self.assertTrue('totalSamples' in stats)
 
 
@@ -104,9 +105,10 @@ class FlameGraphFunctionEndToEndTest(unittest.TestCase):
         response_data = stats_server.decompress_data(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['c']['objectName'], '_func (function)')
-        self.assertTrue('sampleInterval' in stats['c'])
+        self.assertEqual(
+            stats['c']['sampleInterval'], flame_graph._SAMPLE_INTERVAL)
         self.assertTrue('runTime' in stats['c'])
+        self.assertTrue('callStats' in stats['c'])
         self.assertTrue('totalSamples' in stats['c'])
 
-
-# pylint: enable=missing-docstring, blacklisted-name
+# pylint: enable=missing-docstring, blacklisted-name, protected-access

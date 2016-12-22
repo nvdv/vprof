@@ -21,7 +21,7 @@ builtins.initial_rss_size = 0
 _HOST, _PORT = 'localhost', 12345
 _MODULE_FILENAME = 'vprof/tests/test_pkg/dummy_module.py'
 _PACKAGE_PATH = 'vprof/tests/test_pkg/'
-_POLL_INTERVAL = 0.05
+_POLL_INTERVAL = 0.01
 
 
 class MemoryProfilerModuleEndToEndTest(unittest.TestCase):
@@ -48,10 +48,10 @@ class MemoryProfilerModuleEndToEndTest(unittest.TestCase):
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], '%s (module)' % _MODULE_FILENAME)
         self.assertEqual(stats['totalEvents'], 1)
-        first_event = stats['codeEvents'][0]
-        self.assertEqual(first_event[0], 1)
-        self.assertEqual(first_event[1], 1)
-        self.assertEqual(first_event[3], '<module>')
+        self.assertEqual(len(stats['codeEvents']), 1)
+        self.assertListEqual(
+            stats['codeEvents'][0],
+            [1, 1, 0.0, '<module>', 'vprof/tests/test_pkg/dummy_module.py'])
 
 
 class MemoryProfilerPackageEndToEndTest(unittest.TestCase):
@@ -77,10 +77,9 @@ class MemoryProfilerPackageEndToEndTest(unittest.TestCase):
         response_data = stats_server.decompress_data(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], '%s (package)' % _PACKAGE_PATH)
-        first_event = stats['codeEvents'][0]
-        self.assertEqual(first_event[0], 1)
-        self.assertEqual(first_event[1], 1)
-        self.assertEqual(first_event[3], '<module>')
+        self.assertTrue('codeEvents' in stats)
+        self.assertTrue('totalEvents' in stats)
+        self.assertTrue('objectsCount' in stats)
 
 
 class MemoryProfilerFunctionEndToEndTest(unittest.TestCase):

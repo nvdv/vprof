@@ -14,7 +14,7 @@ from vprof.tests import test_pkg # pylint: disable=unused-import
 _HOST, _PORT = 'localhost', 12345
 _MODULE_FILENAME = 'vprof/tests/test_pkg/dummy_module.py'
 _PACKAGE_PATH = 'vprof/tests/test_pkg/'
-_POLL_INTERVAL = 0.05
+_POLL_INTERVAL = 0.01
 
 
 class ProfilerModuleEndToEndTest(unittest.TestCase):
