@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-var codeHeatmapModule = require('./code_heatmap.js');
+var codeHeatmapModule = require('../code_heatmap.js');
 
 describe('Code heatmap test suite', function() {
   it('Check renderCode', function() {

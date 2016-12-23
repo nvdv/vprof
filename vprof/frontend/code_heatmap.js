@@ -7,7 +7,11 @@ var d3scale = require('d3-scale');
 var d3select = require('d3-selection');
 
 var hljs = require('highlight.js');
-require('./highlight.css');  // Includes code highlighter CSS.
+try {
+  require('./highlight.css');  // Includes code highlighter CSS.
+} catch (e) {
+  // Do nothing, it's workaround for Jest test runner.
+}
 
 /**
  * Represents code heatmap.

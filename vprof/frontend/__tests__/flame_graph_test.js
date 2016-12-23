@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-var flameGraphModule = require('./flame_graph.js');
+var flameGraphModule = require('../flame_graph.js');
 
 describe('CPU flame graph test suite', function() {
   it('Check getNodeName', function() {
