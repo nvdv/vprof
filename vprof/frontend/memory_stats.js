@@ -70,11 +70,12 @@ function MemoryChart(parent, data) {
     .ticks(this.TICKS_NUMBER)
     .tickFormat(d3format.format(',.0f'));
 
-  // Since axis.ticks(n) is only a recommendation, set tick values
-  // explicitly when their number is low.
+  // Set tick values explicitly when number of events is low.
   if (this.data_.codeEvents.length < this.TICKS_NUMBER) {
-    var tickValues = Array.apply(null, Array(this.data_.codeEvents.length)).map(
-      function (_, i) { return i + 1; });
+    var tickValues = [];
+    for (var i = 0; i < this.data_.codeEvents.length; i++) {
+      tickValues.push(i);
+    }
     this.xAxis_.tickValues(tickValues);
   } else {
     this.xAxis_.ticks(this.TICKS_NUMBER);
