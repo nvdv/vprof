@@ -34,8 +34,18 @@ function FlameGraph(parent, data) {
   this.parent_ = parent;
   this.xScale_ = d3scale.scaleLinear().domain([0, 1]).range([0, this.WIDTH]);
   this.yScale_ = d3scale.scaleLinear().range([0, this.HEIGHT]);
-  this.color_ = d3scale.scaleOrdinal(d3scale.schemeCategory10);
   this.flameGraph_ = d3hierarchy.partition();
+
+  var hashDomain = [];
+  var max = Math.pow(2, 24) - 1;
+  var parts = 5;
+  for (var i = 0; i < parts; i++) {
+    hashDomain.push(i * max / parts);
+  }
+
+  this.color_ = d3scale.scaleLinear()
+    .domain(hashDomain)
+    .range(['#a6611a', '#dfc27d', '#f5f5f5', '#80cdc1', '#018571']);
 }
 
 /** Renders flame graph. */
@@ -75,8 +85,7 @@ FlameGraph.prototype.render = function() {
     .attr('y', function(d) { return self.yScale_(1 - d.y0 - (d.y1 - d.y0)); })
     .attr('width', function(d) { return self.xScale_(d.x1 - d.x0); })
     .attr('height', function(d) { return self.yScale_(d.y1 - d.y0); })
-    .style('fill', function(d) {
-      return self.color_(FlameGraph.getNodeName_(d.data)); })
+    .style('fill', function(d) { return self.color_(d.data.colorHash); })
     .on('mouseover', function(d) { self.showTooltip_(this, tooltip, d.data); })
     .on('mouseout', function() { self.hideTooltip_(this, tooltip); });
 
