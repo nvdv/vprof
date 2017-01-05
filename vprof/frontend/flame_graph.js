@@ -4,6 +4,7 @@
 
 'use strict';
 var d3hierarchy = require('d3-hierarchy');
+var d3interpolate = require('d3-interpolate');
 var d3scale = require('d3-scale');
 var d3select = require('d3-selection');
 
@@ -29,7 +30,8 @@ function FlameGraph(parent, data) {
     '<p>&#8226 Double click to restore original scale</p>');
   this.NO_DATA_MESSAGE = (
     'Sorry, no samples. Seems like run time is less than sampling interval.');
-  this.NUM_COLOR_DOMAIN_POINTS = 5;
+  this.COLORS = ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00'];
+  this.NUM_COLOR_DOMAIN_POINTS = this.COLORS.length;
   this.MAX_COLOR_DOMAIN_VALUE = Math.pow(2, 24) - 1;
 
   this.data_ = data;
@@ -42,7 +44,8 @@ function FlameGraph(parent, data) {
 
   this.color_ = d3scale.scaleLinear()
     .domain(hashDomain)
-    .range(['#a6611a', '#dfc27d', '#f5f5f5', '#80cdc1', '#018571']);
+    .range(this.COLORS)
+    .interpolate(d3interpolate.interpolateLab);
 }
 
 /** Renders flame graph. */
