@@ -3,12 +3,10 @@ import inspect
 import runpy
 import signal
 import time
-import zlib
 
 from collections import defaultdict
 from vprof import base_profiler
 
-_HASH_LENGTH = 2 ** 24 - 1
 _SAMPLE_INTERVAL = 0.001
 
 
@@ -105,13 +103,12 @@ class _StatProfiler(object):
         """Reformats call tree for the UI."""
         stack_params = self._extract_stack_params(node, total_samples)
         func_name = '%s @ %s' % (stack_params[0], stack_params[1])
-        name_hash = zlib.adler32(func_name.encode('utf-8')) & _HASH_LENGTH
         return {
             'stack': stack_params,
             'children': [self._reformat_tree(child, total_samples)
                          for child in node['children']],
             'sampleCount': node['sampleCount'],
-            'colorHash': name_hash
+            'colorHash': base_profiler.hash_name(func_name)
         }
 
     @property

@@ -1,6 +1,9 @@
 """Base class for a profile wrapper."""
 import os
 import sys
+import zlib
+
+_HASH_LENGTH = 2 ** 24 - 1
 
 
 def get_package_code(package_path):
@@ -23,6 +26,11 @@ def get_package_code(package_path):
                 compiled_code = compile(src_code, package_path, 'exec')
                 all_code[filename] = src_code, compiled_code
     return all_code
+
+
+def hash_name(name):
+    """Hash name and trim resulting hash."""
+    return zlib.adler32(name.encode('utf-8')) & _HASH_LENGTH
 
 
 class BaseProfiler(object):
