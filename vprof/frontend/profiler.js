@@ -3,7 +3,10 @@
  */
 
 'use strict';
+var color = require('./color');
 var d3select = require('d3-selection');
+var d3interpolate = require('d3-interpolate');
+var d3scale = require('d3-scale');
 
 /**
  * Represents Python profiler output.
@@ -17,6 +20,7 @@ function Profiler(parent, data) {
 
   this.data_ = data;
   this.parent_ = parent;
+  this.color_ = color.createColorScale();
 }
 
 /** Renders profiler output */
@@ -44,7 +48,7 @@ Profiler.prototype.render = function() {
     .on('mouseover', function(d) { self.showTooltip_(this, tooltip, d); })
     .on('mouseout', function() { self.hideTooltip_(this, tooltip); });
 
-  records.html(Profiler.formatProfilerRecord_);
+  records.html(function(d) { return self.formatProfilerRecord_(self, d); });
 };
 
 /**
@@ -78,10 +82,11 @@ Profiler.prototype.hideTooltip_ = function(element, tooltip) {
 
 /**
  * Formats profiler record.
- * @static
  * */
-Profiler.formatProfilerRecord_ = function(data) {
+Profiler.prototype.formatProfilerRecord_ = function(self, data) {
   return (
+      '<td class="profiler-record-color" style="background:'+
+          self.color_(data[9])+ '"></td>' +
       '<td class="profiler-record-percentage">' + data[4] + '%</td>' +
       '<td class="profiler-record-name">' +
         '<span class="profiler-record-funcname">' + data[2] + '</span>' + ' ' +

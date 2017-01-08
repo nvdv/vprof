@@ -49,6 +49,10 @@
   width: 5%;
 }
 
+.profiler-record-color {
+  width: 20px;
+}
+
 .profiler-legend {
   background: #BCBCBC;
   border: 0px;

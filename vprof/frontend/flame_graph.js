@@ -3,6 +3,7 @@
  */
 
 'use strict';
+var color = require('./color');
 var d3hierarchy = require('d3-hierarchy');
 var d3interpolate = require('d3-interpolate');
 var d3scale = require('d3-scale');
@@ -30,22 +31,12 @@ function FlameGraph(parent, data) {
     '<p>&#8226 Double click to restore original scale</p>');
   this.NO_DATA_MESSAGE = (
     'Sorry, no samples. Seems like run time is less than sampling interval.');
-  this.COLORS = ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00'];
-  this.NUM_COLOR_DOMAIN_POINTS = this.COLORS.length;
-  this.MAX_COLOR_DOMAIN_VALUE = Math.pow(2, 24) - 1;
-
   this.data_ = data;
   this.parent_ = parent;
   this.xScale_ = d3scale.scaleLinear().domain([0, 1]).range([0, this.WIDTH]);
   this.yScale_ = d3scale.scaleLinear().range([0, this.HEIGHT]);
   this.flameGraph_ = d3hierarchy.partition();
-  var hashDomain = FlameGraph.genHashDomain_(
-      this.NUM_COLOR_DOMAIN_POINTS, this.MAX_COLOR_DOMAIN_VALUE);
-
-  this.color_ = d3scale.scaleLinear()
-    .domain(hashDomain)
-    .range(this.COLORS)
-    .interpolate(d3interpolate.interpolateLab);
+  this.color_ = color.createColorScale();
 }
 
 /** Renders flame graph. */
@@ -241,21 +232,6 @@ FlameGraph.getTruncatedNodeName_ = function(d, rectLength) {
     return fullname.substr(0, maxSymbols) + '...';
   }
   return fullname;
-};
-
-/**
- * Generates array to be used as domain for flame graph coloring.
- * @static
- * @param (number) numElements - Number of elements in resulting array.
- * @param {number} maxValue - Max value of domain.
- * @returns {Object}
- */
-FlameGraph.genHashDomain_ = function(numElements, maxValue) {
-  var hashDomain = [];
-  for (var i = 0; i < numElements; i++) {
-    hashDomain.push(i * maxValue / numElements);
-  }
-  return hashDomain;
 };
 
 /**

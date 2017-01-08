@@ -52,9 +52,11 @@ class Profiler(base_profiler.BaseProfiler):
             funcname = funcname.replace('<', '[').replace('>', ']')
             filename = filename.replace('<', '[').replace('>', ']')
             short_path = os.path.basename(filename)
+            func_name = '%s @ %s' % (funcname, filename)
+            color_hash = base_profiler.hash_name(func_name)
             records.append(
                 (filename, lineno, funcname, cum_time, percentage, num_calls,
-                 cum_calls, time_per_call, short_path))
+                 cum_calls, time_per_call, short_path, color_hash))
         return sorted(records, key=operator.itemgetter(4), reverse=True)
 
     def run(self):
