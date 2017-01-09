@@ -48,7 +48,27 @@ Profiler.prototype.render = function() {
     .on('mouseover', function(d) { self.showTooltip_(this, tooltip, d); })
     .on('mouseout', function() { self.hideTooltip_(this, tooltip); });
 
-  records.html(function(d) { return self.formatProfilerRecord_(self, d); });
+  records.append('td')
+    .attr('class', 'profiler-record-color')
+    .style('background', function(d) { return self.color_(d[9]); });
+
+  records.append('td')
+    .attr('class', 'profiler-record-percentage')
+    .html(function(d) { return d[4] + '%'; });
+
+  records.append('td')
+    .attr('class', 'profiler-record-name')
+    .html(function(d) {
+      return (
+        '<span class="profiler-record-funcname">' + d[2] + '</span>' + ' ' +
+        '<span class="profiler-record-filename">' + d[8] + '</span>' + ':' +
+        '<span class="profiler-record-lineno">' + d[1] + '</span>');
+    });
+
+  records.append('td')
+    .attr('class', 'profiler-record-cumtime')
+    .html(function(d) { return d[3] + 's'; });
+
 };
 
 /**
@@ -78,22 +98,6 @@ Profiler.prototype.showTooltip_ = function(element, tooltip, node) {
 Profiler.prototype.hideTooltip_ = function(element, tooltip) {
   d3select.select(element).attr('class', 'profiler-record-normal');
   tooltip.attr('class', 'content-tooltip content-tooltip-invisible');
-};
-
-/**
- * Formats profiler record.
- * */
-Profiler.prototype.formatProfilerRecord_ = function(self, data) {
-  return (
-      '<td class="profiler-record-color" style="background:'+
-          self.color_(data[9])+ '"></td>' +
-      '<td class="profiler-record-percentage">' + data[4] + '%</td>' +
-      '<td class="profiler-record-name">' +
-        '<span class="profiler-record-funcname">' + data[2] + '</span>' + ' ' +
-        '<span class="profiler-record-filename">' + data[8] + '</span>' + ':' +
-        '<span class="profiler-record-lineno">' + data[1] + '</span>' +
-      '</td>' +
-      '<td class="profiler-record-cumtime">' + data[3] + 's</td>');
 };
 
 /** Renders profiler tab legend. */
