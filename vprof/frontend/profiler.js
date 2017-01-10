@@ -80,7 +80,8 @@ Profiler.prototype.render = function() {
 Profiler.prototype.showTooltip_ = function(element, tooltip, node) {
   d3select.select(element).attr('class', 'profiler-record-highlight');
   tooltip.attr('class', 'content-tooltip content-tooltip-visible')
-    .html('<p><b>Line number:</b> ' + node[1] +'</p>' +
+    .html('<p><b>Function name:</b> ' + node[2] + '</p>' +
+          '<p><b>Line number:</b> ' + node[1] +'</p>' +
           '<p><b>Filename:</b> ' + node[0] +'</p>' +
           '<p><b>Cumulative time:</b> ' + node[3] +'s</p>' +
           '<p><b>Number of calls:</b> ' + node[5] +'</p>' +

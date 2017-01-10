@@ -3,8 +3,6 @@ import os
 import sys
 import zlib
 
-_HASH_LENGTH = 2 ** 24 - 1
-
 
 def get_package_code(package_path):
     """Returns package source code.
@@ -30,7 +28,7 @@ def get_package_code(package_path):
 
 def hash_name(name):
     """Hash name and trim resulting hash."""
-    return zlib.adler32(name.encode('utf-8')) & _HASH_LENGTH
+    return zlib.adler32(name.encode('utf-8'))
 
 
 class BaseProfiler(object):
