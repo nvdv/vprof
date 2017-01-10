@@ -37,18 +37,18 @@ class StatProfilerUnittest(unittest.TestCase):
         expected_result = {
             'stack': ('foo', 'f', 1, 100.0),
             'sampleCount': 100,
-            'colorHash': 8127019,
+            'colorHash': 159121963,
             'children': [{
                 'stack': ('bar', 'f', 2, 70.0),
                 'sampleCount': 70,
-                'colorHash': 1770012,
+                'colorHash': 152764956,
                 'children': [{
                     'stack': ('baz', 'f', 3, 50.0),
                     'sampleCount': 50,
-                    'colorHash': 4391460,
+                    'colorHash': 155386404,
                     'children': [{
                         'stack': ('0', 'e', 4, 40.0),
-                        'colorHash': 14287126,
+                        'colorHash': 47841558,
                         'sampleCount': 40,
                         'children': []
                     }]

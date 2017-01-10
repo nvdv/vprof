@@ -25,11 +25,11 @@ class ProrilerUnittest(unittest.TestCase):
         }
         expected_results = [
             ('fname2', 11, '[func3]', 0.045, 60.0,
-             20, 15, 0.003, 'fname2', 8258897),
+             20, 15, 0.003, 'fname2', 780010833),
             ('fname1', 5, 'func2', 0.02, 26.6667,
-             15, 10, 0.002, 'fname1', 4195479),
+             15, 10, 0.002, 'fname1', 591398039),
             ('fname1', 1, 'func1', 0.01, 13.3333,
-             10, 5, 0.001, 'fname1', 3540118),
+             10, 5, 0.001, 'fname1', 590742678),
         ]
 
         self.assertListEqual(

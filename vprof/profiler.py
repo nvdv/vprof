@@ -1,7 +1,6 @@
 """Module for Python profiler wrapper."""
 import cProfile
 import operator
-import os
 import pstats
 import runpy
 
@@ -51,12 +50,11 @@ class Profiler(base_profiler.BaseProfiler):
             cum_time = round(cum_time, 4)
             funcname = funcname.replace('<', '[').replace('>', ']')
             filename = filename.replace('<', '[').replace('>', ']')
-            short_path = os.path.basename(filename)
             func_name = '%s @ %s' % (funcname, filename)
             color_hash = base_profiler.hash_name(func_name)
             records.append(
                 (filename, lineno, funcname, cum_time, percentage, num_calls,
-                 cum_calls, time_per_call, short_path, color_hash))
+                 cum_calls, time_per_call, filename, color_hash))
         return sorted(records, key=operator.itemgetter(4), reverse=True)
 
     def run(self):
