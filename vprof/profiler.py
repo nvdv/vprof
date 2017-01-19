@@ -13,29 +13,58 @@ class Profiler(base_profiler.BaseProfiler):
     Runs cProfile against specified program and returns obtained stats.
     """
 
-    def run_as_package(self, prof):
+    @base_profiler.run_in_another_process
+    def run_as_package(self):
         """Runs program as a Python package."""
+        prof = cProfile.Profile()
         prof.enable()
         try:
             runpy.run_path(self._run_object, run_name='__main__')
         except SystemExit:
             pass
         prof.disable()
+        prof_stats = pstats.Stats(prof)
+        prof_stats.calc_callees()
+        return {
+            'callStats': self._transform_stats(prof_stats),
+            'totalTime': prof_stats.total_tt,
+            'primitiveCalls': prof_stats.prim_calls,
+            'totalCalls': prof_stats.total_calls,
+        }
 
-    def run_as_module(self, prof):
+    @base_profiler.run_in_another_process
+    def run_as_module(self):
         """Runs program as Python module."""
+        prof = cProfile.Profile()
         try:
             with open(self._run_object, 'rb') as srcfile:
                 code = compile(srcfile.read(), self._run_object, 'exec')
             prof.runctx(code, self._globs, None)
         except SystemExit:
             pass
+        prof_stats = pstats.Stats(prof)
+        prof_stats.calc_callees()
+        return {
+            'callStats': self._transform_stats(prof_stats),
+            'totalTime': prof_stats.total_tt,
+            'primitiveCalls': prof_stats.prim_calls,
+            'totalCalls': prof_stats.total_calls,
+        }
 
-    def run_as_function(self, prof):
+    def run_as_function(self):
         """Runs object as a Python function."""
+        prof = cProfile.Profile()
         prof.enable()
         self._run_object(*self._run_args, **self._run_kwargs)
         prof.disable()
+        prof_stats = pstats.Stats(prof)
+        prof_stats.calc_callees()
+        return {
+            'callStats': self._transform_stats(prof_stats),
+            'totalTime': prof_stats.total_tt,
+            'primitiveCalls': prof_stats.prim_calls,
+            'totalCalls': prof_stats.total_calls,
+        }
 
     def _transform_stats(self, prof):
         """Post-processes obtained stats for UI."""
@@ -59,15 +88,12 @@ class Profiler(base_profiler.BaseProfiler):
 
     def run(self):
         """Runs cProfile and retunrs obtained stats."""
-        prof = cProfile.Profile()
         run_dispatcher = self.get_run_dispatcher()
-        run_dispatcher(prof)
-        prof_stats = pstats.Stats(prof)
-        prof_stats.calc_callees()
+        profiler_output = run_dispatcher()
         return {
             'objectName': self._object_name,
-            'callStats': self._transform_stats(prof_stats),
-            'totalTime': prof_stats.total_tt,
-            'primitiveCalls': prof_stats.prim_calls,
-            'totalCalls': prof_stats.total_calls
+            'callStats': profiler_output['callStats'],
+            'totalTime': profiler_output['totalTime'],
+            'primitiveCalls': profiler_output['primitiveCalls'],
+            'totalCalls': profiler_output['totalCalls']
         }

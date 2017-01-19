@@ -1,6 +1,5 @@
 """Module for statistical profiler."""
 import inspect
-import multiprocessing
 import runpy
 import signal
 import time
