@@ -1,4 +1,5 @@
 """Base class for a profile wrapper."""
+import multiprocessing
 import os
 import sys
 import zlib
@@ -29,6 +30,28 @@ def get_package_code(package_path):
 def hash_name(name):
     """Hash name and trim resulting hash."""
     return zlib.adler32(name.encode('utf-8'))
+
+
+def run_in_another_process(func):
+    """Runs wrapped function in separate process.
+
+    Function arguments should be serializable and it should return dictionary
+    with output values.
+    """
+    def multiprocessing_wrapper(*args, **kwargs):
+
+        def remote_wrapper(manager_dict):
+            output_dict = func(*args, **kwargs)
+            manager_dict.update(output_dict)
+
+        manager = multiprocessing.Manager()
+        manager_dict = manager.dict()
+        process = multiprocessing.Process(
+            target=remote_wrapper, args=(manager_dict,))
+        process.start()
+        process.join()
+        return manager_dict
+    return multiprocessing_wrapper
 
 
 class BaseProfiler(object):

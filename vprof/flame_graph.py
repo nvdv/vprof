@@ -1,5 +1,6 @@
 """Module for statistical profiler."""
 import inspect
+import multiprocessing
 import runpy
 import signal
 import time
@@ -140,6 +141,7 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
     Runs statistical profiler and returns obtained stats.
     """
 
+    @base_profiler.run_in_another_process
     def run_as_package(self):
         """Runs program as a Python package."""
         with _StatProfiler() as prof:
@@ -147,8 +149,13 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
                 runpy.run_path(self._run_object, run_name='__main__')
             except SystemExit:
                 pass
-        return prof
+        return {
+            'runTime': prof.run_time,
+            'callStats': prof.call_tree,
+            'totalSamples': prof.call_tree.get('sampleCount') or 0
+        }
 
+    @base_profiler.run_in_another_process
     def run_as_module(self):
         """Runs program as a Python module."""
         with open(self._run_object, 'rb') as srcfile, _StatProfiler() as prof:
@@ -158,23 +165,30 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
                 exec(code, self._globs, None)
             except SystemExit:
                 pass
-        return prof
+        return {
+            'runTime': prof.run_time,
+            'callStats': prof.call_tree,
+            'totalSamples': prof.call_tree.get('sampleCount') or 0
+        }
 
     def run_as_function(self):
         """Runs object as a function."""
         with _StatProfiler() as prof:
             self._run_object(*self._run_args, **self._run_kwargs)
-        return prof
+        return {
+            'runTime': prof.run_time,
+            'callStats': prof.call_tree,
+            'totalSamples': prof.call_tree.get('sampleCount') or 0
+        }
 
     def run(self):
         """Runs statistical profiler and returns stats."""
         run_dispatcher = self.get_run_dispatcher()
-        prof = run_dispatcher()
-        sample_count = prof.call_tree.get('sampleCount') or 0
+        profiler_output = run_dispatcher()
         return {
             'objectName': self._object_name,
             'sampleInterval': _SAMPLE_INTERVAL,
-            'runTime': prof.run_time,
-            'callStats': prof.call_tree,
-            'totalSamples': sample_count,
+            'runTime': profiler_output['runTime'],
+            'callStats': profiler_output['callStats'],
+            'totalSamples': profiler_output['totalSamples'],
         }
