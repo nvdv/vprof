@@ -50,7 +50,7 @@ def run_in_another_process(func):
             target=remote_wrapper, args=(manager_dict,))
         process.start()
         process.join()
-        return manager_dict
+        return manager_dict._getvalue()
     return multiprocessing_wrapper
 
 

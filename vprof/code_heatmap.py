@@ -110,6 +110,7 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
             ['line', i + j + 1, l] for j, l in enumerate(src_code[i:]))
         return code_with_skips
 
+    @base_profiler.run_in_another_process
     def run_as_package(self):
         """Runs program as Python package."""
         pkg_code = base_profiler.get_package_code(self._run_object)
@@ -120,8 +121,12 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
                 runpy.run_path(self._run_object)
             except SystemExit:
                 pass
-        return self._consodalidate_stats(pkg_code, prof)
+        return {
+            'objectName': self._run_object,
+            'heatmaps': self._consodalidate_stats(pkg_code, prof)
+        }
 
+    @base_profiler.run_in_another_process
     def run_as_module(self):
         """Runs program as module."""
         try:
@@ -136,11 +141,14 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
         heatmap = prof.heatmap[os.path.abspath(self._run_object)]
         sources = src_code.split('\n')
         skip_map = self._calc_skips(heatmap, len(sources))
-        return [{
+        return {
             'objectName': self._run_object,
-            'heatmap': heatmap,
-            'srcCode': self._skip_lines(sources, skip_map)
-        }]
+            'heatmaps': [{
+                'objectName': self._run_object,
+                'heatmap': heatmap,
+                'srcCode': self._skip_lines(sources, skip_map)
+            }]
+        }
 
     def run_as_function(self):
         """Runs object as function."""
@@ -157,13 +165,16 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
 
         object_name = 'function %s @ %s' % (
             self._run_object.__name__, filename)
-        return [{
+        return {
             'objectName': object_name,
-            'heatmap': prof.heatmap[filename],
-            'srcCode': source_lines,
-        }]
+            'heatmaps': [{
+                'objectName': object_name,
+                'heatmap': prof.heatmap[filename],
+                'srcCode': source_lines
+            }]
+        }
 
     def run(self):
         """Calculates code heatmap for specified Python program."""
         run_dispatcher = self.get_run_dispatcher()
-        return run_dispatcher()
+        return run_dispatcher()['heatmaps']
