@@ -89,7 +89,7 @@ def main():
         except runner.AmbiguousConfigurationError:
             print('Profiler configuration %s is ambiguous. '
                   'Please, remove duplicates.' % config)
-            sys.exit(_ERR_CODES['ambiguous configuration'])
+            sys.exit(_ERR_CODES['ambiguous_configuration'])
         except runner.BadOptionError as exc:
             print(exc)
             sys.exit(_ERR_CODES['bad_option'])
