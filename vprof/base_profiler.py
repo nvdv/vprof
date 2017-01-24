@@ -32,6 +32,25 @@ def hash_name(name):
     return zlib.adler32(name.encode('utf-8'))
 
 
+class ProcessWithException(multiprocessing.Process):
+    """Process subclass that propagates exceptions to parent process."""
+
+    def __init__(self, *args, **kwargs):
+        super(self.__class__, self).__init__(*args, **kwargs)
+        self.parent_conn, self.child_conn = multiprocessing.Pipe()
+
+    def run(self):
+        try:
+            super(self.__class__, self).run()
+            self.child_conn.send(None)
+        except Exception as exc:
+            self.child_conn.send(exc)
+
+    @property
+    def exception(self):
+        return self.parent_conn.recv()
+
+
 def run_in_another_process(func):
     """Runs wrapped function in separate process.
 
@@ -46,10 +65,13 @@ def run_in_another_process(func):
 
         manager = multiprocessing.Manager()
         manager_dict = manager.dict()
-        process = multiprocessing.Process(
+        process = ProcessWithException(
             target=remote_wrapper, args=(manager_dict,))
         process.start()
         process.join()
+        exc = process.exception
+        if exc:
+            raise exc
         return manager_dict._getvalue()
     return multiprocessing_wrapper
 
