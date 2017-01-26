@@ -10,7 +10,6 @@ from vprof import base_profiler
 _SAMPLE_INTERVAL = 0.001
 
 
-#TODO(nvdv): Some of class methods look complicated. Consider refactoring them.
 class _StatProfiler(object):
     """Statistical profiler.
 
@@ -18,7 +17,6 @@ class _StatProfiler(object):
     """
 
     def __init__(self):
-        self._call_tree = {}
         self._stats = defaultdict(int)
         self._start_time = None
         self.base_frame = None
@@ -67,18 +65,14 @@ class _StatProfiler(object):
         """
         curr_level = call_tree
         for func in stack:
-            next_level = {
+            next_level_index = {
                 node['stack']: node for node in curr_level['children']}
-            if func not in next_level:
-                new_stack = {
-                    'stack': func,
-                    'children': [],
-                    'sampleCount': 0
-                }
-                curr_level['children'].append(new_stack)
-                curr_level = new_stack
+            if func not in next_level_index:
+                new_node = {'stack': func, 'children': [], 'sampleCount': 0}
+                curr_level['children'].append(new_node)
+                curr_level = new_node
             else:
-                curr_level = next_level[func]
+                curr_level = next_level_index[func]
         curr_level['sampleCount'] = sample_count
 
     def _fill_sample_count(self, node):
@@ -87,51 +81,40 @@ class _StatProfiler(object):
             self._fill_sample_count(child) for child in node['children'])
         return node['sampleCount']
 
-    def _extract_stack_params(self, node, total_samples):
-        """Extracts and processes stack parameters from call tree node."""
-        funcname, filename, lineno = node['stack']
+    def _get_percentage(self, sample_count, total_samples):
+        """Return percentage of sample_count in total_samples."""
+        if total_samples != 0:
+            return 100 * round(float(sample_count) / total_samples, 3)
+        return 0.0
+
+    def _format_tree(self, node, total_samples):
+        """Reformats call tree for the UI."""
+        funcname, filename, _ = node['stack']
         funcname = funcname.replace('<', '[').replace('>', ']')
         filename = filename.replace('<', '[').replace('>', ']')
-        if total_samples != 0:
-            percentage = 100 * round(
-                float(node['sampleCount']) / total_samples, 3)
-        else:
-            percentage = 0.0
-        return funcname, filename, lineno, percentage
-
-    def _reformat_tree(self, node, total_samples):
-        """Reformats call tree for the UI."""
-        stack_params = self._extract_stack_params(node, total_samples)
-        func_name = '%s @ %s' % (stack_params[0], stack_params[1])
+        sample_percent = self._get_percentage(
+            node['sampleCount'], total_samples)
+        color_hash = base_profiler.hash_name('%s @ %s' % (funcname, filename))
         return {
-            'stack': stack_params,
-            'children': [self._reformat_tree(child, total_samples)
+            'stack': node['stack'],
+            'children': [self._format_tree(child, total_samples)
                          for child in node['children']],
             'sampleCount': node['sampleCount'],
-            'colorHash': base_profiler.hash_name(func_name)
+            'samplePercentage': sample_percent,
+            'colorHash': color_hash
         }
 
     @property
     def call_tree(self):
         """Returns call tree from statistical profiler."""
-        if self._call_tree:
-            return self._call_tree
-
-        # Add base node to call tree for convenience,
-        call_tree = {
-            'stack': ('base', '', 1),
-            'children': [],
-            'sampleCount': 0}
+        call_tree = {'stack': 'base', 'sampleCount': 0, 'children': []}
         for stack, sample_count in self._stats.items():
             self._insert_stack(reversed(stack), sample_count, call_tree)
         self._fill_sample_count(call_tree)
-        call_tree = self._reformat_tree(
-            call_tree, call_tree['sampleCount'])
-
-        # Omit base node in results.
-        if call_tree['children']:
-            self._call_tree = call_tree['children'][0]
-        return self._call_tree
+        if not call_tree['children']:
+            return {}
+        return self._format_tree(
+            call_tree['children'][0], call_tree['sampleCount'])
 
 
 class FlameGraphProfiler(base_profiler.BaseProfiler):
@@ -148,10 +131,12 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
                 runpy.run_path(self._run_object, run_name='__main__')
             except SystemExit:
                 pass
+
+        call_tree = prof.call_tree
         return {
             'runTime': prof.run_time,
-            'callStats': prof.call_tree,
-            'totalSamples': prof.call_tree.get('sampleCount') or 0
+            'callStats': call_tree,
+            'totalSamples': call_tree.get('sampleCount') or 0
         }
 
     @base_profiler.run_in_another_process
@@ -164,20 +149,24 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
                 exec(code, self._globs, None)
             except SystemExit:
                 pass
+
+        call_tree = prof.call_tree
         return {
             'runTime': prof.run_time,
-            'callStats': prof.call_tree,
-            'totalSamples': prof.call_tree.get('sampleCount') or 0
+            'callStats': call_tree,
+            'totalSamples': call_tree.get('sampleCount') or 0
         }
 
     def run_as_function(self):
         """Runs object as a function."""
         with _StatProfiler() as prof:
             self._run_object(*self._run_args, **self._run_kwargs)
+
+        call_tree = prof.call_tree
         return {
             'runTime': prof.run_time,
-            'callStats': prof.call_tree,
-            'totalSamples': prof.call_tree.get('sampleCount') or 0
+            'callStats': call_tree,
+            'totalSamples': call_tree.get('sampleCount') or 0
         }
 
     def run(self):

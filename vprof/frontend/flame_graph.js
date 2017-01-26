@@ -165,7 +165,7 @@ FlameGraph.prototype.showTooltip_ = function(element, tooltip, node) {
           '<p><b>Line number:</b> ' + node.stack[2] +'</p>' +
           '<p><b>Filename:</b> ' + node.stack[1] +'</p>' +
           '<p><b>Sample count:</b> ' + node.sampleCount + '</p>' +
-          '<p><b>Percentage:</b> ' + node.stack[3] +'%</p>')
+          '<p><b>Percentage:</b> ' + node.samplePercentage +'%</p>')
     .style('left', d3select.event.pageX)
     .style('top', d3select.event.pageY);
 };
