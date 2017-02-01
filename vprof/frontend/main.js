@@ -160,10 +160,9 @@ function handleHelpDisplay(e) {
   e = e || window.event;
   if (e.key === 'h') {
     var helpActiveTab = d3select.select('.active-tab .tabhelp');
-    helpActiveTab.classed({
-      'inactive-tabhelp': !helpActiveTab.classed('inactive-tabhelp'),
-      'active-tabhelp': !helpActiveTab.classed('active-tabhelp')
-    });
+    helpActiveTab.classed('active-tabhelp',
+                          !helpActiveTab.classed('active-tabhelp'))
+      .classed('inactive-tabhelp', !helpActiveTab.classed('inactive-tabhelp'));
   }
 }
 
