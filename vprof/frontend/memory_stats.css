@@ -52,8 +52,6 @@
 .memory-graph {
   fill: #9EDAE5;
   opacity: 0.6;
-  stroke: #17BECF;
-  stroke-width: 2px;
 }
 
 .memory-graph-axis {
@@ -82,9 +80,3 @@
   stroke-dasharray: 4;
 }
 
-.memory-graph-focus-line-highlight {
-  fill: #FD8D3C;
-  opacity: 0.3;
-  stroke: #E6550D;
-  stroke-width: 2px;
-}
