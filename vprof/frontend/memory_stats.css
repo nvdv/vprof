@@ -5,6 +5,8 @@
 }
 
 .memory-usage-graph {
+  padding-left: 10px;
+  padding-right: 10px;
   width: 70%;
 }
 
