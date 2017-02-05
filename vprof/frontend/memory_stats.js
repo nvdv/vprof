@@ -18,7 +18,7 @@ var d3zoom = require('d3-zoom');
  * @param {Object} data - Data for memory chart rendering.
  */
 function MemoryChart(parent, data) {
-  this.MARGIN_LEFT = 40;
+  this.MARGIN_LEFT = 27;
   this.MARGIN_RIGHT = 5;
   this.MARGIN_TOP = 15;
   this.MARGIN_BOTTOM  = 30;
@@ -59,7 +59,7 @@ function MemoryChart(parent, data) {
   this.AXIS_TEXT_Y_OFFSET = 30;
   this.LEGEND_X = this.GRAPH_WIDTH - 350;
   this.LEGEND_Y = 100;
-  this.ZOOM_SCALE_EXTENT = [1, 50];
+  this.ZOOM_SCALE_EXTENT = [1, 100];
   this.ZOOM_TRANSLATE_EXTENT = [[0, 0], [this.WIDTH, this.HEIGHT]];
 
   this.xScale_ = d3scale.scaleLinear()
