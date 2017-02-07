@@ -134,6 +134,8 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
 
         call_tree = prof.call_tree
         return {
+            'objectName': self._object_name,
+            'sampleInterval': _SAMPLE_INTERVAL,
             'runTime': prof.run_time,
             'callStats': call_tree,
             'totalSamples': call_tree.get('sampleCount') or 0
@@ -152,6 +154,8 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
 
         call_tree = prof.call_tree
         return {
+            'objectName': self._object_name,
+            'sampleInterval': _SAMPLE_INTERVAL,
             'runTime': prof.run_time,
             'callStats': call_tree,
             'totalSamples': call_tree.get('sampleCount') or 0
@@ -164,19 +168,9 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
 
         call_tree = prof.call_tree
         return {
+            'objectName': self._object_name,
+            'sampleInterval': _SAMPLE_INTERVAL,
             'runTime': prof.run_time,
             'callStats': call_tree,
             'totalSamples': call_tree.get('sampleCount') or 0
-        }
-
-    def run(self):
-        """Runs statistical profiler and returns stats."""
-        run_dispatcher = self.get_run_dispatcher()
-        profiler_output = run_dispatcher()
-        return {
-            'objectName': self._object_name,
-            'sampleInterval': _SAMPLE_INTERVAL,
-            'runTime': profiler_output['runTime'],
-            'callStats': profiler_output['callStats'],
-            'totalSamples': profiler_output['totalSamples'],
         }

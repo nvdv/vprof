@@ -43,11 +43,12 @@ class ProcessWithException(multiprocessing.Process):
         try:
             super(self.__class__, self).run()
             self.child_conn.send(None)
-        except Exception as exc:
+        except Exception as exc:  # pylint: disable=broad-except
             self.child_conn.send(exc)
 
     @property
     def exception(self):
+        """Returns exception from child process."""
         return self.parent_conn.recv()
 
 
@@ -58,8 +59,9 @@ def run_in_another_process(func):
     with output values.
     """
     def multiprocessing_wrapper(*args, **kwargs):
+        """Wraps function to be executed in separate process."""
 
-        def remote_wrapper(manager_dict):
+        def remote_wrapper(manager_dict):  # pylint: disable=missing-docstring
             output_dict = func(*args, **kwargs)
             manager_dict.update(output_dict)
 
@@ -72,7 +74,7 @@ def run_in_another_process(func):
         exc = process.exception
         if exc:
             raise exc
-        return manager_dict._getvalue()
+        return manager_dict._getvalue()  # pylint: disable=protected-access
     return multiprocessing_wrapper
 
 
@@ -153,5 +155,6 @@ class BaseProfiler(object):
         return self.run_as_module
 
     def run(self):
-        """Runs profiler and returns collect stats."""
-        raise NotImplementedError
+        """Runs profiler and returns collected stats."""
+        run_dispatcher = self.get_run_dispatcher()
+        return run_dispatcher()

@@ -55,8 +55,9 @@ class BaseProfileUnittest(unittest.TestCase):
         })
 
     def testRun(self):
-        with self.assertRaises(NotImplementedError):
-            self._profile.run()
+        self._profile.get_run_dispatcher = mock.MagicMock(
+            return_value=lambda: 1)
+        self.assertEqual(self._profile.run(), 1)
 
     def testRunAsModule(self):
         with self.assertRaises(NotImplementedError):

@@ -66,11 +66,11 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
             sources = src_code.split('\n')
             skip_map = self._calc_skips(heatmap, len(sources))
             package_heatmap.append({
-                'objectName': modname,
+                'name': modname,
                 'heatmap': heatmap,
                 'srcCode': self._skip_lines(sources, skip_map)
             })
-        return sorted(package_heatmap, key=operator.itemgetter('objectName'))
+        return sorted(package_heatmap, key=operator.itemgetter('name'))
 
     def _calc_skips(self, heatmap, num_lines):
         """Calculates line skip map for large sources.
@@ -144,7 +144,7 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
         return {
             'objectName': self._run_object,
             'heatmaps': [{
-                'objectName': self._run_object,
+                'name': self._run_object,
                 'heatmap': heatmap,
                 'srcCode': self._skip_lines(sources, skip_map)
             }]
@@ -168,13 +168,8 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
         return {
             'objectName': object_name,
             'heatmaps': [{
-                'objectName': object_name,
+                'name': object_name,
                 'heatmap': prof.heatmap[filename],
                 'srcCode': source_lines
             }]
         }
-
-    def run(self):
-        """Calculates code heatmap for specified Python program."""
-        run_dispatcher = self.get_run_dispatcher()
-        return run_dispatcher()['heatmaps']

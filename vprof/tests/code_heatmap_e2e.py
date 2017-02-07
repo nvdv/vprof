@@ -51,10 +51,12 @@ class CodeHeatmapModuleEndToEndTest(unittest.TestCase):
             'http://%s:%s/profile' % (_HOST, _PORT))
         response_data = stats_server.decompress_data(response.read())
         stats = json.loads(response_data.decode('utf-8'))
-        self.assertEqual(len(stats), 1)
-        self.assertEqual(stats[0]['objectName'], _MODULE_FILENAME)
-        self.assertDictEqual(stats[0]['heatmap'], {'1': 1})
-        self.assertListEqual(stats[0]['srcCode'], _DUMMY_MODULE_SOURCELINES)
+        self.assertEqual(stats['objectName'], _MODULE_FILENAME)
+        heatmaps = stats['heatmaps']
+        self.assertEqual(len(heatmaps), 1)
+        self.assertEqual(heatmaps[0]['name'], _MODULE_FILENAME)
+        self.assertDictEqual(heatmaps[0]['heatmap'], {'1': 1})
+        self.assertListEqual(heatmaps[0]['srcCode'], _DUMMY_MODULE_SOURCELINES)
 
 
 class CodeHeatmapPackageEndToEndTest(unittest.TestCase):
@@ -79,13 +81,15 @@ class CodeHeatmapPackageEndToEndTest(unittest.TestCase):
             'http://%s:%s/profile' % (_HOST, _PORT))
         response_data = stats_server.decompress_data(response.read())
         stats = json.loads(response_data.decode('utf-8'))
-        self.assertEqual(len(stats), 2)
+        self.assertEqual(stats['objectName'], _PACKAGE_PATH)
+        heatmaps = stats['heatmaps']
+        self.assertEqual(len(heatmaps), 2)
         self.assertTrue(
-            'vprof/tests/test_pkg/__main__.py' in stats[0]['objectName'])
+            'vprof/tests/test_pkg/__main__.py' in heatmaps[0]['name'])
         self.assertTrue(
-            'vprof/tests/test_pkg/dummy_module.py' in stats[1]['objectName'])
-        self.assertListEqual(stats[0]['srcCode'], _MAIN_MODULE_SOURCELINES)
-        self.assertListEqual(stats[1]['srcCode'], _DUMMY_MODULE_SOURCELINES)
+            'vprof/tests/test_pkg/dummy_module.py' in heatmaps[1]['name'])
+        self.assertListEqual(heatmaps[0]['srcCode'], _MAIN_MODULE_SOURCELINES)
+        self.assertListEqual(heatmaps[1]['srcCode'], _DUMMY_MODULE_SOURCELINES)
 
 
 class CodeHeatmapFunctionEndToEndTest(unittest.TestCase):
@@ -116,14 +120,15 @@ class CodeHeatmapFunctionEndToEndTest(unittest.TestCase):
             'http://%s:%s/profile' % (_HOST, _PORT))
         response_data = stats_server.decompress_data(response.read())
         stats = json.loads(response_data.decode('utf-8'))
-        self.assertEqual(len(stats), 1)
-        self.assertTrue('function _func' in stats['h'][0]['objectName'])
+        heatmaps = stats['h']['heatmaps']
+        self.assertEqual(len(heatmaps), 1)
+        self.assertTrue('function _func' in heatmaps[0]['name'])
         self.assertDictEqual(
-            stats['h'][0]['heatmap'], {'96': 1, '97': 1})
+            heatmaps[0]['heatmap'], {'100': 1, '101': 1})
         self.assertListEqual(
-            stats['h'][0]['srcCode'],
-            [['line', 95, '        def _func(foo, bar):\n'],
-             ['line', 96, u'            baz = foo + bar\n'],
-             ['line', 97, u'            return baz\n']])
+            heatmaps[0]['srcCode'],
+            [['line', 99, '        def _func(foo, bar):\n'],
+             ['line', 100, u'            baz = foo + bar\n'],
+             ['line', 101, u'            return baz\n']])
 
 # pylint: enable=missing-docstring, blacklisted-name

@@ -32,7 +32,7 @@ function CodeHeatmap(parent, data) {
   this.HELP_MESSAGE = (
     '<p>&#8226 Hover over line to see line execution count.</p>');
 
-  this.data_ = data;
+  this.data_ = data.heatmaps;
   this.parent_ = parent;
   this.heatmapScale_ = d3scale.scaleLog()
     .domain([this.MIN_RUN_COUNT, this.MAX_RUN_COUNT])
@@ -57,11 +57,11 @@ CodeHeatmap.prototype.render = function() {
     .data(this.data_)
     .enter()
     .append('a')
-    .attr('href', function(d) { return '#' + d.objectName; })
+    .attr('href', function(d) { return '#' + d.name; })
     .append('div')
     .attr('class', 'heatmap-module-name')
     .append('text')
-    .html(function(d) { return d.objectName; });
+    .html(function(d) { return d.name; });
 
   var codeContainer = pageContainer.append('div')
     .attr('class', 'heatmap-code-container');
@@ -73,11 +73,11 @@ CodeHeatmap.prototype.render = function() {
     .attr('class', 'heatmap-src-file');
 
   heatmapContainer.append('a')
-    .attr('href', function(d) { return '#' + d.objectName; })
+    .attr('href', function(d) { return '#' + d.name; })
     .attr('class', 'heatmap-src-code-header')
-    .attr('id', function(d) { return d.objectName; })
+    .attr('id', function(d) { return d.name; })
     .append('text')
-    .html(function(d) { return d.objectName; });
+    .html(function(d) { return d.name; });
 
   var renderedSources = [];
   for (var i = 0; i < this.data_.length; i++) {
