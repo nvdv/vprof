@@ -143,8 +143,8 @@ class BaseProfiler(object):
         """
         raise NotImplementedError
 
-    def get_run_dispatcher(self):
-        """Returns run dispatcher depending on self._run_object value."""
+    def _get_dispatcher(self):
+        """Returns dispatcher depending on self._run_object value."""
         if self._is_run_obj_function:
             self._object_name = '%s (function)' % self._run_object.__name__
             return self.profile_function
@@ -156,5 +156,5 @@ class BaseProfiler(object):
 
     def run(self):
         """Runs profiler and returns collected stats."""
-        run_dispatcher = self.get_run_dispatcher()
-        return run_dispatcher()
+        dispatcher = self._get_dispatcher()
+        return dispatcher()

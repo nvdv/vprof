@@ -206,9 +206,9 @@ class MemoryProfiler(base_profiler.BaseProfiler):
 
     def run(self):
         """Collects memory stats for specified Python program."""
-        run_dispatcher = self.get_run_dispatcher()
+        dispatcher = self._get_dispatcher()
         existing_objects = _get_in_memory_objects()
-        prof = run_dispatcher()
+        prof = dispatcher()
         new_objects = _get_in_memory_objects()
 
         new_obj_count = _get_obj_count_difference(new_objects, existing_objects)

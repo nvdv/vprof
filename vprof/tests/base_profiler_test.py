@@ -55,7 +55,7 @@ class BaseProfileUnittest(unittest.TestCase):
         })
 
     def testRun(self):
-        self._profile.get_run_dispatcher = mock.MagicMock(
+        self._profile._get_dispatcher = mock.MagicMock(
             return_value=lambda: 1)
         self.assertEqual(self._profile.run(), 1)
 
@@ -76,19 +76,19 @@ class BaseProfileUnittest(unittest.TestCase):
         _func = lambda a: a
         self._profile._run_object = _func
         self.assertEqual(
-            self._profile.get_run_dispatcher(),
+            self._profile._get_dispatcher(),
             self._profile.profile_function)
 
         self._profile._is_run_obj_function = False
         self._profile._is_run_obj_package = True
         self.assertEqual(
-            self._profile.get_run_dispatcher(),
+            self._profile._get_dispatcher(),
             self._profile.profile_package)
 
         self._profile._is_run_obj_package = False
         self._profile._is_run_obj_module = True
         self.assertEqual(
-            self._profile.get_run_dispatcher(),
+            self._profile._get_dispatcher(),
             self._profile.profile_module)
 
     def testReplaceSysargs(self):
