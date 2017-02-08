@@ -111,8 +111,8 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
         return code_with_skips
 
     @base_profiler.run_in_another_process
-    def run_as_package(self):
-        """Runs program as Python package."""
+    def profile_package(self):
+        """Calculates heatmap for package."""
         pkg_code = base_profiler.get_package_code(self._run_object)
         with _CodeHeatmapCalculator() as prof:
             for _, compiled_code in pkg_code.values():
@@ -127,8 +127,8 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
         }
 
     @base_profiler.run_in_another_process
-    def run_as_module(self):
-        """Runs program as module."""
+    def profile_module(self):
+        """Calculates heatmap for module."""
         try:
             with open(self._run_object, 'r') as srcfile, \
                     _CodeHeatmapCalculator() as prof:
@@ -150,8 +150,8 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
             }]
         }
 
-    def run_as_function(self):
-        """Runs object as function."""
+    def profile_function(self):
+        """Calculates heatmap for function."""
         with _CodeHeatmapCalculator() as prof:
             prof.add_code(self._run_object.__code__)
             self._run_object(*self._run_args, **self._run_kwargs)

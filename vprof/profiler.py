@@ -34,8 +34,8 @@ class Profiler(base_profiler.BaseProfiler):
         return sorted(records, key=operator.itemgetter(4), reverse=True)
 
     @base_profiler.run_in_another_process
-    def run_as_package(self):
-        """Runs program as a Python package."""
+    def profile_package(self):
+        """Runs cProfile on package."""
         prof = cProfile.Profile()
         prof.enable()
         try:
@@ -54,8 +54,8 @@ class Profiler(base_profiler.BaseProfiler):
         }
 
     @base_profiler.run_in_another_process
-    def run_as_module(self):
-        """Runs program as Python module."""
+    def profile_module(self):
+        """Runs cProfile on module."""
         prof = cProfile.Profile()
         try:
             with open(self._run_object, 'rb') as srcfile:
@@ -73,8 +73,8 @@ class Profiler(base_profiler.BaseProfiler):
             'totalCalls': prof_stats.total_calls,
         }
 
-    def run_as_function(self):
-        """Runs object as a Python function."""
+    def profile_function(self):
+        """Runs cProfile on function."""
         prof = cProfile.Profile()
         prof.enable()
         self._run_object(*self._run_args, **self._run_kwargs)

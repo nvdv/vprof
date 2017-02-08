@@ -61,15 +61,15 @@ class BaseProfileUnittest(unittest.TestCase):
 
     def testRunAsModule(self):
         with self.assertRaises(NotImplementedError):
-            self._profile.run_as_module()
+            self._profile.profile_module()
 
     def testRunAsPackage(self):
         with self.assertRaises(NotImplementedError):
-            self._profile.run_as_package()
+            self._profile.profile_package()
 
     def testRunAsFunction(self):
         with self.assertRaises(NotImplementedError):
-            self._profile.run_as_function()
+            self._profile.profile_function()
 
     def testGetRunDispatcher(self):
         self._profile._is_run_obj_function = True
@@ -77,19 +77,19 @@ class BaseProfileUnittest(unittest.TestCase):
         self._profile._run_object = _func
         self.assertEqual(
             self._profile.get_run_dispatcher(),
-            self._profile.run_as_function)
+            self._profile.profile_function)
 
         self._profile._is_run_obj_function = False
         self._profile._is_run_obj_package = True
         self.assertEqual(
             self._profile.get_run_dispatcher(),
-            self._profile.run_as_package)
+            self._profile.profile_package)
 
         self._profile._is_run_obj_package = False
         self._profile._is_run_obj_module = True
         self.assertEqual(
             self._profile.get_run_dispatcher(),
-            self._profile.run_as_module)
+            self._profile.profile_module)
 
     def testReplaceSysargs(self):
         self._profile._run_object = mock.MagicMock()

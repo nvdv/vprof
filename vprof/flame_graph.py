@@ -124,8 +124,8 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
     """
 
     @base_profiler.run_in_another_process
-    def run_as_package(self):
-        """Runs program as a Python package."""
+    def profile_package(self):
+        """Runs statistical profiler on packages."""
         with _StatProfiler() as prof:
             try:
                 runpy.run_path(self._run_object, run_name='__main__')
@@ -142,8 +142,8 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
         }
 
     @base_profiler.run_in_another_process
-    def run_as_module(self):
-        """Runs program as a Python module."""
+    def profile_module(self):
+        """Runs statistical profiler on module."""
         with open(self._run_object, 'rb') as srcfile, _StatProfiler() as prof:
             code = compile(srcfile.read(), self._run_object, 'exec')
             prof.base_frame = inspect.currentframe()
@@ -161,8 +161,8 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
             'totalSamples': call_tree.get('sampleCount') or 0
         }
 
-    def run_as_function(self):
-        """Runs object as a function."""
+    def profile_function(self):
+        """Runs statistical profiler on function."""
         with _StatProfiler() as prof:
             self._run_object(*self._run_args, **self._run_kwargs)
 

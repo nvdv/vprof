@@ -119,24 +119,24 @@ class BaseProfiler(object):
         else:
             sys.argv[:] = [self._run_object]
 
-    def run_as_package(self):
-        """Runs object as package specified by filesystem path.
+    def profile_package(self):
+        """Profiles package specified by filesystem path.
 
         Runs object specified by self._run_object as package specified by
         path in filesystem. Must be overridden in child classes.
         """
         raise NotImplementedError
 
-    def run_as_module(self):
-        """Runs object as module.
+    def profile_module(self):
+        """Profiles module.
 
         Runs object specified by self._run_object as Python module.
         Must be overridden in child classes.
         """
         raise NotImplementedError
 
-    def run_as_function(self):
-        """Runs object as function.
+    def profile_function(self):
+        """Profiles function.
 
         Runs object specified by self._run_object as Python function with args.
         Must be overridden in child classes.
@@ -147,12 +147,12 @@ class BaseProfiler(object):
         """Returns run dispatcher depending on self._run_object value."""
         if self._is_run_obj_function:
             self._object_name = '%s (function)' % self._run_object.__name__
-            return self.run_as_function
+            return self.profile_function
         elif self._is_run_obj_package:
             self._object_name = '%s (package)' % self._run_object
-            return self.run_as_package
+            return self.profile_package
         self._object_name = '%s (module)' % self._run_object
-        return self.run_as_module
+        return self.profile_module
 
     def run(self):
         """Runs profiler and returns collected stats."""

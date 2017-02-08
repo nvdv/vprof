@@ -170,8 +170,8 @@ class MemoryProfiler(base_profiler.BaseProfiler):
     Runs memory profiler and processes all obtained stats.
     """
 
-    def run_as_package(self):
-        """Runs program as package."""
+    def profile_package(self):
+        """Gets memory stats from package."""
         pkg_code = base_profiler.get_package_code(self._run_object)
         with _CodeEventsTracker() as prof:
             for _, compiled_code in pkg_code.values():
@@ -183,8 +183,8 @@ class MemoryProfiler(base_profiler.BaseProfiler):
                 pass
         return prof
 
-    def run_as_module(self):
-        """Runs program as module."""
+    def profile_module(self):
+        """Gets memory stats from module."""
         try:
             with open(self._run_object, 'rb') as srcfile,\
                 _CodeEventsTracker() as prof:
@@ -196,8 +196,8 @@ class MemoryProfiler(base_profiler.BaseProfiler):
             pass
         return prof
 
-    def run_as_function(self):
-        """Runs object as function."""
+    def profile_function(self):
+        """Gets memory stats from function."""
         with _CodeEventsTracker() as prof:
             prof.add_code(self._run_object.__code__)
             prof.compute_mem_overhead()
