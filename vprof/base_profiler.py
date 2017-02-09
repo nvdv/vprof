@@ -87,18 +87,7 @@ class BaseProfiler(object):
         Args:
             run_object: object that will be run under profiler.
         """
-        self._is_run_obj_function, self._is_run_obj_package = False, False
-        self._is_run_obj_module = False
-        if isinstance(run_object, tuple):
-            self._run_object, self._run_args, self._run_kwargs = run_object
-            self._is_run_obj_function = True
-        else:
-            self._run_object, _, self._run_args = run_object.partition(' ')
-            if os.path.isdir(self._run_object):
-                self._is_run_obj_package = True
-            elif os.path.isfile(self._run_object):
-                self._is_run_obj_module = True
-
+        self._set_run_object_type(run_object)
         if self._is_run_obj_module:
             self._globs = {
                 '__file__': self._run_object,
@@ -111,6 +100,20 @@ class BaseProfiler(object):
         if not self._is_run_obj_function:
             self._replace_sysargs()
         self._object_name = None
+
+    def _set_run_object_type(self, run_object):
+        """Sets type flags depending on run_object value."""
+        self._is_run_obj_function, self._is_run_obj_package = False, False
+        self._is_run_obj_module = False
+        if isinstance(run_object, tuple):
+            self._run_object, self._run_args, self._run_kwargs = run_object
+            self._is_run_obj_function = True
+        else:
+            self._run_object, _, self._run_args = run_object.partition(' ')
+            if os.path.isdir(self._run_object):
+                self._is_run_obj_package = True
+            elif os.path.isfile(self._run_object):
+                self._is_run_obj_module = True
 
     def _replace_sysargs(self):
         """Replaces sys.argv with proper args to pass to script."""
