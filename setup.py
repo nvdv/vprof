@@ -59,10 +59,10 @@ class RunLintCommand(cmd.Command):
     def run(self):
         subprocess.check_call(shlex.split('npm run lint'))
         subprocess.check_call(shlex.split(
-            'pylint --reports=n --rcfile=pylint.rc ' + ' '.join(
+            'pylint --reports=n --rcfile=.pylintrc ' + ' '.join(
                 glob.glob('vprof/*.py'))))
         subprocess.check_call(shlex.split(
-            'pylint --reports=n --rcfile=pylint.rc ' + ' '.join(
+            'pylint --reports=n --rcfile=.pylintrc ' + ' '.join(
                 glob.glob('vprof/tests/*.py'))))
 
 
