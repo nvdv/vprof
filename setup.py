@@ -9,8 +9,8 @@ import unittest
 from distutils import cmd
 from setuptools import setup
 from setuptools.command.install import install
-from pip.req import parse_requirements
 from pip.download import PipSession
+from pip.req import parse_requirements
 
 
 class RunUnittestsCommand(cmd.Command):

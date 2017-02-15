@@ -2,6 +2,7 @@
 import inspect
 import operator
 import os
+import time
 import runpy
 import sys
 
@@ -19,7 +20,9 @@ class _CodeHeatmapCalculator(object):
     def __init__(self):
         self._all_code = set()
         self._original_trace_function = sys.gettrace()
-        self.heatmap = defaultdict(lambda: defaultdict(int))
+        self.execution_count = defaultdict(lambda: defaultdict(int))
+        self.heatmap = defaultdict(lambda: defaultdict(float))
+        self.prev_event = None
 
     def add_code(self, code):
         """Recursively adds code to be examined."""
@@ -35,13 +38,25 @@ class _CodeHeatmapCalculator(object):
 
     def __exit__(self, exc_type, exc_val, exc_tbf):
         """Disables heatmap calculator."""
+        if self.prev_event:
+            self._save_event()
         sys.settrace(self._original_trace_function)
+
+    def _save_event(self):
+        """Stores execution time for pending line."""
+        fname, lineno, timestamp = self.prev_event
+        self.heatmap[fname][lineno] += time.time() - timestamp
+        self.prev_event = None
 
     def _calc_heatmap(self, frame, event, arg):  # pylint: disable=unused-argument
         """Calculates code heatmap."""
-        if event == 'line' and frame.f_code in self._all_code:
-            abs_filename = os.path.abspath(frame.f_code.co_filename)
-            self.heatmap[abs_filename][frame.f_lineno] += 1
+        if event == 'line':
+            if self.prev_event:
+                self._save_event()
+            if frame.f_code in self._all_code:
+                abs_filename = os.path.abspath(frame.f_code.co_filename)
+                self.execution_count[abs_filename][frame.f_lineno] += 1
+                self.prev_event = (abs_filename, frame.f_lineno, time.time())
         return self._calc_heatmap
 
 
