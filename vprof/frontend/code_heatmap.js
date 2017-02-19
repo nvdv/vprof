@@ -24,8 +24,8 @@ try {
  * @property {string} MAX_RUN_COLOR - Color that represents MAX_RUN_COUNT.
  */
 function CodeHeatmap(parent, data) {
-  this.MIN_RUN_COUNT = 1;
-  this.MAX_RUN_COUNT = 10000;
+  this.MIN_RUN_COUNT = 0.00001;
+  this.MAX_RUN_COUNT = 0.5;
   this.MIN_RUN_COLOR = '#ebfaeb';
   this.MAX_RUN_COLOR = '#47d147';
   this.COLOR_SCALE_POWER = 0.25;
@@ -116,7 +116,7 @@ CodeHeatmap.prototype.render = function() {
 CodeHeatmap.prototype.showTooltip_ = function(element, tooltip, runCount) {
   d3select.select(element).attr('class', 'heatmap-src-line-highlight');
   tooltip.attr('class', 'content-tooltip content-tooltip-visible')
-    .html('<b>Execution count: </b>' + runCount)
+    .html('<b>Execution time: </b>' + runCount)
     .style('left', d3select.event.pageX)
     .style('top', d3select.event.pageY);
 };
