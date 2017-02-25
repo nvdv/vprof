@@ -78,11 +78,13 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
             heatmap = prof.heatmap[abs_path]
             if not heatmap:  # If no heatmap - skip module.
                 continue
+            exec_count = prof.execution_count[abs_path]
             sources = src_code.split('\n')
             skip_map = self._calc_skips(heatmap, len(sources))
             package_heatmap.append({
                 'name': modname,
                 'heatmap': heatmap,
+                'executionCount': exec_count,
                 'srcCode': self._skip_lines(sources, skip_map)
             })
         return sorted(package_heatmap, key=operator.itemgetter('name'))
@@ -153,7 +155,9 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
                 exec(code, self._globs, None)
         except SystemExit:
             pass
-        heatmap = prof.heatmap[os.path.abspath(self._run_object)]
+        abspath = os.path.abspath(self._run_object)
+        heatmap = prof.heatmap[abspath]
+        execution_count = prof.execution_count[abspath]
         sources = src_code.split('\n')
         skip_map = self._calc_skips(heatmap, len(sources))
         return {
@@ -161,6 +165,7 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
             'heatmaps': [{
                 'name': self._run_object,
                 'heatmap': heatmap,
+                'executionCount': execution_count,
                 'srcCode': self._skip_lines(sources, skip_map)
             }]
         }
@@ -185,6 +190,7 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
             'heatmaps': [{
                 'name': object_name,
                 'heatmap': prof.heatmap[filename],
+                'executionCount': prof.execution_count[filename],
                 'srcCode': source_lines
             }]
         }

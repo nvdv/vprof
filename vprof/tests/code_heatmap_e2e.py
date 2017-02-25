@@ -55,7 +55,7 @@ class CodeHeatmapModuleEndToEndTest(unittest.TestCase):
         heatmaps = stats['heatmaps']
         self.assertEqual(len(heatmaps), 1)
         self.assertEqual(heatmaps[0]['name'], _MODULE_FILENAME)
-        self.assertDictEqual(heatmaps[0]['heatmap'], {'1': 1})
+        self.assertDictEqual(heatmaps[0]['executionCount'], {'1': 1})
         self.assertListEqual(heatmaps[0]['srcCode'], _DUMMY_MODULE_SOURCELINES)
 
 
@@ -124,7 +124,7 @@ class CodeHeatmapFunctionEndToEndTest(unittest.TestCase):
         self.assertEqual(len(heatmaps), 1)
         self.assertTrue('function _func' in heatmaps[0]['name'])
         self.assertDictEqual(
-            heatmaps[0]['heatmap'], {'100': 1, '101': 1})
+            heatmaps[0]['executionCount'], {'100': 1, '101': 1})
         self.assertListEqual(
             heatmaps[0]['srcCode'],
             [['line', 99, '        def _func(foo, bar):\n'],
