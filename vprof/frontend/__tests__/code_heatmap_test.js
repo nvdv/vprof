@@ -11,20 +11,36 @@ describe('Code heatmap test suite', function() {
     var calculator = new codeHeatmapModule.CodeHeatmap(parent, data);
 
     var srcCode = [['line', 1, 'foo'], ['line', 2, 'bar'], ['line', 3, 'baz']];
-    var heatmap = {1: 1, 2: 1, 3: 1};
+    var heatmap = {1: 0.1, 2: 0.2, 3: 0.2};
+    var executionCount = {1: 1, 2: 1, 3: 1};
+    var codeStats = {
+      'srcCode': srcCode,
+      'heatmap': heatmap,
+      'executionCount': executionCount,
+    };
+
     var expectedResult = {
       'srcCode': "123",
-      'lineMap': {0: 1, 1: 1, 2: 1}};
-    expect(calculator.renderCode_(srcCode, heatmap)).toEqual(
-      expectedResult);
+      'timeMap': {0: 0.1, 1: 0.2, 2: 0.2},
+      'countMap': {0: 1, 1: 1, 2: 1}
+    };
+    expect(calculator.renderCode_(codeStats)).toEqual(expectedResult);
 
     srcCode = [['line', 1, 'foo'], ['line', 2, 'bar'],
                ['skip', 5], ['line', 8, 'hahaha']];
-    heatmap = {1: 1, 2: 1, 8: 1};
+    heatmap = {1: 0.1, 2: 0.1, 8: 0.3};
+    executionCount = {1: 1, 2: 1, 8: 1};
+    codeStats = {
+      'srcCode': srcCode,
+      'heatmap': heatmap,
+      'executionCount': executionCount,
+    };
+
     expectedResult = {
       'srcCode': "12<div class='heatmap-skip-line'>5 lines skipped</div>8",
-      'lineMap': {0: 1, 1: 1, 2: 1}};
-    expect(calculator.renderCode_(srcCode, heatmap)).toEqual(
-      expectedResult);
+      'timeMap': {0: 0.1, 1: 0.1, 2: 0.3},
+      'countMap': {0: 1, 1: 1, 2: 1}
+    };
+    expect(calculator.renderCode_(codeStats)).toEqual(expectedResult);
   });
 });
