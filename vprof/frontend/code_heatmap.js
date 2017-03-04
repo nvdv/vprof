@@ -24,18 +24,17 @@ try {
  * @property {string} MAX_RUN_COLOR - Color that represents MAX_RUN_COUNT.
  */
 function CodeHeatmap(parent, data) {
-  this.MIN_RUN_COUNT = 0.00001;
-  this.MAX_RUN_COUNT = 0.5;
+  this.MIN_RUN_TIME = 0.000001;
+  this.MAX_RUN_TIME = data.runTime;
   this.MIN_RUN_COLOR = '#ebfaeb';
   this.MAX_RUN_COLOR = '#47d147';
-  this.COLOR_SCALE_POWER = 0.25;
   this.HELP_MESSAGE = (
     '<p>&#8226 Hover over line to see line execution count.</p>');
 
   this.data_ = data.heatmaps;
   this.parent_ = parent;
   this.heatmapScale_ = d3scale.scaleLog()
-    .domain([this.MIN_RUN_COUNT, this.MAX_RUN_COUNT])
+    .domain([this.MIN_RUN_TIME, this.MAX_RUN_TIME])
     .range([this.MIN_RUN_COLOR, this.MAX_RUN_COLOR]);
 }
 
