@@ -135,11 +135,14 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
             for _, compiled_code in pkg_code.values():
                 prof.add_code(compiled_code)
             try:
+                start_time = time.time()
                 runpy.run_path(self._run_object)
+                run_time = time.time() - start_time
             except SystemExit:
                 pass
         return {
             'objectName': self._run_object,
+            'runTime': run_time,
             'heatmaps': self._consodalidate_stats(pkg_code, prof)
         }
 
@@ -151,7 +154,9 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
                     _CodeHeatmapCalculator() as prof:
                 src_code = srcfile.read()
                 code = compile(src_code, self._run_object, 'exec')
+                start_time = time.time()
                 prof.add_code(code)
+                run_time = time.time() - start_time
                 exec(code, self._globs, None)
         except SystemExit:
             pass
@@ -162,6 +167,7 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
         skip_map = self._calc_skips(heatmap, len(sources))
         return {
             'objectName': self._run_object,
+            'runTime': run_time,
             'heatmaps': [{
                 'name': self._run_object,
                 'heatmap': heatmap,
@@ -174,7 +180,9 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
         """Calculates heatmap for function."""
         with _CodeHeatmapCalculator() as prof:
             prof.add_code(self._run_object.__code__)
+            start_time = time.time()
             self._run_object(*self._run_args, **self._run_kwargs)
+            run_time = time.time() - start_time
         code_lines, start_line = inspect.getsourcelines(self._run_object)
         filename = os.path.abspath(inspect.getsourcefile(self._run_object))
 
@@ -187,6 +195,7 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
             self._run_object.__name__, filename)
         return {
             'objectName': object_name,
+            'runTime': run_time,
             'heatmaps': [{
                 'name': object_name,
                 'heatmap': prof.heatmap[filename],

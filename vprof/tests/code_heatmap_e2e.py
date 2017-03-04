@@ -52,6 +52,7 @@ class CodeHeatmapModuleEndToEndTest(unittest.TestCase):
         response_data = stats_server.decompress_data(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], _MODULE_FILENAME)
+        self.assertTrue(stats['runTime'] > 0)
         heatmaps = stats['heatmaps']
         self.assertEqual(len(heatmaps), 1)
         self.assertEqual(heatmaps[0]['name'], _MODULE_FILENAME)
@@ -82,6 +83,7 @@ class CodeHeatmapPackageEndToEndTest(unittest.TestCase):
         response_data = stats_server.decompress_data(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], _PACKAGE_PATH)
+        self.assertTrue(stats['runTime'] > 0)
         heatmaps = stats['heatmaps']
         self.assertEqual(len(heatmaps), 2)
         self.assertTrue(
@@ -120,15 +122,16 @@ class CodeHeatmapFunctionEndToEndTest(unittest.TestCase):
             'http://%s:%s/profile' % (_HOST, _PORT))
         response_data = stats_server.decompress_data(response.read())
         stats = json.loads(response_data.decode('utf-8'))
+        self.assertTrue(stats['h']['runTime'] > 0)
         heatmaps = stats['h']['heatmaps']
         self.assertEqual(len(heatmaps), 1)
         self.assertTrue('function _func' in heatmaps[0]['name'])
         self.assertDictEqual(
-            heatmaps[0]['executionCount'], {'100': 1, '101': 1})
+            heatmaps[0]['executionCount'], {'102': 1, '103': 1})
         self.assertListEqual(
             heatmaps[0]['srcCode'],
-            [['line', 99, '        def _func(foo, bar):\n'],
-             ['line', 100, u'            baz = foo + bar\n'],
-             ['line', 101, u'            return baz\n']])
+            [['line', 101, '        def _func(foo, bar):\n'],
+             ['line', 102, u'            baz = foo + bar\n'],
+             ['line', 103, u'            return baz\n']])
 
 # pylint: enable=missing-docstring, blacklisted-name
