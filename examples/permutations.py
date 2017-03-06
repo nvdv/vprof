@@ -3,7 +3,7 @@
 Example is taken from https://docs.python.org/3.5/library/itertools.html.
 
 To profile this with vprof run:
-    vprof -c cmh -s permutations.py
+    vprof -c cmh permutations.py
 """
 
 def permutations(iterable, r=None):
