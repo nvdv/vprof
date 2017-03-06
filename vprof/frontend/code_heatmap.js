@@ -31,7 +31,7 @@ function CodeHeatmap(parent, data) {
   this.HELP_MESSAGE = (
     '<p>&#8226 Hover over line to see line execution count.</p>');
 
-  this.data_ = data.heatmaps;
+  this.data_ = data;
   this.parent_ = parent;
   this.heatmapScale_ = d3scale.scaleLog()
     .domain([this.MIN_RUN_TIME, this.MAX_RUN_TIME])
@@ -53,7 +53,7 @@ CodeHeatmap.prototype.render = function() {
     .html('Inspected modules');
 
   moduleList.selectAll('.heatmap-module-name')
-    .data(this.data_)
+    .data(this.data_.heatmaps)
     .enter()
     .append('a')
     .attr('href', function(d) { return '#' + d.name; })
@@ -66,7 +66,7 @@ CodeHeatmap.prototype.render = function() {
     .attr('class', 'heatmap-code-container');
 
   var heatmapContainer = codeContainer.selectAll('div')
-    .data(this.data_)
+    .data(this.data_.heatmaps)
     .enter()
     .append('div')
     .attr('class', 'heatmap-src-file');
@@ -79,8 +79,8 @@ CodeHeatmap.prototype.render = function() {
     .html(function(d) { return d.name; });
 
   var renderedSources = [];
-  for (var i = 0; i < this.data_.length; i++) {
-    renderedSources.push(this.renderCode_(this.data_[i]));
+  for (var i = 0; i < this.data_.heatmaps.length; i++) {
+    renderedSources.push(this.renderCode_(this.data_.heatmaps[i]));
   }
 
   var fileContainers = heatmapContainer.append('div')
@@ -100,7 +100,7 @@ CodeHeatmap.prototype.render = function() {
           if(renderedSources[i].countMap[j]) {
             self.showTooltip_(
               this, tooltip, renderedSources[i].timeMap[j],
-              renderedSources[i].countMap[j]);
+              renderedSources[i].countMap[j], self.data_.runTime);
           }
         })
         .on('mouseout', function() { self.hideTooltip_(this, tooltip); });
@@ -115,10 +115,13 @@ CodeHeatmap.prototype.render = function() {
  * @param {number} lineRuncount - Line execution count.
  */
 CodeHeatmap.prototype.showTooltip_ = function(element, tooltip,
-                                              lineRuntime, lineRuncount) {
+                                              lineRuntime, lineRuncount,
+                                              totalTime) {
   d3select.select(element).attr('class', 'heatmap-src-line-highlight');
   tooltip.attr('class', 'content-tooltip content-tooltip-visible')
     .html('<p><b>Time spent: </b>' + lineRuntime + ' s</p>' +
+          '<p><b>Total running time: </b>' + totalTime + ' s</p>' +
+          '<p><b>Percentage: </b>' + 100 * (lineRuntime / totalTime) + '%</p>' +
           '<p><b>Run count: </b>' + lineRuncount + '</p>')
     .style('left', d3select.event.pageX)
     .style('top', d3select.event.pageY);

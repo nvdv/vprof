@@ -154,10 +154,10 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
                     _CodeHeatmapCalculator() as prof:
                 src_code = srcfile.read()
                 code = compile(src_code, self._run_object, 'exec')
-                start_time = time.time()
                 prof.add_code(code)
-                run_time = time.time() - start_time
+                start_time = time.time()
                 exec(code, self._globs, None)
+                run_time = time.time() - start_time
         except SystemExit:
             pass
         abspath = os.path.abspath(self._run_object)
