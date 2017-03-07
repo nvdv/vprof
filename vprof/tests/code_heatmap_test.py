@@ -18,32 +18,32 @@ class CodeHeatmapCalculator(unittest.TestCase):
 
     def testInit(self):
         self._calc.__init__()
-        self.assertEqual(self._calc._all_code, set())
-        self.assertEqual(self._calc._original_trace_function, sys.gettrace())
+        self.assertEqual(self._calc.all_code, set())
+        self.assertEqual(self._calc.original_trace_function, sys.gettrace())
         self.assertEqual(self._calc.heatmap, defaultdict(int))
 
     def testAddCode(self):
         code = mock.MagicMock()
-        self._calc._all_code = set()
+        self._calc.all_code = set()
         self._calc.add_code(code)
-        self.assertIn(code, self._calc._all_code)
+        self.assertIn(code, self._calc.all_code)
 
     @mock.patch('os.path.abspath')
     def testCalcHeatmap(self, abspath_mock):
         abspath_mock.side_effect = lambda arg: arg
         self._calc.heatmap = defaultdict(lambda: defaultdict(int))
         self._calc.execution_count = defaultdict(lambda: defaultdict(float))
-        self._calc.prev_event = None
+        self._calc.prev_lineno = None
         event, arg = 'line', mock.MagicMock()
         frame1, frame2 = mock.MagicMock(), mock.MagicMock()
         frame1.f_code, frame2.f_code = mock.MagicMock(), mock.MagicMock()
         frame1.f_code.co_filename = 'foo.py'
         frame2.f_code.co_filename = 'foo.py'
         frame1.f_lineno, frame2.f_lineno = 1, 2
-        self._calc._all_code = set((frame1.f_code, frame2.f_code))
+        self._calc.all_code = set((frame1.f_code, frame2.f_code))
 
-        self._calc._calc_heatmap(frame1, event, arg)
-        self._calc._calc_heatmap(frame2, event, arg)
+        self._calc.calc_heatmap(frame1, event, arg)
+        self._calc.calc_heatmap(frame2, event, arg)
 
         fname, lineno = frame1.f_code.co_filename, frame1.f_lineno
         self.assertEqual(self._calc.execution_count[fname][lineno], 1)

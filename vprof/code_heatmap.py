@@ -18,46 +18,48 @@ class _CodeHeatmapCalculator(object):
     """
 
     def __init__(self):
-        self._all_code = set()
-        self._original_trace_function = sys.gettrace()
+        self.all_code = set()
+        self.original_trace_function = sys.gettrace()
         self.execution_count = defaultdict(lambda: defaultdict(int))
         self.heatmap = defaultdict(lambda: defaultdict(float))
-        self.prev_event = None
+        self.prev_lineno = None
+        self.prev_filename = None
+        self.prev_timestamp = None
 
     def add_code(self, code):
         """Recursively adds code to be examined."""
-        if code not in self._all_code:
-            self._all_code.add(code)
+        if code not in self.all_code:
+            self.all_code.add(code)
             for subcode in filter(inspect.iscode, code.co_consts):
                 self.add_code(subcode)
 
     def __enter__(self):
         """Enables heatmap calculator."""
-        sys.settrace(self._calc_heatmap)
+        sys.settrace(self.calc_heatmap)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tbf):
         """Disables heatmap calculator."""
-        if self.prev_event:
-            self._save_event()
-        sys.settrace(self._original_trace_function)
+        if self.prev_lineno:
+            self.heatmap[self.prev_filename][self.prev_lineno] += (
+                time.time() - self.prev_timestamp)
+            self.prev_lineno = None
+        sys.settrace(self.original_trace_function)
 
-    def _save_event(self):
-        """Stores execution time for pending line."""
-        fname, lineno, timestamp = self.prev_event
-        self.heatmap[fname][lineno] += time.time() - timestamp
-        self.prev_event = None
 
-    def _calc_heatmap(self, frame, event, arg):  # pylint: disable=unused-argument
+    def calc_heatmap(self, frame, event, arg):  # pylint: disable=unused-argument
         """Calculates code heatmap."""
-        if event == 'line':
-            if self.prev_event:
-                self._save_event()
-            if frame.f_code in self._all_code:
-                abs_filename = os.path.abspath(frame.f_code.co_filename)
-                self.execution_count[abs_filename][frame.f_lineno] += 1
-                self.prev_event = (abs_filename, frame.f_lineno, time.time())
-        return self._calc_heatmap
+        if event == 'line' and frame.f_code in self.all_code:
+            if self.prev_lineno:
+                self.heatmap[self.prev_filename][self.prev_lineno] += (
+                    time.time() - self.prev_timestamp)
+                self.prev_lineno = None
+            abs_filename = os.path.abspath(frame.f_code.co_filename)
+            self.execution_count[abs_filename][frame.f_lineno] += 1
+            self.prev_filename = abs_filename
+            self.prev_lineno = frame.f_lineno
+            self.prev_timestamp = time.time()
+        return self.calc_heatmap
 
 
 class CodeHeatmapProfiler(base_profiler.BaseProfiler):
@@ -127,6 +129,7 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
             ['line', i + j + 1, l] for j, l in enumerate(src_code[i:]))
         return code_with_skips
 
+
     @base_profiler.run_in_another_process
     def profile_package(self):
         """Calculates heatmap for package."""
@@ -135,15 +138,16 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
             for _, compiled_code in pkg_code.values():
                 prof.add_code(compiled_code)
             try:
-                start_time = time.time()
                 runpy.run_path(self._run_object)
-                run_time = time.time() - start_time
             except SystemExit:
                 pass
+        heatmaps = self._consodalidate_stats(pkg_code, prof)
+        run_time = sum(
+            time for heatmap in heatmaps for time in heatmap.values())
         return {
             'objectName': self._run_object,
             'runTime': run_time,
-            'heatmaps': self._consodalidate_stats(pkg_code, prof)
+            'heatmaps': heatmaps
         }
 
     @base_profiler.run_in_another_process
@@ -155,9 +159,7 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
                 src_code = srcfile.read()
                 code = compile(src_code, self._run_object, 'exec')
                 prof.add_code(code)
-                start_time = time.time()
                 exec(code, self._globs, None)
-                run_time = time.time() - start_time
         except SystemExit:
             pass
         abspath = os.path.abspath(self._run_object)
@@ -165,6 +167,7 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
         execution_count = prof.execution_count[abspath]
         sources = src_code.split('\n')
         skip_map = self._calc_skips(heatmap, len(sources))
+        run_time = sum(time for time in heatmap.values())
         return {
             'objectName': self._run_object,
             'runTime': run_time,
@@ -180,9 +183,7 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
         """Calculates heatmap for function."""
         with _CodeHeatmapCalculator() as prof:
             prof.add_code(self._run_object.__code__)
-            start_time = time.time()
             self._run_object(*self._run_args, **self._run_kwargs)
-            run_time = time.time() - start_time
         code_lines, start_line = inspect.getsourcelines(self._run_object)
         filename = os.path.abspath(inspect.getsourcefile(self._run_object))
 
@@ -193,6 +194,7 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
 
         object_name = 'function %s @ %s' % (
             self._run_object.__name__, filename)
+        run_time = sum(time for time in prof.heatmap[filename].values())
         return {
             'objectName': object_name,
             'runTime': run_time,
