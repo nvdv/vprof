@@ -110,6 +110,13 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
             skips.append((prev_line, num_lines - prev_line))
         return skips
 
+    def _calc_runtime_for_package(self, package_heatmap):
+        """Calculates total running time from package heatmap."""
+        run_time = 0
+        for module_heatmap in package_heatmap:
+            run_time += sum(time for time in module_heatmap['heatmap'].values())
+        return run_time
+
     @staticmethod
     def _skip_lines(src_code, skip_map):
         """Skips lines in src_code specified by skip map."""
@@ -129,7 +136,6 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
             ['line', i + j + 1, l] for j, l in enumerate(src_code[i:]))
         return code_with_skips
 
-
     @base_profiler.run_in_another_process
     def profile_package(self):
         """Calculates heatmap for package."""
@@ -141,13 +147,12 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
                 runpy.run_path(self._run_object)
             except SystemExit:
                 pass
-        heatmaps = self._consodalidate_stats(pkg_code, prof)
-        run_time = sum(
-            time for heatmap in heatmaps for time in heatmap.values())
+        package_heatmap = self._consodalidate_stats(pkg_code, prof)
+        run_time = self._calc_runtime_for_package(package_heatmap)
         return {
             'objectName': self._run_object,
             'runTime': run_time,
-            'heatmaps': heatmaps
+            'heatmaps': package_heatmap
         }
 
     @base_profiler.run_in_another_process
