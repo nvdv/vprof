@@ -97,11 +97,8 @@ CodeHeatmap.prototype.render = function() {
     .each(function(_, i) {
       d3select.select(fileContainers[i]).selectAll('.heatmap-src-line-normal')
         .on('mouseover', function(_, j) {
-          if(renderedSources[i].countMap[j]) {
-            self.showTooltip_(
-              this, tooltip, renderedSources[i].timeMap[j],
-              renderedSources[i].countMap[j], self.data_.runTime);
-          }
+          self.showTooltip_(
+              this, tooltip, renderedSources, i, j, self.data_.runTime);
         })
         .on('mouseout', function() { self.hideTooltip_(this, tooltip); });
     });
@@ -111,12 +108,18 @@ CodeHeatmap.prototype.render = function() {
  * Shows line execution count inside tooltip and adds line highlighting.
  * @param {Object} element - Element representing highlighted line.
  * @param {Object} tooltip - Element representing tooltip.
- * @param {number} lineRuntime - Time spent on line.
- * @param {number} lineRuncount - Line execution count.
+ * @param {Object} sources - Object that represents sources with stats.
+ * @param {number} fileIndex - Index of file with source code.
+ * @param {number} lineIndex - Index of line in file.
+ * @param {number} totalTime - Module running time.
  */
-CodeHeatmap.prototype.showTooltip_ = function(element, tooltip,
-                                              lineRuntime, lineRuncount,
-                                              totalTime) {
+CodeHeatmap.prototype.showTooltip_ = function(element, tooltip, sources,
+                                              fileIndex, lineIndex, totalTime) {
+  if (!sources[fileIndex].countMap[lineIndex]) {
+    return;
+  }
+  var lineRuntime = sources[fileIndex].timeMap[lineIndex];
+  var lineRuncount = sources[fileIndex].countMap[lineIndex];
   d3select.select(element).attr('class', 'heatmap-src-line-highlight');
   tooltip.attr('class', 'content-tooltip content-tooltip-visible')
     .html('<p><b>Time spent: </b>' + lineRuntime + ' s</p>' +
@@ -169,13 +172,13 @@ CodeHeatmap.prototype.renderCode_ = function(stats) {
  * Formats single line of Python source file.
  * @param {number} lineNumber - Line number for code browser.
  * @param {string} codeLine - Source line.
- * @param {number} runCount - Number of line runs.
- * @returns {string}
+ * @param {number} lineRuntime - Line run time.
+ * @returns {string}`
  */
 CodeHeatmap.prototype.formatSrcLine_ = function(lineNumber, codeLine,
-                                                runCount) {
+                                                lineRuntime) {
   var highlightedLine = hljs.highlight('python', codeLine).value;
-  var backgroundColor = runCount ? this.heatmapScale_(runCount) : '';
+  var backgroundColor = lineRuntime ? this.heatmapScale_(lineRuntime) : '';
   return (
       "<div class='heatmap-src-line-normal' style='background-color: " +
         backgroundColor + "'>" +
