@@ -3,6 +3,7 @@ import inspect
 import operator
 import os
 import time
+import threading
 import runpy
 import sys
 
@@ -35,6 +36,7 @@ class _CodeHeatmapCalculator(object):
 
     def __enter__(self):
         """Enables heatmap calculator."""
+        threading.settrace(self.calc_heatmap)
         sys.settrace(self.calc_heatmap)
         return self
 
@@ -45,7 +47,7 @@ class _CodeHeatmapCalculator(object):
                 time.time() - self.prev_timestamp)
             self.prev_lineno = None
         sys.settrace(self.original_trace_function)
-
+        threading.settrace(self.original_trace_function)
 
     def calc_heatmap(self, frame, event, arg):  # pylint: disable=unused-argument
         """Calculates code heatmap."""
