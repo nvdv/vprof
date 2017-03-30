@@ -31,8 +31,8 @@ class CodeHeatmapCalculator(unittest.TestCase):
     @mock.patch('os.path.abspath')
     def testCalcHeatmap(self, abspath_mock):
         abspath_mock.side_effect = lambda arg: arg
-        self._calc.heatmap = defaultdict(lambda: defaultdict(int))
-        self._calc.execution_count = defaultdict(lambda: defaultdict(float))
+        self._calc._heatmap = defaultdict(lambda: defaultdict(int))
+        self._calc._execution_count = defaultdict(lambda: defaultdict(float))
         self._calc.prev_lineno = None
         event, arg = 'line', mock.MagicMock()
         frame1, frame2 = mock.MagicMock(), mock.MagicMock()
@@ -46,8 +46,8 @@ class CodeHeatmapCalculator(unittest.TestCase):
         self._calc.calc_heatmap(frame2, event, arg)
 
         fname, lineno = frame1.f_code.co_filename, frame1.f_lineno
-        self.assertEqual(self._calc.execution_count[fname][lineno], 1)
-        self.assertEqual(self._calc.execution_count[fname][lineno], 1)
+        self.assertEqual(self._calc._execution_count[fname][lineno], 1)
+        self.assertEqual(self._calc._execution_count[fname][lineno], 1)
 
 
 class CodeHeatmapProfileUnitTest(unittest.TestCase):

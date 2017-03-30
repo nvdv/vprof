@@ -3,7 +3,6 @@ import inspect
 import operator
 import os
 import time
-import threading
 import runpy
 import sys
 
@@ -21,8 +20,8 @@ class _CodeHeatmapCalculator(object):
     def __init__(self):
         self.all_code = set()
         self.original_trace_function = sys.gettrace()
-        self.execution_count = defaultdict(lambda: defaultdict(int))
-        self.heatmap = defaultdict(lambda: defaultdict(float))
+        self._execution_count = defaultdict(lambda: defaultdict(int))
+        self._heatmap = defaultdict(lambda: defaultdict(float))
         self.prev_lineno = None
         self.prev_filename = None
         self.prev_timestamp = None
@@ -36,32 +35,41 @@ class _CodeHeatmapCalculator(object):
 
     def __enter__(self):
         """Enables heatmap calculator."""
-        threading.settrace(self.calc_heatmap)
         sys.settrace(self.calc_heatmap)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tbf):
         """Disables heatmap calculator."""
         if self.prev_lineno:
-            self.heatmap[self.prev_filename][self.prev_lineno] += (
+            self._heatmap[self.prev_filename][self.prev_lineno] += (
                 time.time() - self.prev_timestamp)
             self.prev_lineno = None
         sys.settrace(self.original_trace_function)
-        threading.settrace(self.original_trace_function)
 
     def calc_heatmap(self, frame, event, arg):  # pylint: disable=unused-argument
         """Calculates code heatmap."""
         if event == 'line' and frame.f_code in self.all_code:
             if self.prev_lineno:
-                self.heatmap[self.prev_filename][self.prev_lineno] += (
+                self._heatmap[self.prev_filename][self.prev_lineno] += (
                     time.time() - self.prev_timestamp)
                 self.prev_lineno = None
-            abs_filename = os.path.abspath(frame.f_code.co_filename)
-            self.execution_count[abs_filename][frame.f_lineno] += 1
-            self.prev_filename = abs_filename
+            self._execution_count[frame.f_code.co_filename][frame.f_lineno] += 1
+            self.prev_filename = frame.f_code.co_filename
             self.prev_lineno = frame.f_lineno
             self.prev_timestamp = time.time()
         return self.calc_heatmap
+
+    @property
+    def heatmap(self):
+        """Returns heatmap with absolute path names."""
+        return {os.path.abspath(fname): self._heatmap[fname]
+                for fname in self._heatmap}
+
+    @property
+    def execution_count(self):
+        """Returns execution count map with absolute path names."""
+        return {os.path.abspath(fname): self._execution_count[fname]
+                for fname in self._heatmap}
 
 
 class CodeHeatmapProfiler(base_profiler.BaseProfiler):
