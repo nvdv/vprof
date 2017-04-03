@@ -87,7 +87,7 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
         for modname, (src_code, _) in package_code.items():
             abs_path = (modname if os.path.isabs(modname)
                         else os.path.abspath(modname))
-            heatmap = prof.heatmap[abs_path]
+            heatmap = prof.heatmap.get(abs_path)
             if not heatmap:  # If no heatmap - skip module.
                 continue
             exec_count = prof.execution_count[abs_path]
@@ -153,7 +153,7 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
             for _, compiled_code in pkg_code.values():
                 prof.add_code(compiled_code)
             try:
-                runpy.run_path(self._run_object)
+                runpy.run_path(self._run_object, run_name='__main__')
             except SystemExit:
                 pass
         package_heatmap = self._consodalidate_stats(pkg_code, prof)
