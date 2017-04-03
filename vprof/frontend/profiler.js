@@ -105,6 +105,8 @@ Profiler.prototype.hideTooltip_ = function(element, tooltip) {
 Profiler.prototype.renderLegend_ = function(parent) {
   parent.append('div')
     .attr('class', 'profiler-legend')
+    .append('div')
+    .attr('class', 'content-legend')
     .append('text')
     .html('<p><b>Object name:</b> ' + this.data_.objectName + '</p>' +
           '<p><b>Total time:</b> ' + this.data_.totalTime + 's</p>' +

@@ -174,7 +174,7 @@ CodeHeatmap.prototype.renderCode_ = function(stats) {
  * @param {number} lineNumber - Line number for code browser.
  * @param {string} codeLine - Source line.
  * @param {number} lineRuntime - Line run time.
- * @returns {string}`
+ * @returns {string}
  */
 CodeHeatmap.prototype.formatSrcLine_ = function(lineNumber, codeLine,
                                                 lineRuntime) {

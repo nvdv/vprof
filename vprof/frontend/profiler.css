@@ -54,17 +54,6 @@
 }
 
 .profiler-legend {
-  background: #BCBCBC;
-  border: 0px;
-  border-radius: 5px-container;
-  font: 15px sans-serif;
   margin-left: 25px;
   margin-top: 20px;
-  opacity: 0.9;
-  padding: 8px;
-  pointer-events: none;
-  position: absolute;
-  text-align: center;
 }
-
-

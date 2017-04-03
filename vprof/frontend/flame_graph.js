@@ -22,7 +22,7 @@ function FlameGraph(parent, data) {
   this.TEXT_OFFSET_X = 5;
   this.TEXT_OFFSET_Y= 14;
   this.TEXT_CUTOFF = 0.075 * this.WIDTH;
-  this.LEGEND_X = this.WIDTH - 400;
+  this.LEGEND_X = this.WIDTH - 500;
   this.LEGEND_Y = 100;
   this.MIN_TEXT_HEIGHT = 18;
   this.HELP_MESSAGE = (
