@@ -1,15 +1,15 @@
 """Program stats server."""
 import functools
 import gzip
-import json
 import io
+import json
 import os
 import sys
 import webbrowser
 
 from six import BytesIO
-from six.moves import socketserver
 from six.moves import SimpleHTTPServer as http_server
+from six.moves import socketserver
 
 _STATIC_DIR = 'frontend'
 _PROFILE_HTML = '%s/profile.html' % _STATIC_DIR

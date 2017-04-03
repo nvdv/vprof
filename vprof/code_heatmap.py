@@ -2,9 +2,9 @@
 import inspect
 import operator
 import os
-import time
 import runpy
 import sys
+import time
 
 from collections import defaultdict
 from vprof import base_profiler
@@ -127,8 +127,7 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
             run_time += sum(time for time in module_heatmap['heatmap'].values())
         return run_time
 
-    @staticmethod
-    def _skip_lines(src_code, skip_map):
+    def _skip_lines(self, src_code, skip_map):
         """Skips lines in src_code specified by skip map."""
         if not skip_map:
             return [['line', j + 1, l] for j, l in enumerate(src_code)]

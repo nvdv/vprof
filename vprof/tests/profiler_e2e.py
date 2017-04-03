@@ -1,6 +1,6 @@
 # pylint: disable=missing-docstring, blacklisted-name
-import json
 import functools
+import json
 import threading
 import unittest
 
