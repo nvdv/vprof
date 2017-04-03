@@ -120,11 +120,12 @@ CodeHeatmap.prototype.showTooltip_ = function(element, tooltip, sources,
   }
   var lineRuntime = sources[fileIndex].timeMap[lineIndex];
   var lineRuncount = sources[fileIndex].countMap[lineIndex];
+  var percentage = Math.round(10000 * lineRuntime / totalTime) / 100;
   d3select.select(element).attr('class', 'heatmap-src-line-highlight');
   tooltip.attr('class', 'content-tooltip content-tooltip-visible')
     .html('<p><b>Time spent: </b>' + lineRuntime + ' s</p>' +
           '<p><b>Total running time: </b>' + totalTime + ' s</p>' +
-          '<p><b>Percentage: </b>' + 100 * (lineRuntime / totalTime) + '%</p>' +
+          '<p><b>Percentage: </b>' + percentage + '%</p>' +
           '<p><b>Run count: </b>' + lineRuncount + '</p>')
     .style('left', d3select.event.pageX)
     .style('top', d3select.event.pageY);
