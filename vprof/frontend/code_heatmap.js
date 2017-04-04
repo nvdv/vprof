@@ -33,7 +33,8 @@ function CodeHeatmap(parent, data) {
 
   this.data_ = data;
   this.parent_ = parent;
-  this.heatmapScale_ = d3scale.scaleLog()
+  this.heatmapScale_ = d3scale.scalePow()
+    .exponent(0.6)
     .domain([this.MIN_RUN_TIME, this.MAX_RUN_TIME])
     .range([this.MIN_RUN_COLOR, this.MAX_RUN_COLOR]);
 }
