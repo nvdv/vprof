@@ -103,9 +103,9 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
 
     def _calc_skips(self, heatmap, num_lines):
         """Calculates line skip map for large sources.
-        Skip map is list of tuples, where first element of tuple is line
-        number and second is length of skip region:
-            [(1, 10), (15, 10)] means skip 10 lines after line 1 and
+        Skip map is a list of tuples, where first element of tuple is line
+        number and second is length of the skip region:
+            [(1, 10), (15, 10)] means skipping 10 lines after line 1 and
             10 lines after line 15.
         """
         if num_lines < self._MIN_SKIP_SIZE:

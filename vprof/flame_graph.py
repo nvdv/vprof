@@ -127,6 +127,7 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
     def profile_package(self):
         """Runs statistical profiler on packages."""
         with _StatProfiler() as prof:
+            prof.base_frame = inspect.currentframe()
             try:
                 runpy.run_path(self._run_object, run_name='__main__')
             except SystemExit:
