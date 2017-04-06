@@ -55,8 +55,7 @@ class ProcessWithException(multiprocessing.Process):
 def run_in_another_process(func):
     """Runs wrapped function in separate process.
 
-    Function arguments should be serializable and it should return dictionary
-    with output values.
+    Function arguments and output should be serializable.
     """
     def multiprocessing_wrapper(*args, **kwargs):
         """Wraps function to be executed in separate process."""

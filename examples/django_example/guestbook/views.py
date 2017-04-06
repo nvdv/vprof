@@ -1,4 +1,4 @@
-"""Remote profiling example with Flask.
+"""Remote profiling example with Django.
 First of all launch vprof in remote mode:
 
     vprof -r
@@ -40,7 +40,7 @@ def add_entry(request):
     """Adds single guestbook record."""
     if request.method == 'POST':
         models.Entry(
-        name=request.POST['name'], message=request.POST['message']).save()
+            name=request.POST['name'], message=request.POST['message']).save()
     return http.HttpResponseRedirect(
         urlresolvers.reverse('show_guestbook'), request)
 

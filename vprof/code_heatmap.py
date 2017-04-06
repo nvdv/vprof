@@ -206,15 +206,15 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
             source_lines.append(('line', start_line, line))
             start_line += 1
 
-        object_name = 'function %s @ %s' % (
-            self._run_object.__name__, filename)
-        run_time = sum(time for time in prof.heatmap[filename].values())
+        heatmap = prof.heatmap[filename]
+        object_name = 'function %s @ %s' % (self._run_object.__name__, filename)
+        run_time = sum(time for time in heatmap.values())
         return {
             'objectName': object_name,
             'runTime': run_time,
             'heatmaps': [{
                 'name': object_name,
-                'heatmap': prof.heatmap[filename],
+                'heatmap': heatmap,
                 'executionCount': prof.execution_count[filename],
                 'srcCode': source_lines
             }]
