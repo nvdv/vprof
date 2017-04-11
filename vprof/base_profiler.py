@@ -28,7 +28,7 @@ def get_package_code(package_path):
 
 
 def hash_name(name):
-    """Hash name and trim resulting hash."""
+    """Hashes name and trims resulting hash."""
     return zlib.adler32(name.encode('utf-8'))
 
 
