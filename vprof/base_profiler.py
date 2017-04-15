@@ -36,12 +36,12 @@ class ProcessWithException(multiprocessing.Process):
     """Process subclass that propagates exceptions to parent process."""
 
     def __init__(self, *args, **kwargs):
-        super(self.__class__, self).__init__(*args, **kwargs)
+        super(ProcessWithException, self).__init__(*args, **kwargs)
         self.parent_conn, self.child_conn = multiprocessing.Pipe()
 
     def run(self):
         try:
-            super(self.__class__, self).run()
+            super(ProcessWithException, self).run()
             self.child_conn.send(None)
         except Exception as exc:  # pylint: disable=broad-except
             self.child_conn.send(exc)

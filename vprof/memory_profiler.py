@@ -70,11 +70,11 @@ def _get_obj_count_difference(objs1, objs2):
     return obj_count_1 - obj_count_2
 
 
-def _format_obj_count(obj_count):
+def _format_obj_count(objects):
     """Formats object count."""
     result = []
     regex = re.compile(r'<(?P<type>\w+) \'(?P<name>\S+)\'>')
-    for obj_type, obj_count in obj_count.items():
+    for obj_type, obj_count in objects.items():
         if obj_count != 0:
             match = re.findall(regex, repr(obj_type))
             _, name = match[0]

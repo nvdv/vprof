@@ -84,8 +84,7 @@ def main():
     else:
         config, source = args.config
         try:
-            program_stats = runner.run_profilers(  # pylint: disable=redefined-variable-type
-                source, config, verbose=True)
+            program_stats = runner.run_profilers(source, config, verbose=True)
         except runner.AmbiguousConfigurationError:
             print('Profiler configuration %s is ambiguous. '
                   'Please, remove duplicates.' % config)
