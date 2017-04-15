@@ -13,7 +13,8 @@ class Profiler(base_profiler.BaseProfiler):
     Runs cProfile against specified program and returns obtained stats.
     """
 
-    def _transform_stats(self, prof):
+    @staticmethod
+    def _transform_stats(prof):
         """Post-processes obtained stats for UI."""
         records = []
         for info, params in prof.stats.items():

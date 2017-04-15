@@ -57,7 +57,8 @@ class StatsHandler(http_server.SimpleHTTPRequestHandler):
         http_server.SimpleHTTPRequestHandler.__init__(
             self, *args, **kwargs)
 
-    def _handle_root(self):
+    @staticmethod
+    def _handle_root():
         """Handles index.html requests."""
         res_filename = os.path.join(
             os.path.dirname(__file__), _PROFILE_HTML)

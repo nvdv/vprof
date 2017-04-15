@@ -120,14 +120,16 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
             skips.append((prev_line, num_lines - prev_line))
         return skips
 
-    def _calc_runtime_for_package(self, package_heatmap):
+    @staticmethod
+    def _calc_runtime_for_package(package_heatmap):
         """Calculates total running time from package heatmap."""
         run_time = 0
         for module_heatmap in package_heatmap:
             run_time += sum(time for time in module_heatmap['heatmap'].values())
         return run_time
 
-    def _skip_lines(self, src_code, skip_map):
+    @staticmethod
+    def _skip_lines(src_code, skip_map):
         """Skips lines in src_code specified by skip map."""
         if not skip_map:
             return [['line', j + 1, l] for j, l in enumerate(src_code)]

@@ -53,7 +53,8 @@ class _StatProfiler(object):
         self._stats[tuple(stack)] += 1
         signal.setitimer(signal.ITIMER_PROF, _SAMPLE_INTERVAL)
 
-    def _insert_stack(self, stack, sample_count, call_tree):
+    @staticmethod
+    def _insert_stack(stack, sample_count, call_tree):
         """Inserts stack into the call tree.
 
         Also creates all intermediate nodes in the call tree.
@@ -81,7 +82,8 @@ class _StatProfiler(object):
             self._fill_sample_count(child) for child in node['children'])
         return node['sampleCount']
 
-    def _get_percentage(self, sample_count, total_samples):
+    @staticmethod
+    def _get_percentage(sample_count, total_samples):
         """Return percentage of sample_count in total_samples."""
         if total_samples != 0:
             return 100 * round(float(sample_count) / total_samples, 3)
