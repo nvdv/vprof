@@ -34,8 +34,7 @@ class Profiler(base_profiler.BaseProfiler):
                  cum_calls, time_per_call, filename, color_hash))
         return sorted(records, key=operator.itemgetter(4), reverse=True)
 
-    @base_profiler.run_in_another_process
-    def profile_package(self):
+    def _profile_package(self):
         """Runs cProfile on package."""
         prof = cProfile.Profile()
         prof.enable()
@@ -54,8 +53,11 @@ class Profiler(base_profiler.BaseProfiler):
             'totalCalls': prof_stats.total_calls,
         }
 
-    @base_profiler.run_in_another_process
-    def profile_module(self):
+    def profile_package(self):
+        """Runs package profiler in separate process."""
+        return base_profiler.run_in_separate_process(self._profile_package)
+
+    def _profile_module(self):
         """Runs cProfile on module."""
         prof = cProfile.Profile()
         try:
@@ -73,6 +75,10 @@ class Profiler(base_profiler.BaseProfiler):
             'primitiveCalls': prof_stats.prim_calls,
             'totalCalls': prof_stats.total_calls,
         }
+
+    def profile_module(self):
+        """Runs module profiler in separate process."""
+        return base_profiler.run_in_separate_process(self._profile_module)
 
     def profile_function(self):
         """Runs cProfile on function."""

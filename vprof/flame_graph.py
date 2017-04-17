@@ -125,8 +125,7 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
     Runs statistical profiler and returns obtained stats.
     """
 
-    @base_profiler.run_in_another_process
-    def profile_package(self):
+    def _profile_package(self):
         """Runs statistical profiler on packages."""
         with _StatProfiler() as prof:
             prof.base_frame = inspect.currentframe()
@@ -144,8 +143,11 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
             'totalSamples': call_tree.get('sampleCount', 0)
         }
 
-    @base_profiler.run_in_another_process
-    def profile_module(self):
+    def profile_package(self):
+        """Runs package profiler in separate process."""
+        return base_profiler.run_in_separate_process(self._profile_package)
+
+    def _profile_module(self):
         """Runs statistical profiler on module."""
         with open(self._run_object, 'rb') as srcfile, _StatProfiler() as prof:
             code = compile(srcfile.read(), self._run_object, 'exec')
@@ -163,6 +165,10 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
             'callStats': call_tree,
             'totalSamples': call_tree.get('sampleCount', 0)
         }
+
+    def profile_module(self):
+        """Runs module profiler in separate process."""
+        return base_profiler.run_in_separate_process(self._profile_module)
 
     def profile_function(self):
         """Runs statistical profiler on function."""

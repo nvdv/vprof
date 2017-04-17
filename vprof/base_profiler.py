@@ -6,7 +6,7 @@ import zlib
 
 
 def get_package_code(package_path):
-    """Returns package source code.
+    """Returns source code of Python package.
 
     Args:
         package_path: Path to Python package.
@@ -33,15 +33,25 @@ def hash_name(name):
 
 
 class ProcessWithException(multiprocessing.Process):
-    """Process subclass that propagates exceptions to parent process."""
+    """Process subclass that propagates exceptions to parent process.
 
-    def __init__(self, *args, **kwargs):
+    Also handles sending function output to parent process.
+
+    Args:
+        parent_conn: Parent end of multiprocessing.Pipe.
+        child_conn: Child end of multiprocessing.Pipe.
+        result: Result that self._target returns.
+    """
+
+    def __init__(self, result, *args, **kwargs):
         super(ProcessWithException, self).__init__(*args, **kwargs)
         self.parent_conn, self.child_conn = multiprocessing.Pipe()
+        self.result = result
 
     def run(self):
         try:
-            super(ProcessWithException, self).run()
+            self.result.update(
+                self._target(*self._args, **self._kwargs))
             self.child_conn.send(None)
         except Exception as exc:  # pylint: disable=broad-except
             self.child_conn.send(exc)
@@ -51,30 +61,28 @@ class ProcessWithException(multiprocessing.Process):
         """Returns exception from child process."""
         return self.parent_conn.recv()
 
+    @property
+    def output(self):
+        """Returns target function output."""
+        return self.result._getvalue()  # pylint: disable=protected-access
 
-def run_in_another_process(func):
-    """Runs wrapped function in separate process.
 
-    Function arguments and output should be serializable.
+def run_in_separate_process(func, *args, **kwargs):
+    """Runs function in separate process.
+
+    This function is used instead of decorator, since Python multiprocessing
+    module can't serialize decorated function on all platforms.
     """
-    def multiprocessing_wrapper(*args, **kwargs):
-        """Wraps function to be executed in separate process."""
-
-        def remote_wrapper(manager_dict):  # pylint: disable=missing-docstring
-            output_dict = func(*args, **kwargs)
-            manager_dict.update(output_dict)
-
-        manager = multiprocessing.Manager()
-        manager_dict = manager.dict()
-        process = ProcessWithException(
-            target=remote_wrapper, args=(manager_dict,))
-        process.start()
-        process.join()
-        exc = process.exception
-        if exc:
-            raise exc
-        return manager_dict._getvalue()  # pylint: disable=protected-access
-    return multiprocessing_wrapper
+    manager = multiprocessing.Manager()
+    manager_dict = manager.dict()
+    process = ProcessWithException(
+        manager_dict, target=func, args=args, kwargs=kwargs)
+    process.start()
+    process.join()
+    exc = process.exception
+    if exc:
+        raise exc
+    return process.output
 
 
 class BaseProfiler(object):

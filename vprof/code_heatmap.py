@@ -147,8 +147,7 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
             ['line', i + j + 1, l] for j, l in enumerate(src_code[i:]))
         return code_with_skips
 
-    @base_profiler.run_in_another_process
-    def profile_package(self):
+    def _profile_package(self):
         """Calculates heatmap for package."""
         pkg_code = base_profiler.get_package_code(self._run_object)
         with _CodeHeatmapCalculator() as prof:
@@ -166,8 +165,11 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
             'heatmaps': package_heatmap
         }
 
-    @base_profiler.run_in_another_process
-    def profile_module(self):
+    def profile_package(self):
+        """Runs package profiler in separate process."""
+        return base_profiler.run_in_separate_process(self._profile_package)
+
+    def _profile_module(self):
         """Calculates heatmap for module."""
         try:
             with open(self._run_object, 'r') as srcfile, \
@@ -194,6 +196,10 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
                 'srcCode': self._skip_lines(sources, skip_map)
             }]
         }
+
+    def profile_module(self):
+        """Runs module profiler in separate process."""
+        return base_profiler.run_in_separate_process(self._profile_module)
 
     def profile_function(self):
         """Calculates heatmap for function."""
