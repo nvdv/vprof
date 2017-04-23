@@ -128,7 +128,7 @@ setup(
     url='http://github.com/nvdv/vprof',
     license='BSD',
     author='nvdv',
-    author_email='modestdev@gmail.com',
+    author_email='aflatnine@gmail.com',
     include_package_data=True,
     keywords=['debugging', 'profiling'],
     entry_points={
