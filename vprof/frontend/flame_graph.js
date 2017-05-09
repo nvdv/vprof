@@ -4,6 +4,7 @@
 
 'use strict';
 var color = require('./color');
+var common = require('./common');
 var d3hierarchy = require('d3-hierarchy');
 var d3interpolate = require('d3-interpolate');
 var d3scale = require('d3-scale');
@@ -227,11 +228,9 @@ FlameGraph.getTruncatedNodeName_ = function(d, rectLength) {
   var fullname = FlameGraph.getNodeName_(d);
   var maxSymbols = rectLength / 10;  // Approx. 10 pixels per character.
   if (maxSymbols <= 3) {
-    return '';
-  } else if (fullname.length > maxSymbols - 3) { // Full name minus ellipsis.
-    return fullname.substr(0, maxSymbols) + '...';
+    return '';  // Return empty string if rectangle is too small.
   }
-  return fullname;
+  return common.shortenString(fullname, maxSymbols, false);
 };
 
 /**

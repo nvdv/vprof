@@ -4,6 +4,7 @@
 
 'use strict';
 var color = require('./color');
+var common = require('./common');
 var d3select = require('d3-selection');
 var d3interpolate = require('d3-interpolate');
 var d3scale = require('d3-scale');
@@ -15,6 +16,7 @@ var d3scale = require('d3-scale');
  * @param {Object} data - Data for rendering.
  */
 function Profiler(parent, data) {
+  this.PATH_CHAR_COUNT = 70;
   this.HELP_MESSAGE = (
     '<p>&#8226 Hover over record to see detailed stats</p>');
 
@@ -59,9 +61,10 @@ Profiler.prototype.render = function() {
   records.append('td')
     .attr('class', 'profiler-record-name')
     .html(function(d) {
+      var path = common.shortenString(d[8], this.PATH_CHAR_COUNT, false);
       return (
         '<span class="profiler-record-funcname">' + d[2] + '</span>' + ' ' +
-        '<span class="profiler-record-filename">' + d[8] + '</span>' + ':' +
+        '<span class="profiler-record-filename">' + path + '</span>' + ':' +
         '<span class="profiler-record-lineno">' + d[1] + '</span>');
     });
 

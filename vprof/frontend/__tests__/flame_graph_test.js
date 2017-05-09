@@ -14,7 +14,7 @@ describe('CPU flame graph test suite', function() {
 
     expect(flameGraphModule.FlameGraph.getTruncatedNodeName_(node, 1)).toBe('');
     expect(flameGraphModule.FlameGraph.getTruncatedNodeName_(node, 50))
-      .toBe('foo:1...');
+      .toBe('fo...');
     expect(flameGraphModule.FlameGraph.getTruncatedNodeName_(node, 500))
       .toBe('foo:10 (bar.py)');
   });
