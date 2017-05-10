@@ -61,7 +61,7 @@ Profiler.prototype.render = function() {
   records.append('td')
     .attr('class', 'profiler-record-name')
     .html(function(d) {
-      var path = common.shortenString(d[8], this.PATH_CHAR_COUNT, false);
+      var path = common.shortenString(d[8], this.PATH_CHAR_COUNT, true);
       return (
         '<span class="profiler-record-funcname">' + d[2] + '</span>' + ' ' +
         '<span class="profiler-record-filename">' + path + '</span>' + ':' +

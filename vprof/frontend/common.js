@@ -6,6 +6,11 @@
 
 /**
  * Truncates string if length is greater than maxLength.
+ * @param {string} s - Input string.
+ * @param {number} maxLength - Length of the output string.
+ * @param {boolean} front - Whether append ellipsis at the start or at the end
+ *                          of the string.
+ * @returns {string}
  */
 function shortenString(s, maxLength, front) {
   if (s.length <= maxLength) {
