@@ -64,7 +64,11 @@ def main():
                         help="don't suppress error messages")
     parser.add_argument('--version', action='version',
                         version='vprof %s' % __version__)
-    args = parser.parse_args()
+    (args, leftover_args) = parser.parse_known_args()
+
+    # Override sys.argv so the command being profiled can grab its' own args if
+    # necessary
+    sys.argv[:] = leftover_args
 
     # Render visualizations from saved file.
     if args.input_file:
