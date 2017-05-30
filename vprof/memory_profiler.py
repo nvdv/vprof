@@ -50,12 +50,6 @@ def _process_in_memory_objects(objects):
                               if not inspect.isframe(obj))
 
 
-def _get_memory_usage_for_process(pid):
-    """Returns memory usage for process specified by pid."""
-    memory_info = psutil.Process(pid).memory_info()
-    return memory_info.rss
-
-
 def _get_object_count_by_type(objects):
     """Counts Python objects by type."""
     return Counter(map(type, objects))
@@ -93,7 +87,7 @@ class _CodeEventsTracker(object):
         self._all_code = set()
         self._events_list = deque()
         self._original_trace_function = sys.gettrace()
-        self._pid = os.getpid()
+        self._process = psutil.Process(os.getpid())
         self._resulting_events = []
         self.mem_overhead = None
 
@@ -116,9 +110,8 @@ class _CodeEventsTracker(object):
     def _trace_memory_usage(self, frame, event, arg):  #pylint: disable=unused-argument
         """Tracks memory usage when specified events occur."""
         if event == 'line' and frame.f_code in self._all_code:
-            curr_memory = _get_memory_usage_for_process(self._pid)
             self._events_list.append(
-                (frame.f_lineno, curr_memory,
+                (frame.f_lineno, self._process.memory_info().rss,
                  frame.f_code.co_name, frame.f_code.co_filename))
         return self._trace_memory_usage
 
@@ -150,17 +143,20 @@ class _CodeEventsTracker(object):
             self,
             self._resulting_events,
             self._events_list,
-            self._all_code
+            self._all_code,
+            self._process
         ]
         overhead_count = _get_object_count_by_type(overhead)
         # One for reference to __dict__ and one for reference to
         # the current module.
         overhead_count[dict] += 2
+        # psutil overhead.
+        overhead_count[psutil._psosx.Process] += 1  #pylint: disable=protected-access
         return overhead_count
 
     def compute_mem_overhead(self):
         """Computes memory overhead at current time."""
-        self.mem_overhead = (_get_memory_usage_for_process(self._pid) -
+        self.mem_overhead = (self._process.memory_info().rss -
                              builtins.initial_rss_size)
 
 

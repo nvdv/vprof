@@ -21,7 +21,7 @@ from vprof import stats_server
 __version__ = '0.36.1'
 
 _PROGRAN_NAME = 'vprof'
-_MODULE_DESC = 'Python visual profiler'
+_MODULE_DESC = 'Visual profiler for Python'
 _HOST, _PORT = 'localhost', 8000
 _CONFIG_DESC = (
     """profile program SRC with configuration CONFIG

@@ -42,11 +42,12 @@ class CodeEventsTrackerUnittest(unittest.TestCase):
         self._tracker.add_code(code)
         self.assertIn(code, self._tracker._all_code)
 
-    @mock.patch('vprof.memory_profiler._get_memory_usage_for_process')
-    def testTraceMemoryUsage(self, get_memory_mock):
-        self._tracker._pid = mock.MagicMock()
+    def testTraceMemoryUsage(self):
+        self._tracker._process = mock.MagicMock()
         event, arg = 'line', mock.MagicMock()
-        curr_memory = get_memory_mock.return_value
+        memory_info = mock.MagicMock()
+        curr_memory = memory_info.rss
+        self._tracker._process.memory_info.return_value = memory_info
         frame1, frame2 = mock.MagicMock(), mock.MagicMock()
         frame3, frame4 = mock.MagicMock(), mock.MagicMock()
         frame1.f_lineno, frame2.f_lineno = 1, 2
