@@ -79,7 +79,7 @@ class StatsHandler(http_server.SimpleHTTPRequestHandler):
         with io.open(res_filename, 'rb') as res_file:
             content = res_file.read()
         _, extension = os.path.splitext(self.path)
-        return content, 'text/%s' % extension
+        return content, 'text/%s' % extension[1:]  # Skip dot in the extension.
 
     def do_GET(self):
         """Handles HTTP GET requests."""
