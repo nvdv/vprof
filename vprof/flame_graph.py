@@ -92,8 +92,6 @@ class _StatProfiler(object):
     def _format_tree(self, node, total_samples):
         """Reformats call tree for the UI."""
         funcname, filename, _ = node['stack']
-        funcname = funcname.replace('<', '[').replace('>', ']')
-        filename = filename.replace('<', '[').replace('>', ']')
         sample_percent = self._get_percentage(
             node['sampleCount'], total_samples)
         color_hash = base_profiler.hash_name('%s @ %s' % (funcname, filename))

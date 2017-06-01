@@ -25,8 +25,6 @@ class Profiler(base_profiler.BaseProfiler):
             else:
                 percentage = round(100 * (cum_time / prof.total_tt), 4)
             cum_time = round(cum_time, 4)
-            funcname = funcname.replace('<', '[').replace('>', ']')
-            filename = filename.replace('<', '[').replace('>', ']')
             func_name = '%s @ %s' % (funcname, filename)
             color_hash = base_profiler.hash_name(func_name)
             records.append(

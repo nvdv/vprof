@@ -161,8 +161,9 @@ FlameGraph.prototype.redrawTitles_ = function(titles) {
  */
 FlameGraph.prototype.showTooltip_ = function(element, tooltip, node) {
   d3select.select(element).attr('class', 'flame-graph-rect-highlight');
+  var funcName = node.stack[0].replace(/</g, "&lt;").replace(/>/g, "&gt;");
   tooltip.attr('class', 'content-tooltip content-tooltip-visible')
-    .html('<p><b>Function name:</b> ' + node.stack[0] + '</p>' +
+    .html('<p><b>Function name:</b> ' + funcName + '</p>' +
           '<p><b>Line number:</b> ' + node.stack[2] +'</p>' +
           '<p><b>Filename:</b> ' + node.stack[1] +'</p>' +
           '<p><b>Sample count:</b> ' + node.sampleCount + '</p>' +

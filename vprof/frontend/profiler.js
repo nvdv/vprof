@@ -62,8 +62,9 @@ Profiler.prototype.render = function() {
     .attr('class', 'profiler-record-name')
     .html(function(d) {
       var path = common.shortenString(d[8], this.PATH_CHAR_COUNT, true);
+      var funcName = d[2].replace(/</g, "&lt;").replace(/>/g, "&gt;");
       return (
-        '<span class="profiler-record-funcname">' + d[2] + '</span>' + ' ' +
+        '<span class="profiler-record-funcname">' + funcName + '</span>' + ' ' +
         '<span class="profiler-record-filename">' + path + '</span>' + ':' +
         '<span class="profiler-record-lineno">' + d[1] + '</span>');
     });
@@ -82,8 +83,9 @@ Profiler.prototype.render = function() {
  */
 Profiler.prototype.showTooltip_ = function(element, tooltip, node) {
   d3select.select(element).attr('class', 'profiler-record-highlight');
+  var funcName = node[2].replace(/</g, "&lt;").replace(/>/g, "&gt;");
   tooltip.attr('class', 'content-tooltip content-tooltip-visible')
-    .html('<p><b>Function name:</b> ' + node[2] + '</p>' +
+    .html('<p><b>Function name:</b> ' + funcName + '</p>' +
           '<p><b>Line number:</b> ' + node[1] +'</p>' +
           '<p><b>Filename:</b> ' + node[0] +'</p>' +
           '<p><b>Cumulative time:</b> ' + node[3] +'s</p>' +
