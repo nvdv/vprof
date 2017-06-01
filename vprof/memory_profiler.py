@@ -71,8 +71,8 @@ def _format_obj_count(objects):
     for obj_type, obj_count in objects.items():
         if obj_count != 0:
             match = re.findall(regex, repr(obj_type))
-            _, name = match[0]
-            result.append((name, obj_count))
+            obj_type, obj_name = match[0]
+            result.append(("%s %s" % (obj_type, obj_name), obj_count))
     return sorted(result, key=operator.itemgetter(1), reverse=True)
 
 
@@ -150,7 +150,7 @@ class _CodeEventsTracker(object):
         # One for reference to __dict__ and one for reference to
         # the current module.
         overhead_count[dict] += 2
-        # psutil overhead.
+        # Rethink this.
         overhead_count[psutil._psosx.Process] += 1  #pylint: disable=protected-access
         return overhead_count
 

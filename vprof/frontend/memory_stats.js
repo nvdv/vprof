@@ -275,7 +275,7 @@ MemoryChart.prototype.renderObjectsTable_ = function() {
     .attr('class', 'memory-table-name');
 
   tableName.append('td')
-    .text('Objects left in memory');
+    .text('Objects in memory');
   tableName.append('td')
     .text('');
 
@@ -283,7 +283,7 @@ MemoryChart.prototype.renderObjectsTable_ = function() {
     .attr('class', 'memory-table-header');
 
   tableHeader.append('td')
-    .text('Object type');
+    .text('Objects');
   tableHeader.append('td')
     .text('Count');
 
