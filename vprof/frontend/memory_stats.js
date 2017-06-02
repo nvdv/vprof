@@ -22,7 +22,8 @@ function MemoryChart(parent, data) {
   this.MARGIN_RIGHT = 5;
   this.MARGIN_TOP = 15;
   this.MARGIN_BOTTOM  = 30;
-  this.PAD_SIZE = 10;
+  this.HEIGHT_PAD = 10;
+  this.WIDTH_PAD = 25;
   this.MIN_RANGE_C = 0.8;
   this.MAX_RANGE_C = 1.2;
   this.MOUSE_X_OFFSET = 10;
@@ -49,8 +50,8 @@ function MemoryChart(parent, data) {
     .attr('class', 'memory-usage-graph');
 
   this.TABLE_WIDTH = this.objectsTable_.node().scrollWidth;
-  this.HEIGHT = this.memoryUsageGraph_.node().scrollHeight - this.PAD_SIZE;
-  this.WIDTH = this.memoryUsageGraph_.node().scrollWidth - this.PAD_SIZE;
+  this.HEIGHT = this.memoryUsageGraph_.node().scrollHeight - this.HEIGHT_PAD;
+  this.WIDTH = this.memoryUsageGraph_.node().scrollWidth - this.WIDTH_PAD;
   this.GRAPH_HEIGHT = this.HEIGHT - (this.MARGIN_TOP + this.MARGIN_BOTTOM);
   this.GRAPH_WIDTH = this.TABLE_WIDTH + this.WIDTH - (
       this.MARGIN_LEFT + this.MARGIN_RIGHT);
