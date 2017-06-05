@@ -150,8 +150,6 @@ class _CodeEventsTracker(object):
         # One for reference to __dict__ and one for reference to
         # the current module.
         overhead_count[dict] += 2
-        # Rethink this.
-        overhead_count[psutil._psosx.Process] += 1  #pylint: disable=protected-access
         return overhead_count
 
     def compute_mem_overhead(self):
