@@ -53,6 +53,7 @@ CodeHeatmap.prototype.render = function() {
     .attr('class', 'heatmap-module-header')
     .html('Inspected modules');
 
+  var self = this;
   moduleList.selectAll('.heatmap-module-name')
     .data(this.data_.heatmaps)
     .enter()
@@ -60,8 +61,11 @@ CodeHeatmap.prototype.render = function() {
     .attr('href', function(d) { return '#' + d.name; })
     .append('div')
     .attr('class', 'heatmap-module-name')
+    .style('background-color', function(d) {
+      return self.heatmapScale_(CodeHeatmap.sumValues(d.heatmap)); })
     .append('text')
-    .html(function(d) { return d.name; });
+    .html(function(d) {
+      return d.name; });
 
   var codeContainer = pageContainer.append('div')
     .attr('class', 'heatmap-code-container');
@@ -194,6 +198,15 @@ CodeHeatmap.prototype.renderHelp_ = function() {
   this.parent_.append('div')
     .attr('class', 'tabhelp inactive-tabhelp')
     .html(this.HELP_MESSAGE);
+};
+
+/** Returns sum of values in the object */
+CodeHeatmap.sumValues = function(obj) {
+  var s = 0;
+  for (var key in obj) {
+    s += obj[key];
+  }
+  return s;
 };
 
 /**
