@@ -93,11 +93,13 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
             exec_count = prof.execution_count[abs_path]
             sources = src_code.split('\n')
             skip_map = self._calc_skips(heatmap, len(sources))
+            run_time = sum(time for time in heatmap.values())
             package_heatmap.append({
                 'name': modname,
                 'heatmap': heatmap,
                 'executionCount': exec_count,
-                'srcCode': self._skip_lines(sources, skip_map)
+                'srcCode': self._skip_lines(sources, skip_map),
+                'runTime': run_time
             })
         return sorted(package_heatmap, key=operator.itemgetter('name'))
 
@@ -119,14 +121,6 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
         if num_lines - prev_line > self._SKIP_LINES:
             skips.append((prev_line, num_lines - prev_line))
         return skips
-
-    @staticmethod
-    def _calc_runtime_for_package(package_heatmap):
-        """Calculates total running time from package heatmap."""
-        run_time = 0
-        for module_heatmap in package_heatmap:
-            run_time += sum(time for time in module_heatmap['heatmap'].values())
-        return run_time
 
     @staticmethod
     def _skip_lines(src_code, skip_map):
@@ -158,7 +152,7 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
             except SystemExit:
                 pass
         package_heatmap = self._consodalidate_stats(pkg_code, prof)
-        run_time = self._calc_runtime_for_package(package_heatmap)
+        run_time = sum(heatmap['runTime'] for heatmap in package_heatmap)
         return {
             'objectName': self._run_object,
             'runTime': run_time,
@@ -193,7 +187,8 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
                 'name': self._run_object,
                 'heatmap': heatmap,
                 'executionCount': execution_count,
-                'srcCode': self._skip_lines(sources, skip_map)
+                'srcCode': self._skip_lines(sources, skip_map),
+                'runTime': run_time
             }]
         }
 
@@ -224,6 +219,7 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
                 'name': object_name,
                 'heatmap': heatmap,
                 'executionCount': prof.execution_count[filename],
-                'srcCode': source_lines
+                'srcCode': source_lines,
+                'runTime': run_time
             }]
         }

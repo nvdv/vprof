@@ -91,7 +91,9 @@ class CodeHeatmapPackageEndToEndTest(unittest.TestCase):
         self.assertTrue(
             'vprof/tests/test_pkg/dummy_module.py' in heatmaps[1]['name'])
         self.assertListEqual(heatmaps[0]['srcCode'], _MAIN_MODULE_SOURCELINES)
+        self.assertTrue(heatmaps[0]['runTime'] > 0)
         self.assertListEqual(heatmaps[1]['srcCode'], _DUMMY_MODULE_SOURCELINES)
+        self.assertTrue(heatmaps[1]['runTime'] > 0)
 
 
 class CodeHeatmapFunctionEndToEndTest(unittest.TestCase):
@@ -127,11 +129,11 @@ class CodeHeatmapFunctionEndToEndTest(unittest.TestCase):
         self.assertEqual(len(heatmaps), 1)
         self.assertTrue('function _func' in heatmaps[0]['name'])
         self.assertDictEqual(
-            heatmaps[0]['executionCount'], {'102': 1, '103': 1})
+            heatmaps[0]['executionCount'], {'104': 1, '105': 1})
         self.assertListEqual(
             heatmaps[0]['srcCode'],
-            [['line', 101, '        def _func(foo, bar):\n'],
-             ['line', 102, u'            baz = foo + bar\n'],
-             ['line', 103, u'            return baz\n']])
+            [['line', 103, '        def _func(foo, bar):\n'],
+             ['line', 104, u'            baz = foo + bar\n'],
+             ['line', 105, u'            return baz\n']])
 
 # pylint: enable=missing-docstring, blacklisted-name

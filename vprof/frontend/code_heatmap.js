@@ -53,6 +53,9 @@ CodeHeatmap.prototype.render = function() {
     .attr('class', 'heatmap-module-header')
     .html('Inspected modules');
 
+  var moduleTooltip = pageContainer.append('div')
+    .attr('class', 'content-tooltip content-tooltip-invisible');
+
   var self = this;
   moduleList.selectAll('.heatmap-module-name')
     .data(this.data_.heatmaps)
@@ -62,10 +65,13 @@ CodeHeatmap.prototype.render = function() {
     .append('div')
     .attr('class', 'heatmap-module-name')
     .style('background-color', function(d) {
-      return self.heatmapScale_(CodeHeatmap.sumValues(d.heatmap)); })
+      return self.heatmapScale_(d.runTime); })
+    .on('mouseover', function(d) {
+      self.showModuleTooltip_(moduleTooltip, d.runTime, self.data_.runTime);
+    })
+    .on('mouseout', function() { self.hideModuleTooltip_(moduleTooltip); })
     .append('text')
-    .html(function(d) {
-      return d.name; });
+    .html(function(d) { return d.name; });
 
   var codeContainer = pageContainer.append('div')
     .attr('class', 'heatmap-code-container');
@@ -94,7 +100,7 @@ CodeHeatmap.prototype.render = function() {
     .html(function(_, i) { return renderedSources[i].srcCode; })
     .nodes();
 
-  var tooltip = pageContainer.append('div')
+  var codeTooltip = pageContainer.append('div')
     .attr('class', 'content-tooltip content-tooltip-invisible');
 
   var self = this;
@@ -102,15 +108,41 @@ CodeHeatmap.prototype.render = function() {
     .each(function(_, i) {
       d3select.select(fileContainers[i]).selectAll('.heatmap-src-line-normal')
         .on('mouseover', function(_, j) {
-          self.showTooltip_(
-              this, tooltip, renderedSources, i, j, self.data_.runTime);
+          self.showCodeTooltip_(
+              this, codeTooltip, renderedSources, i, j, self.data_.runTime);
         })
-        .on('mouseout', function() { self.hideTooltip_(this, tooltip); });
+        .on('mouseout', function() {
+          self.hideCodeTooltip_(this, codeTooltip); });
     });
 };
 
 /**
- * Shows line execution count inside tooltip and adds line highlighting.
+ * Shows module tooltip with running time.
+ * @param {Object} tooltip - Element representing tooltip.
+ * @param {number} moduleTime - Module running time.
+ * @param {number} totalTime - Total running time.
+ */
+CodeHeatmap.prototype.showModuleTooltip_ = function(tooltip, moduleTime,
+                                                    totalTime) {
+  var percentage = Math.round(10000 * moduleTime / totalTime) / 100;
+  tooltip.attr('class', 'content-tooltip content-tooltip-visible')
+    .html('<p><b>Time spent: </b>'+ moduleTime + ' s</p>' +
+          '<p><b>Total running time: </b>' + totalTime + ' s</p>' +
+          '<p><b>Percentage: </b>' + percentage + '%</p>')
+    .style('left', d3select.event.pageX)
+    .style('top', d3select.event.pageY);
+};
+
+/**
+ * Hides module tooltip.
+ * @param {Object} tooltip - Element representing tooltip.
+ */
+CodeHeatmap.prototype.hideModuleTooltip_ = function(tooltip) {
+  tooltip.attr('class', 'content-tooltip content-tooltip-invisible');
+};
+
+/**
+ * Shows line execution count inside code tooltip and adds line highlighting.
  * @param {Object} element - Element representing highlighted line.
  * @param {Object} tooltip - Element representing tooltip.
  * @param {Object} sources - Object that represents sources with stats.
@@ -118,8 +150,8 @@ CodeHeatmap.prototype.render = function() {
  * @param {number} lineIndex - Index of line in file.
  * @param {number} totalTime - Module running time.
  */
-CodeHeatmap.prototype.showTooltip_ = function(element, tooltip, sources,
-                                              fileIndex, lineIndex, totalTime) {
+CodeHeatmap.prototype.showCodeTooltip_ = function(
+    element, tooltip, sources, fileIndex, lineIndex, totalTime) {
   if (!sources[fileIndex].countMap[lineIndex]) {
     return;
   }
@@ -137,11 +169,11 @@ CodeHeatmap.prototype.showTooltip_ = function(element, tooltip, sources,
 };
 
 /**
- * Hides provided tooltip and removes line highlighting.
+ * Hides code tooltip and removes line highlighting.
  * @param {Object} element - Element representing highlighted line.
  * @param {Object} tooltip - Element representing tooltip.
  */
-CodeHeatmap.prototype.hideTooltip_ = function(element, tooltip) {
+CodeHeatmap.prototype.hideCodeTooltip_ = function(element, tooltip) {
   d3select.select(element).attr('class', 'heatmap-src-line-normal');
   tooltip.attr('class', 'content-tooltip content-tooltip-invisible');
 };
@@ -198,15 +230,6 @@ CodeHeatmap.prototype.renderHelp_ = function() {
   this.parent_.append('div')
     .attr('class', 'tabhelp inactive-tabhelp')
     .html(this.HELP_MESSAGE);
-};
-
-/** Returns sum of values in the object */
-CodeHeatmap.sumValues = function(obj) {
-  var s = 0;
-  for (var key in obj) {
-    s += obj[key];
-  }
-  return s;
 };
 
 /**
