@@ -78,8 +78,8 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
     Contains all logic related to heatmap calculation and processing.
     """
 
-    _SKIP_LINES = 10
-    _MIN_SKIP_SIZE = 100
+    SKIP_LINES = 10
+    MIN_SKIP_SIZE = 100
 
     def _consodalidate_stats(self, package_code, prof):
         """Merges profiler stats and package_code."""
@@ -110,15 +110,15 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
             [(1, 10), (15, 10)] means skipping 10 lines after line 1 and
             10 lines after line 15.
         """
-        if num_lines < self._MIN_SKIP_SIZE:
+        if num_lines < self.MIN_SKIP_SIZE:
             return []
         skips, prev_line = [], 0
         for line in sorted(heatmap):
             curr_skip = line - prev_line - 1
-            if curr_skip > self._SKIP_LINES:
+            if curr_skip > self.SKIP_LINES:
                 skips.append((prev_line, curr_skip))
             prev_line = line
-        if num_lines - prev_line > self._SKIP_LINES:
+        if num_lines - prev_line > self.SKIP_LINES:
             skips.append((prev_line, num_lines - prev_line))
         return skips
 
