@@ -26,8 +26,9 @@ describe('Code heatmap test suite', function() {
     };
     expect(calculator.renderCode_(codeStats)).toEqual(expectedResult);
 
-    srcCode = [['line', 1, 'foo'], ['line', 2, 'bar'],
-               ['skip', 5], ['line', 8, 'hahaha']];
+    srcCode = [
+      ['line', 1, 'foo'], ['line', 2, 'bar'],
+      ['skip', 5], ['line', 8, 'hahaha']];
     heatmap = {1: 0.1, 2: 0.1, 8: 0.3};
     executionCount = {1: 1, 2: 1, 8: 1};
     codeStats = {

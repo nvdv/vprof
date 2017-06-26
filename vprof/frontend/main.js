@@ -160,8 +160,8 @@ function handleHelpDisplay(e) {
   e = e || window.event;
   if (e.key === 'h') {
     var helpActiveTab = d3select.select('.active-tab .tabhelp');
-    helpActiveTab.classed('active-tabhelp',
-                          !helpActiveTab.classed('active-tabhelp'))
+    helpActiveTab.classed(
+      'active-tabhelp', !helpActiveTab.classed('active-tabhelp'))
       .classed('inactive-tabhelp', !helpActiveTab.classed('inactive-tabhelp'));
   }
 }
@@ -172,11 +172,11 @@ function handleHelpDisplay(e) {
   */
 function showTab_(tabId) {
   d3select.selectAll('.main-tab-content')
-   .classed('active-tab', false)
-   .classed('inactive-tab', true);
+    .classed('active-tab', false)
+    .classed('inactive-tab', true);
   d3select.select('#' + tabId)
-   .classed('active-tab', true)
-   .classed('inactive-tab', false);
+    .classed('active-tab', true)
+    .classed('inactive-tab', false);
 }
 
 /** Makes request to server and renders page with received data. */

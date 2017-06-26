@@ -54,7 +54,7 @@ function MemoryChart(parent, data) {
   this.WIDTH = this.memoryUsageGraph_.node().scrollWidth - this.WIDTH_PAD;
   this.GRAPH_HEIGHT = this.HEIGHT - (this.MARGIN_TOP + this.MARGIN_BOTTOM);
   this.GRAPH_WIDTH = this.TABLE_WIDTH + this.WIDTH - (
-      this.MARGIN_LEFT + this.MARGIN_RIGHT);
+    this.MARGIN_LEFT + this.MARGIN_RIGHT);
   this.AXIS_TEXT_X = this.GRAPH_WIDTH - this.TABLE_WIDTH;
   this.AXIS_TEXT_Y = 12;
   this.AXIS_TEXT_Y_OFFSET = 30;
@@ -83,13 +83,13 @@ function MemoryChart(parent, data) {
   }
 
   this.yRange_ = d3array.extent(
-      this.data_.codeEvents, function(d) { return d[2]; });
+    this.data_.codeEvents, function(d) { return d[2]; });
   this.yScale_ = d3scale.scaleLinear()
     .domain([
       this.MIN_RANGE_C * this.yRange_[0], this.MAX_RANGE_C * this.yRange_[1]])
     .range([this.GRAPH_HEIGHT, 0]);
   this.yAxis_ = d3axis.axisLeft()
-      .scale(this.yScale_);
+    .scale(this.yScale_);
 
   var self = this;
   this.memoryGraph_ = d3shape.area()
@@ -105,7 +105,7 @@ MemoryChart.prototype.render = function() {
     .attr('height', this.HEIGHT)
     .append('g')
     .attr('transform',
-          'translate(' + this.MARGIN_LEFT + ',' + this.MARGIN_TOP + ')');
+      'translate(' + this.MARGIN_LEFT + ',' + this.MARGIN_TOP + ')');
 
   var tooltip = this.memoryUsageGraph_.append('div')
     .attr('class', 'content-tooltip content-tooltip-invisible');
@@ -123,7 +123,7 @@ MemoryChart.prototype.render = function() {
     .attr('class', 'memory-graph-focus')
     .attr('r', this.FOCUS_RADIUS)
     .attr('transform',
-          'translate(' + (-100) + ', '  + (-100) + ')');  // Hide focus.
+      'translate(' + (-100) + ', '  + (-100) + ')');  // Hide focus.
   var focusXLine = canvas.append('line')
     .attr('class', 'memory-graph-focus-line')
     .attr('y1', this.GRAPH_HEIGHT);
@@ -159,7 +159,7 @@ MemoryChart.prototype.render = function() {
       var t = d3select.event.transform;
       xGroup.call(self.xAxis_.scale(t.rescaleX(self.xScale_)));
       path.attr(
-          'transform', 'translate(' + t.x + ' 0) ' + 'scale(' + t.k + ' 1)');
+        'transform', 'translate(' + t.x + ' 0) ' + 'scale(' + t.k + ' 1)');
     });
 
   canvas.call(zoom);
@@ -190,7 +190,7 @@ MemoryChart.prototype.renderLegend_ = function() {
  * @param {Object} focusYLine - Object representing focus line parallel to OX.
  */
 MemoryChart.prototype.hideFocus_ = function(focus, tooltip, focusXLine,
-    focusYLine) {
+  focusYLine) {
   focus.style('display', 'none');
   tooltip.attr('class', 'content-tooltip content-tooltip-invisible');
   focusXLine.style('display', 'none');
@@ -219,14 +219,14 @@ MemoryChart.prototype.showFocus_ = function(focus, focusXLine, focusYLine) {
  * @param {Object} focusYLine - Object representing focus line parallel to OX.
  */
 MemoryChart.prototype.redrawFocus_ = function(canvas, focus, tooltip,
-    focusXLine, focusYLine) {
+  focusXLine, focusYLine) {
   var t = d3zoom.zoomTransform(canvas.node());
   var crds = d3select.mouse(canvas.node());
   var xCoord = (crds[0] - t.x) / t.k;
   var closestIndex = Math.round(this.xScale_.invert(xCoord)) - 1;
   var closestY = this.yScale_(this.data_.codeEvents[closestIndex][2]);
   var closestX = t.k * this.xScale_(
-      this.data_.codeEvents[closestIndex][0]) + t.x;
+    this.data_.codeEvents[closestIndex][0]) + t.x;
 
   focus.attr('transform', 'translate(' + closestX + ', ' +
              closestY + ')');

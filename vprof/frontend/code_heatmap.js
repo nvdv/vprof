@@ -109,7 +109,7 @@ CodeHeatmap.prototype.render = function() {
       d3select.select(fileContainers[i]).selectAll('.heatmap-src-line-normal')
         .on('mouseover', function(_, j) {
           self.showCodeTooltip_(
-              this, codeTooltip, renderedSources, i, j, self.data_.runTime);
+            this, codeTooltip, renderedSources, i, j, self.data_.runTime);
         })
         .on('mouseout', function() {
           self.hideCodeTooltip_(this, codeTooltip); });
@@ -123,7 +123,7 @@ CodeHeatmap.prototype.render = function() {
  * @param {number} totalTime - Total running time.
  */
 CodeHeatmap.prototype.showModuleTooltip_ = function(tooltip, moduleTime,
-                                                    totalTime) {
+  totalTime) {
   var percentage = Math.round(10000 * moduleTime / totalTime) / 100;
   tooltip.attr('class', 'content-tooltip content-tooltip-visible')
     .html('<p><b>Time spent: </b>'+ moduleTime + ' s</p>' +
@@ -151,7 +151,7 @@ CodeHeatmap.prototype.hideModuleTooltip_ = function(tooltip) {
  * @param {number} totalTime - Module running time.
  */
 CodeHeatmap.prototype.showCodeTooltip_ = function(
-    element, tooltip, sources, fileIndex, lineIndex, totalTime) {
+  element, tooltip, sources, fileIndex, lineIndex, totalTime) {
   if (!sources[fileIndex].countMap[lineIndex]) {
     return;
   }
@@ -189,14 +189,14 @@ CodeHeatmap.prototype.renderCode_ = function(stats) {
     if (stats.srcCode[i][0] === 'line') {
       var lineNumber = stats.srcCode[i][1], codeLine = stats.srcCode[i][2];
       outputCode.push(
-          this.formatSrcLine_(lineNumber, codeLine, stats.heatmap[lineNumber]));
+        this.formatSrcLine_(lineNumber, codeLine, stats.heatmap[lineNumber]));
       timeMap[srcIndex] = stats.heatmap[lineNumber];
       countMap[srcIndex] = stats.executionCount[lineNumber];
       srcIndex++;
     } else if (stats.srcCode[i][0] === 'skip') {
       outputCode.push(
-          "<div class='heatmap-skip-line'>" + stats.srcCode[i][1] +
-          ' lines skipped</div>');
+        "<div class='heatmap-skip-line'>" + stats.srcCode[i][1] +
+        ' lines skipped</div>');
     }
   }
   return {
@@ -214,15 +214,15 @@ CodeHeatmap.prototype.renderCode_ = function(stats) {
  * @returns {string}
  */
 CodeHeatmap.prototype.formatSrcLine_ = function(lineNumber, codeLine,
-                                                lineRuntime) {
+  lineRuntime) {
   var highlightedLine = hljs.highlight('python', codeLine).value;
   var backgroundColor = lineRuntime ? this.heatmapScale_(lineRuntime) : '';
   return (
-      "<div class='heatmap-src-line-normal' style='background-color: " +
+    "<div class='heatmap-src-line-normal' style='background-color: " +
         backgroundColor + "'>" +
-          "<div class='heatmap-src-line-number'>" + lineNumber + "</div>" +
-          "<div class='heatmap-src-line-code'>" + highlightedLine + "</div>" +
-      "</div>");
+    "<div class='heatmap-src-line-number'>" + lineNumber + "</div>" +
+    "<div class='heatmap-src-line-code'>" + highlightedLine + "</div>" +
+    "</div>");
 };
 
 /** Renders code heatmap help. */
