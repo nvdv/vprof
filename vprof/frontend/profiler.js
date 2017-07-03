@@ -38,6 +38,16 @@ Profiler.prototype.render = function() {
     .append('div')
     .attr('class', 'profiler-record-table');
 
+  recordsTable.append('tr')
+    .attr('class', 'profiler-record-table-header')
+    .html(
+      '<td>Color</td>' +
+      '<td>%</td>' +
+      '<td>Function name</td>' +
+      '<td>Filename</td>' +
+      '<td>Line</td>' +
+      '<td>Time</td>');
+
   this.renderLegend_(content);
   this.renderHelp_();
 
@@ -59,15 +69,18 @@ Profiler.prototype.render = function() {
     .html(function(d) { return d[4] + '%'; });
 
   records.append('td')
-    .attr('class', 'profiler-record-name')
+    .attr('class', 'profiler-record-funcname')
     .html(function(d) {
-      var path = common.shortenString(d[8], this.PATH_CHAR_COUNT, true);
-      var funcName = d[2].replace(/</g, "&lt;").replace(/>/g, "&gt;");
-      return (
-        '<span class="profiler-record-funcname">' + funcName + '</span>' + ' ' +
-        '<span class="profiler-record-filename">' + path + '</span>' + ':' +
-        '<span class="profiler-record-lineno">' + d[1] + '</span>');
+      return d[2].replace(/</g, "&lt;").replace(/>/g, "&gt;");
     });
+
+  records.append('td')
+    .attr('class', 'profiler-record-filename')
+    .html(function(d) { return d[0]; });
+
+  records.append('td')
+    .attr('class', 'profiler-record-lineno')
+    .html(function(d) { return d[1]; });
 
   records.append('td')
     .attr('class', 'profiler-record-cumtime')

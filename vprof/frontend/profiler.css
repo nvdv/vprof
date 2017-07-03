@@ -10,10 +10,19 @@
   font-size: 15px;
 }
 
+.profiler-record-table td {
+  padding-left: 8px;
+}
+
 .profiler-record-table-wrapper {
   height: 100%;
   overflow-y: scroll;
-  width: 70%;
+  width: 70%
+}
+
+.profiler-record-table-header {
+  background: #A3A3A3;
+  font-weight: bold;
 }
 
 .profiler-record-normal {
@@ -24,33 +33,8 @@
   background: #FD8D3C;
 }
 
-.profiler-record-percentage {
-  font-size: 14px;
-  padding-left: 8px;
-  width: 5%
-}
-
-.profiler-record-name {
-  padding-left: 8px;
-}
-
-.profiler-record-filename {
-  color: #3C3C3C;
-  font-size: 14px;
-}
-
-.profiler-record-lineno {
-  color: #3C3C3C;
-  font-size: 14px;
-}
-
 .profiler-record-cumtime {
-  padding-right: 15px;
-  width: 5%;
-}
-
-.profiler-record-color {
-  width: 20px;
+  padding-right: 8px;
 }
 
 .profiler-legend {
