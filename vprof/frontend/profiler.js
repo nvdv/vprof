@@ -76,7 +76,7 @@ Profiler.prototype.render = function() {
 
   records.append('td')
     .attr('class', 'profiler-record-filename')
-    .html(function(d) { return d[0]; });
+    .html(function(d) { return common.shortenString(d[0], 70, false); });
 
   records.append('td')
     .attr('class', 'profiler-record-lineno')

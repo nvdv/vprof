@@ -8,6 +8,7 @@
 .profiler-record-table {
   display: table;
   font-size: 15px;
+  width: 100%;
 }
 
 .profiler-record-table td {
