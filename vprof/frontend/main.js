@@ -149,16 +149,21 @@ function renderPage(data) {
     }
   }
 
-  document.onkeypress = handleHelpDisplay;
+  var helpButton = tabHeader.append('div')
+    .attr('class', 'help-button')
+    .text('?');
+
+  document.addEventListener('click', function(event) {
+    handleHelpDisplay(event, helpButton);
+  });
 }
 
 /**
   * Handles tab help display..
-  * @param {Object} e - Key event.
+  * @param {Object} event - Mouse click event.
   */
-function handleHelpDisplay(e) {
-  e = e || window.event;
-  if (e.key === 'h') {
+function handleHelpDisplay(event, helpButton) {
+  if (event.target === helpButton.node()) {
     var helpActiveTab = d3select.select('.active-tab .tabhelp');
     helpActiveTab.classed(
       'active-tabhelp', !helpActiveTab.classed('active-tabhelp'))
