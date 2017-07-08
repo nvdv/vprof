@@ -4,11 +4,11 @@ First of all launch vprof in remote mode:
 
     vprof -r
 
-and launch this app:
+and launch this script:
 
     python guestbook.py
 
-You can profile '/' and '/add' handlers:
+Then you can profile '/' and '/add' handlers:
 
     curl http://127.0.0.1:5000/profile/main
 
@@ -16,7 +16,7 @@ and
 
     curl --data "name=foo&message=bar" http://127.0.0.1:5000/profile/add
 
-Check profiler_handler source code below for more details.
+Check profiler_handler source code below for details.
 
 Note that vprof -r should be relaunched after each run.
 """

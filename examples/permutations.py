@@ -1,4 +1,4 @@
-"""Simple examples calculating iterable permutations.
+"""Permutations example.
 
 Example is taken from https://docs.python.org/3.5/library/itertools.html.
 
