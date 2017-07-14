@@ -1,6 +1,6 @@
 'use strict';
 
-var commonModule = require('../common.js');
+const commonModule = require('../common.js');
 
 describe('Profiler test suite', function() {
   it('Check shortenString', function() {

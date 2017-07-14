@@ -3,10 +3,10 @@
  */
 
 'use strict';
-var d3scale = require('d3-scale');
-var d3select = require('d3-selection');
+const d3scale = require('d3-scale');
+const d3select = require('d3-selection');
 
-var hljs = require('highlight.js');
+const hljs = require('highlight.js');
 try {
   require('./highlight.css');  // Includes code highlighter CSS.
 } catch (e) {
@@ -42,22 +42,22 @@ function CodeHeatmap(parent, data) {
 
 /** Renders code heatmap. */
 CodeHeatmap.prototype.render = function() {
-  var pageContainer = this.parent_.append('div')
+  let pageContainer = this.parent_.append('div')
     .attr('id', 'heatmap-layout');
 
   this.renderHelp_();
 
-  var moduleList = pageContainer.append('div')
+  let moduleList = pageContainer.append('div')
     .attr('class', 'heatmap-module-list');
 
   moduleList.append('div')
     .attr('class', 'heatmap-module-header')
     .html('Inspected modules');
 
-  var moduleTooltip = pageContainer.append('div')
+  let moduleTooltip = pageContainer.append('div')
     .attr('class', 'content-tooltip content-tooltip-invisible');
 
-  var self = this;
+  let self = this;
   moduleList.selectAll('.heatmap-module-name')
     .data(this.data_.heatmaps)
     .enter()
@@ -74,10 +74,10 @@ CodeHeatmap.prototype.render = function() {
     .append('text')
     .html(function(d) { return d.name; });
 
-  var codeContainer = pageContainer.append('div')
+  let codeContainer = pageContainer.append('div')
     .attr('class', 'heatmap-code-container');
 
-  var heatmapContainer = codeContainer.selectAll('div')
+  let heatmapContainer = codeContainer.selectAll('div')
     .data(this.data_.heatmaps)
     .enter()
     .append('div')
@@ -90,21 +90,21 @@ CodeHeatmap.prototype.render = function() {
     .append('text')
     .html(function(d) { return d.name; });
 
-  var renderedSources = [];
-  for (var i = 0; i < this.data_.heatmaps.length; i++) {
+  let renderedSources = [];
+  for (let i = 0; i < this.data_.heatmaps.length; i++) {
     renderedSources.push(this.renderCode_(this.data_.heatmaps[i]));
   }
 
-  var fileContainers = heatmapContainer.append('div')
+  let fileContainers = heatmapContainer.append('div')
     .attr('class', 'heatmap-src-code')
     .append('text')
     .html(function(_, i) { return renderedSources[i].srcCode; })
     .nodes();
 
-  var codeTooltip = pageContainer.append('div')
+  let codeTooltip = pageContainer.append('div')
     .attr('class', 'content-tooltip content-tooltip-invisible');
 
-  var self = this;
+  self = this;
   codeContainer.selectAll('.heatmap-src-file')
     .each(function(_, i) {
       d3select.select(fileContainers[i]).selectAll('.heatmap-src-line-normal')
@@ -125,7 +125,7 @@ CodeHeatmap.prototype.render = function() {
  */
 CodeHeatmap.prototype.showModuleTooltip_ = function(tooltip, moduleTime,
   totalTime) {
-  var percentage = Math.round(10000 * moduleTime / totalTime) / 100;
+  let percentage = Math.round(10000 * moduleTime / totalTime) / 100;
   tooltip.attr('class', 'content-tooltip content-tooltip-visible')
     .html('<p><b>Time spent: </b>'+ moduleTime + ' s</p>' +
           '<p><b>Total running time: </b>' + totalTime + ' s</p>' +
@@ -156,9 +156,9 @@ CodeHeatmap.prototype.showCodeTooltip_ = function(
   if (!sources[fileIndex].countMap[lineIndex]) {
     return;
   }
-  var lineRuntime = sources[fileIndex].timeMap[lineIndex];
-  var lineRuncount = sources[fileIndex].countMap[lineIndex];
-  var percentage = Math.round(10000 * lineRuntime / totalTime) / 100;
+  let lineRuntime = sources[fileIndex].timeMap[lineIndex];
+  let lineRuncount = sources[fileIndex].countMap[lineIndex];
+  let percentage = Math.round(10000 * lineRuntime / totalTime) / 100;
   d3select.select(element).attr('class', 'heatmap-src-line-highlight');
   tooltip.attr('class', 'content-tooltip content-tooltip-visible')
     .html('<p><b>Time spent: </b>' + lineRuntime + ' s</p>' +
@@ -185,10 +185,10 @@ CodeHeatmap.prototype.hideCodeTooltip_ = function(element, tooltip) {
  * @returns {Object}
  */
 CodeHeatmap.prototype.renderCode_ = function(stats) {
-  var outputCode = [], timeMap = {}, srcIndex = 0, countMap = {};
-  for (var i = 0; i < stats.srcCode.length; i++) {
+  let outputCode = [], timeMap = {}, srcIndex = 0, countMap = {};
+  for (let i = 0; i < stats.srcCode.length; i++) {
     if (stats.srcCode[i][0] === 'line') {
-      var lineNumber = stats.srcCode[i][1], codeLine = stats.srcCode[i][2];
+      let lineNumber = stats.srcCode[i][1], codeLine = stats.srcCode[i][2];
       outputCode.push(
         this.formatSrcLine_(lineNumber, codeLine, stats.heatmap[lineNumber]));
       timeMap[srcIndex] = stats.heatmap[lineNumber];
@@ -216,8 +216,8 @@ CodeHeatmap.prototype.renderCode_ = function(stats) {
  */
 CodeHeatmap.prototype.formatSrcLine_ = function(lineNumber, codeLine,
   lineRuntime) {
-  var highlightedLine = hljs.highlight('python', codeLine).value;
-  var backgroundColor = lineRuntime ? this.heatmapScale_(lineRuntime) : '';
+  let highlightedLine = hljs.highlight('python', codeLine).value;
+  let backgroundColor = lineRuntime ? this.heatmapScale_(lineRuntime) : '';
   return (
     "<div class='heatmap-src-line-normal' style='background-color: " +
         backgroundColor + "'>" +
@@ -239,7 +239,7 @@ CodeHeatmap.prototype.renderHelp_ = function() {
  * @param {Object} data - Data for code heatmap rendering.
  */
 function renderCodeHeatmap(data, parent) {
-  var heatmap = new CodeHeatmap(parent, data);
+  let heatmap = new CodeHeatmap(parent, data);
   heatmap.render();
 }
 

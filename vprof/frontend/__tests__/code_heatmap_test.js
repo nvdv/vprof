@@ -1,25 +1,25 @@
 'use strict';
 
-var codeHeatmapModule = require('../code_heatmap.js');
+const codeHeatmapModule = require('../code_heatmap.js');
 
 describe('Code heatmap test suite', function() {
   it('Check renderCode', function() {
     codeHeatmapModule.CodeHeatmap.prototype.formatSrcLine_ = function(n, l, c) {
       return n;
     };
-    var data = {}, parent = {};
-    var calculator = new codeHeatmapModule.CodeHeatmap(parent, data);
+    let data = {}, parent = {};
+    let calculator = new codeHeatmapModule.CodeHeatmap(parent, data);
 
-    var srcCode = [['line', 1, 'foo'], ['line', 2, 'bar'], ['line', 3, 'baz']];
-    var heatmap = {1: 0.1, 2: 0.2, 3: 0.2};
-    var executionCount = {1: 1, 2: 1, 3: 1};
-    var codeStats = {
+    let srcCode = [['line', 1, 'foo'], ['line', 2, 'bar'], ['line', 3, 'baz']];
+    let heatmap = {1: 0.1, 2: 0.2, 3: 0.2};
+    let executionCount = {1: 1, 2: 1, 3: 1};
+    let codeStats = {
       'srcCode': srcCode,
       'heatmap': heatmap,
       'executionCount': executionCount,
     };
 
-    var expectedResult = {
+    let expectedResult = {
       'srcCode': "123",
       'timeMap': {0: 0.1, 1: 0.2, 2: 0.2},
       'countMap': {0: 1, 1: 1, 2: 1}

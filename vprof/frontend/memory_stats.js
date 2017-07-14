@@ -3,13 +3,13 @@
  */
 
 'use strict';
-var d3array = require('d3-array');
-var d3axis = require('d3-axis');
-var d3format = require('d3-format');
-var d3shape = require('d3-shape');
-var d3select = require('d3-selection');
-var d3scale = require('d3-scale');
-var d3zoom = require('d3-zoom');
+const d3array = require('d3-array');
+const d3axis = require('d3-axis');
+const d3format = require('d3-format');
+const d3shape = require('d3-shape');
+const d3select = require('d3-selection');
+const d3scale = require('d3-scale');
+const d3zoom = require('d3-zoom');
 
 /**
  * Represents memory chart.
@@ -73,8 +73,8 @@ function MemoryChart(parent, data) {
 
   // Set tick values explicitly when number of events is low.
   if (this.data_.codeEvents.length < this.TICKS_NUMBER) {
-    var tickValues = [];
-    for (var i = 0; i < this.data_.codeEvents.length; i++) {
+    let tickValues = [];
+    for (let i = 0; i < this.data_.codeEvents.length; i++) {
       tickValues.push(i);
     }
     this.xAxis_.tickValues(tickValues);
@@ -91,7 +91,7 @@ function MemoryChart(parent, data) {
   this.yAxis_ = d3axis.axisLeft()
     .scale(this.yScale_);
 
-  var self = this;
+  let self = this;
   this.memoryGraph_ = d3shape.area()
     .x(function(d) { return self.xScale_(d[0]); })
     .y0(self.GRAPH_HEIGHT)
@@ -100,39 +100,39 @@ function MemoryChart(parent, data) {
 
 /** Renders memory chart. */
 MemoryChart.prototype.render = function() {
-  var canvas = this.memoryUsageGraph_.append('svg')
+  let canvas = this.memoryUsageGraph_.append('svg')
     .attr('width', this.WIDTH)
     .attr('height', this.HEIGHT)
     .append('g')
     .attr('transform',
       'translate(' + this.MARGIN_LEFT + ',' + this.MARGIN_TOP + ')');
 
-  var tooltip = this.memoryUsageGraph_.append('div')
+  let tooltip = this.memoryUsageGraph_.append('div')
     .attr('class', 'content-tooltip content-tooltip-invisible');
 
   this.renderObjectsTable_();
   this.renderLegend_();
   this.renderHelp_();
 
-  var path = canvas.append('path')
+  let path = canvas.append('path')
     .attr('class', 'memory-graph')
     .attr('d', this.memoryGraph_(this.data_.codeEvents));
 
-  var focus = canvas.append('circle')
+  let focus = canvas.append('circle')
     .style('display', 'none')
     .attr('class', 'memory-graph-focus')
     .attr('r', this.FOCUS_RADIUS)
     .attr('transform',
       'translate(' + (-100) + ', '  + (-100) + ')');  // Hide focus.
-  var focusXLine = canvas.append('line')
+  let focusXLine = canvas.append('line')
     .attr('class', 'memory-graph-focus-line')
     .attr('y1', this.GRAPH_HEIGHT);
-  var focusYLine = canvas.append('line')
+  let focusYLine = canvas.append('line')
     .attr('class', 'memory-graph-focus-line')
     .attr('x1', 0);
 
   // Draw axes.
-  var xGroup = canvas.append('g')
+  let xGroup = canvas.append('g')
     .attr('class', 'x memory-graph-axis')
     .attr('transform', 'translate(0,' + this.GRAPH_HEIGHT + ')')
     .call(this.xAxis_);
@@ -142,7 +142,7 @@ MemoryChart.prototype.render = function() {
     .attr('dy', '.71em')
     .text('Executed lines');
 
-  var yGroup = canvas.append('g')
+  let yGroup = canvas.append('g')
     .attr('class', 'y memory-graph-axis')
     .call(this.yAxis_);
   yGroup.append('text')
@@ -151,12 +151,12 @@ MemoryChart.prototype.render = function() {
     .attr('dy', '.71em')
     .text('Memory usage, MB');
 
-  var self = this;
-  var zoom = d3zoom.zoom()
+  let self = this;
+  let zoom = d3zoom.zoom()
     .scaleExtent(self.ZOOM_SCALE_EXTENT)
     .translateExtent(self.ZOOM_TRANSLATE_EXTENT)
     .on('zoom', function() {
-      var t = d3select.event.transform;
+      let t = d3select.event.transform;
       xGroup.call(self.xAxis_.scale(t.rescaleX(self.xScale_)));
       path.attr(
         'transform', 'translate(' + t.x + ' 0) ' + 'scale(' + t.k + ' 1)');
@@ -220,12 +220,12 @@ MemoryChart.prototype.showFocus_ = function(focus, focusXLine, focusYLine) {
  */
 MemoryChart.prototype.redrawFocus_ = function(canvas, focus, tooltip,
   focusXLine, focusYLine) {
-  var t = d3zoom.zoomTransform(canvas.node());
-  var crds = d3select.mouse(canvas.node());
-  var xCoord = (crds[0] - t.x) / t.k;
-  var closestIndex = Math.round(this.xScale_.invert(xCoord)) - 1;
-  var closestY = this.yScale_(this.data_.codeEvents[closestIndex][2]);
-  var closestX = t.k * this.xScale_(
+  let t = d3zoom.zoomTransform(canvas.node());
+  let crds = d3select.mouse(canvas.node());
+  let xCoord = (crds[0] - t.x) / t.k;
+  let closestIndex = Math.round(this.xScale_.invert(xCoord)) - 1;
+  let closestY = this.yScale_(this.data_.codeEvents[closestIndex][2]);
+  let closestX = t.k * this.xScale_(
     this.data_.codeEvents[closestIndex][0]) + t.x;
 
   focus.attr('transform', 'translate(' + closestX + ', ' +
@@ -236,7 +236,7 @@ MemoryChart.prototype.redrawFocus_ = function(canvas, focus, tooltip,
   focusYLine.attr('y1', closestY)
     .attr('x2', closestX)
     .attr('y2', closestY);
-  var tooltipText = MemoryChart.generateTooltipText_(
+  let tooltipText = MemoryChart.generateTooltipText_(
     this.data_.codeEvents[closestIndex]);
   tooltip.attr('class', 'content-tooltip content-tooltip-visible')
     .html(tooltipText)
@@ -251,9 +251,9 @@ MemoryChart.prototype.redrawFocus_ = function(canvas, focus, tooltip,
  * @returns {string} - Text for tooltip with line stats.
  */
 MemoryChart.generateTooltipText_ = function(stats) {
-  var result = '';
+  let result = '';
   if (stats) {
-    var functionName = stats[3].replace('<', '[').replace('>',  ']');
+    let functionName = stats[3].replace('<', '[').replace('>',  ']');
     result = ('<p><b>Executed line:</b> ' + stats[0] + '</p>' +
               '<p><b>Line number:</b> ' + stats[1] + '</p>' +
               '<p><b>Function name:</b> ' + functionName + '</p>' +
@@ -272,7 +272,7 @@ MemoryChart.prototype.renderHelp_ = function() {
 
 /** Renders object count table. */
 MemoryChart.prototype.renderObjectsTable_ = function() {
-  var tableName = this.objectsTable_.append('tr')
+  let tableName = this.objectsTable_.append('tr')
     .attr('class', 'memory-table-name');
 
   tableName.append('td')
@@ -280,7 +280,7 @@ MemoryChart.prototype.renderObjectsTable_ = function() {
   tableName.append('td')
     .text('');
 
-  var tableHeader = this.objectsTable_.append('tr')
+  let tableHeader = this.objectsTable_.append('tr')
     .attr('class', 'memory-table-header');
 
   tableHeader.append('td')
@@ -288,7 +288,7 @@ MemoryChart.prototype.renderObjectsTable_ = function() {
   tableHeader.append('td')
     .text('Count');
 
-  var countRows = this.objectsTable_.selectAll('.memory-table-row')
+  let countRows = this.objectsTable_.selectAll('.memory-table-row')
     .data(this.data_.objectsCount)
     .enter()
     .append('tr')
@@ -306,7 +306,7 @@ MemoryChart.prototype.renderObjectsTable_ = function() {
  * @param {Object} data - Data for memory chart rendering.
  */
 function renderMemoryStats(data, parent) {
-  var memoryChart = new MemoryChart(parent, data);
+  let memoryChart = new MemoryChart(parent, data);
   memoryChart.render();
 }
 

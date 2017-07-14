@@ -3,10 +3,10 @@
  */
 
 'use strict';
-var d3interpolate = require('d3-interpolate');
-var d3scale = require('d3-scale');
+const d3interpolate = require('d3-interpolate');
+const d3scale = require('d3-scale');
 
-var MAX_COLOR_DOMAIN_VALUE = Math.pow(2, 32);
+const MAX_COLOR_DOMAIN_VALUE = Math.pow(2, 32);
 
 /**
  * Creates color scale that maps hashes (integers) to specified color ranges.

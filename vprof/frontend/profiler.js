@@ -3,11 +3,11 @@
  */
 
 'use strict';
-var color = require('./color');
-var common = require('./common');
-var d3select = require('d3-selection');
-var d3interpolate = require('d3-interpolate');
-var d3scale = require('d3-scale');
+const color = require('./color');
+const common = require('./common');
+const d3select = require('d3-selection');
+const d3interpolate = require('d3-interpolate');
+const d3scale = require('d3-scale');
 
 /**
  * Represents Python profiler output.
@@ -27,13 +27,13 @@ function Profiler(parent, data) {
 
 /** Renders profiler output */
 Profiler.prototype.render = function() {
-  var content = this.parent_.append('div')
+  let content = this.parent_.append('div')
     .attr('class', 'profiler-content');
 
-  var tooltip = this.parent_.append('div')
+  let tooltip = this.parent_.append('div')
     .attr('class', 'content-tooltip content-tooltip-invisible');
 
-  var recordsTable = content.append('div')
+  let recordsTable = content.append('div')
     .attr('class', 'profiler-record-table-wrapper')
     .append('div')
     .attr('class', 'profiler-record-table');
@@ -51,8 +51,8 @@ Profiler.prototype.render = function() {
   this.renderLegend_(content);
   this.renderHelp_();
 
-  var self = this;
-  var records = recordsTable.selectAll('.profiler-record-normal')
+  let self = this;
+  let records = recordsTable.selectAll('.profiler-record-normal')
     .data(this.data_.callStats)
     .enter()
     .append('tr')
@@ -96,7 +96,7 @@ Profiler.prototype.render = function() {
  */
 Profiler.prototype.showTooltip_ = function(element, tooltip, node) {
   d3select.select(element).attr('class', 'profiler-record-highlight');
-  var funcName = node[2].replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  let funcName = node[2].replace(/</g, "&lt;").replace(/>/g, "&gt;");
   tooltip.attr('class', 'content-tooltip content-tooltip-visible')
     .html('<p><b>Function name:</b> ' + funcName + '</p>' +
           '<p><b>Line number:</b> ' + node[1] +'</p>' +
@@ -145,7 +145,7 @@ Profiler.prototype.renderHelp_ = function() {
  * @param {Object} data - Data for profiler output.
  */
 function renderProfilerOutput(data, parent) {
-  var profilerOutput = new Profiler(parent, data);
+  let profilerOutput = new Profiler(parent, data);
   profilerOutput.render();
 }
 

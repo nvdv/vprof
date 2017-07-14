@@ -1,11 +1,11 @@
 'use strict';
 
-var memoryStatsModule = require('../memory_stats.js');
+const memoryStatsModule = require('../memory_stats.js');
 
 describe('Memory stats test suite', function() {
   it('Check generateTooltipText_', function() {
-    var stats = [10, 11, 15, '<func>', 'foo.py'];
-    var expectedResult = (
+    let stats = [10, 11, 15, '<func>', 'foo.py'];
+    let expectedResult = (
       '<p><b>Executed line:</b> 10</p>' +
       '<p><b>Line number:</b> 11</p>' +
       '<p><b>Function name:</b> [func]</p>' +

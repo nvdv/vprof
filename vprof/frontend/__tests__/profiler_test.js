@@ -1,6 +1,6 @@
 'use strict';
 
-var profilerModule = require('../profiler.js');
+const profilerModule = require('../profiler.js');
 
 describe('Profiler test suite', function() {
   it('Dummy test', function() {

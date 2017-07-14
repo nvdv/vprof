@@ -2,6 +2,10 @@
    "env": {
     "browser": 1
   },
+  "parserOptions": {
+      "ecmaVersion": 6,
+      "sourceType": "script"
+  },
   "rules": {
     "camelcase": ["error", { "properties": "never" }],
     "curly": "error",
@@ -12,6 +16,6 @@
     "no-cond-assign": ["error", "always"],
     "strict": ["error", "global"],
     "semi": "error",
-    "max-len": ["error", 80, { "ignoreComments": true }],
-  },
+    "max-len": ["error", 80, { "ignoreComments": true }]
+  }
 }

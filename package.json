@@ -17,13 +17,13 @@
     "d3-zoom": "1.1.1",
     "eslint": "latest",
     "highlight.js": "latest",
-    "jest": "18.0.0",
-    "uglify-js": "latest",
+    "jest": "^18.0.0",
+    "uglify-es": "^3.0.24",
     "watchify": "3.7.0"
   },
   "scripts": {
     "lint": "eslint vprof/frontend",
-    "build": "browserify -g browserify-css vprof/frontend/main.js | uglifyjs > vprof/frontend/vprof_min.js",
+    "build": "browserify -g browserify-css vprof/frontend/main.js | uglifyjs -o vprof/frontend/vprof_min.js",
     "watch": "watchify vprof/frontend/main.js -o vprof/frontend/vprof_min.js -v",
     "test": "jest"
   },
