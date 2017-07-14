@@ -3,13 +3,7 @@
  */
 
 'use strict';
-const d3array = require('d3-array');
-const d3axis = require('d3-axis');
-const d3format = require('d3-format');
-const d3shape = require('d3-shape');
-const d3select = require('d3-selection');
-const d3scale = require('d3-scale');
-const d3zoom = require('d3-zoom');
+const d3 = require('d3');
 
 /**
  * Represents memory chart.
@@ -63,13 +57,13 @@ function MemoryChart(parent, data) {
   this.ZOOM_SCALE_EXTENT = [1, 100];
   this.ZOOM_TRANSLATE_EXTENT = [[0, 0], [this.WIDTH, this.HEIGHT]];
 
-  this.xScale_ = d3scale.scaleLinear()
-    .domain(d3array.extent(this.data_.codeEvents, function(d) { return d[0]; }))
+  this.xScale_ = d3.scaleLinear()
+    .domain(d3.extent(this.data_.codeEvents, function(d) { return d[0]; }))
     .range([0, this.GRAPH_WIDTH]);
-  this.xAxis_ = d3axis.axisBottom()
+  this.xAxis_ = d3.axisBottom()
     .scale(this.xScale_)
     .ticks(this.TICKS_NUMBER)
-    .tickFormat(d3format.format(',.0f'));
+    .tickFormat(d3.format(',.0f'));
 
   // Set tick values explicitly when number of events is low.
   if (this.data_.codeEvents.length < this.TICKS_NUMBER) {
@@ -82,17 +76,17 @@ function MemoryChart(parent, data) {
     this.xAxis_.ticks(this.TICKS_NUMBER);
   }
 
-  this.yRange_ = d3array.extent(
+  this.yRange_ = d3.extent(
     this.data_.codeEvents, function(d) { return d[2]; });
-  this.yScale_ = d3scale.scaleLinear()
+  this.yScale_ = d3.scaleLinear()
     .domain([
       this.MIN_RANGE_C * this.yRange_[0], this.MAX_RANGE_C * this.yRange_[1]])
     .range([this.GRAPH_HEIGHT, 0]);
-  this.yAxis_ = d3axis.axisLeft()
+  this.yAxis_ = d3.axisLeft()
     .scale(this.yScale_);
 
   let self = this;
-  this.memoryGraph_ = d3shape.area()
+  this.memoryGraph_ = d3.area()
     .x(function(d) { return self.xScale_(d[0]); })
     .y0(self.GRAPH_HEIGHT)
     .y1(function(d) { return self.yScale_(d[2]); });
@@ -152,11 +146,11 @@ MemoryChart.prototype.render = function() {
     .text('Memory usage, MB');
 
   let self = this;
-  let zoom = d3zoom.zoom()
+  let zoom = d3.zoom()
     .scaleExtent(self.ZOOM_SCALE_EXTENT)
     .translateExtent(self.ZOOM_TRANSLATE_EXTENT)
     .on('zoom', function() {
-      let t = d3select.event.transform;
+      let t = d3.event.transform;
       xGroup.call(self.xAxis_.scale(t.rescaleX(self.xScale_)));
       path.attr(
         'transform', 'translate(' + t.x + ' 0) ' + 'scale(' + t.k + ' 1)');
@@ -220,8 +214,8 @@ MemoryChart.prototype.showFocus_ = function(focus, focusXLine, focusYLine) {
  */
 MemoryChart.prototype.redrawFocus_ = function(canvas, focus, tooltip,
   focusXLine, focusYLine) {
-  let t = d3zoom.zoomTransform(canvas.node());
-  let crds = d3select.mouse(canvas.node());
+  let t = d3.zoomTransform(canvas.node());
+  let crds = d3.mouse(canvas.node());
   let xCoord = (crds[0] - t.x) / t.k;
   let closestIndex = Math.round(this.xScale_.invert(xCoord)) - 1;
   let closestY = this.yScale_(this.data_.codeEvents[closestIndex][2]);

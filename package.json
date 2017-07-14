@@ -5,20 +5,11 @@
   "dependencies": {
     "browserify": "13",
     "browserify-css": "latest",
-    "d3-array": "1.0.2",
-    "d3-axis": "1.0.3",
-    "d3-format": "1.0.2",
-    "d3-hierarchy": "1.0.3",
-    "d3-interpolate": "1.1.2",
-    "d3-request": "1.0.3",
-    "d3-scale": "1.0.3",
-    "d3-selection": "1.0.3",
-    "d3-shape": "1.0.3",
-    "d3-zoom": "1.1.1",
+    "d3": "4.9.1",
     "eslint": "latest",
     "highlight.js": "latest",
-    "jest": "^18.0.0",
-    "uglify-es": "^3.0.24",
+    "jest": "18.0.0",
+    "uglify-es": "3.0.24",
     "watchify": "3.7.0"
   },
   "scripts": {

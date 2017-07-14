@@ -3,8 +3,7 @@
  */
 
 'use strict';
-const d3request = require('d3-request');
-const d3select = require('d3-selection');
+const d3 = require('d3');
 const codeHeatmapModule = require('./code_heatmap.js');
 const flameGraphModule = require('./flame_graph.js');
 const memoryStatsModule = require('./memory_stats.js');
@@ -18,7 +17,7 @@ const POLL_INTERVAL = 200;  // msec
  * @param {string} id - div ID.
  */
 function createTabContent_(id) {
-  return d3select.select('body')
+  return d3.select('body')
     .append('div')
     .attr('class', 'main-tab-content')
     .attr('id', id);
@@ -35,9 +34,9 @@ function createFlameGraphTab_(parent, status) {
     .attr('class', status)
     .text('Flame graph')
     .on('click', function(d) {
-      d3select.selectAll('li')
+      d3.selectAll('li')
         .attr('class', 'main-tab-not-selected');
-      d3select.select(this)
+      d3.select(this)
         .attr('class', 'main-tab-selected');
       showTab_('flame-graph-tab');
     });
@@ -54,9 +53,9 @@ function createMemoryChartTab_(parent, status) {
     .attr('class', status)
     .text('Memory stats')
     .on('click', function(d) {
-      d3select.selectAll('li')
+      d3.selectAll('li')
         .attr('class', 'main-tab-not-selected');
-      d3select.select(this)
+      d3.select(this)
         .attr('class', 'main-tab-selected');
       showTab_('memory-chart-tab');
     });
@@ -73,9 +72,9 @@ function createCodeHeatmapTab_(parent, status) {
     .attr('class', status)
     .text('Code heatmap')
     .on('click', function(d) {
-      d3select.selectAll('li')
+      d3.selectAll('li')
         .attr('class', 'main-tab-not-selected');
-      d3select.select(this)
+      d3.select(this)
         .attr('class', 'main-tab-selected');
       showTab_('code-heatmap-tab');
     });
@@ -92,9 +91,9 @@ function createProfilerTab_(parent, status) {
     .attr('class', status)
     .text('Profiler')
     .on('click', function(d) {
-      d3select.selectAll('li')
+      d3.selectAll('li')
         .attr('class', 'main-tab-not-selected');
-      d3select.select(this)
+      d3.select(this)
         .attr('class', 'main-tab-selected');
       showTab_('profiler-tab');
     });
@@ -107,9 +106,9 @@ function createProfilerTab_(parent, status) {
 function renderPage(data) {
   // Remove all existing tabs and their content
   // in case if user is refreshing main page.
-  d3select.select('body').selectAll('*').remove();
+  d3.select('body').selectAll('*').remove();
 
-  let tabHeader = d3select.select('body')
+  let tabHeader = d3.select('body')
     .append('ul')
     .attr('class', 'main-tab-header');
 
@@ -161,7 +160,7 @@ function renderPage(data) {
   */
 function handleHelpDisplay(event, helpButton) {
   if (event.target === helpButton.node()) {
-    let helpActiveTab = d3select.select('.active-tab .tabhelp');
+    let helpActiveTab = d3.select('.active-tab .tabhelp');
     helpActiveTab.classed(
       'active-tabhelp', !helpActiveTab.classed('active-tabhelp'))
       .classed('inactive-tabhelp', !helpActiveTab.classed('inactive-tabhelp'));
@@ -173,28 +172,28 @@ function handleHelpDisplay(event, helpButton) {
   * @param {string} tabId - Next active tab identifier.
   */
 function showTab_(tabId) {
-  d3select.selectAll('.main-tab-content')
+  d3.selectAll('.main-tab-content')
     .classed('active-tab', false)
     .classed('inactive-tab', true);
-  d3select.select('#' + tabId)
+  d3.select('#' + tabId)
     .classed('active-tab', true)
     .classed('inactive-tab', false);
 }
 
 /** Makes request to server and renders page with received data. */
 function main() {
-  let progressIndicator = d3select.select('body')
+  let progressIndicator = d3.select('body')
     .append('div')
     .attr('id', 'main-progress-indicator');
 
   // TODO (nvdv): Simplify this code.
-  d3request.json(JSON_URI, function(data) {
+  d3.json(JSON_URI, function(data) {
     if (Object.keys(data).length !== 0) {
       progressIndicator.remove();
       renderPage(data);
     } else {
       let timerId = setInterval(function() {
-        d3request.json(JSON_URI, function(data) {
+        d3.json(JSON_URI, function(data) {
           if (Object.keys(data).length !== 0) {
             progressIndicator.remove();
             clearInterval(timerId);

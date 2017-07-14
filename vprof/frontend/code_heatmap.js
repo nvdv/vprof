@@ -3,9 +3,7 @@
  */
 
 'use strict';
-const d3scale = require('d3-scale');
-const d3select = require('d3-selection');
-
+const d3 = require('d3');
 const hljs = require('highlight.js');
 try {
   require('./highlight.css');  // Includes code highlighter CSS.
@@ -34,7 +32,7 @@ function CodeHeatmap(parent, data) {
 
   this.data_ = data;
   this.parent_ = parent;
-  this.heatmapScale_ = d3scale.scalePow()
+  this.heatmapScale_ = d3.scalePow()
     .exponent(0.6)
     .domain([this.MIN_RUN_TIME, this.MAX_RUN_TIME])
     .range([this.MIN_RUN_COLOR, this.MAX_RUN_COLOR]);
@@ -107,7 +105,7 @@ CodeHeatmap.prototype.render = function() {
   self = this;
   codeContainer.selectAll('.heatmap-src-file')
     .each(function(_, i) {
-      d3select.select(fileContainers[i]).selectAll('.heatmap-src-line-normal')
+      d3.select(fileContainers[i]).selectAll('.heatmap-src-line-normal')
         .on('mouseover', function(_, j) {
           self.showCodeTooltip_(
             this, codeTooltip, renderedSources, i, j, self.data_.runTime);
@@ -130,8 +128,8 @@ CodeHeatmap.prototype.showModuleTooltip_ = function(tooltip, moduleTime,
     .html('<p><b>Time spent: </b>'+ moduleTime + ' s</p>' +
           '<p><b>Total running time: </b>' + totalTime + ' s</p>' +
           '<p><b>Percentage: </b>' + percentage + '%</p>')
-    .style('left', d3select.event.pageX)
-    .style('top', d3select.event.pageY);
+    .style('left', d3.event.pageX)
+    .style('top', d3.event.pageY);
 };
 
 /**
@@ -159,14 +157,14 @@ CodeHeatmap.prototype.showCodeTooltip_ = function(
   let lineRuntime = sources[fileIndex].timeMap[lineIndex];
   let lineRuncount = sources[fileIndex].countMap[lineIndex];
   let percentage = Math.round(10000 * lineRuntime / totalTime) / 100;
-  d3select.select(element).attr('class', 'heatmap-src-line-highlight');
+  d3.select(element).attr('class', 'heatmap-src-line-highlight');
   tooltip.attr('class', 'content-tooltip content-tooltip-visible')
     .html('<p><b>Time spent: </b>' + lineRuntime + ' s</p>' +
           '<p><b>Total running time: </b>' + totalTime + ' s</p>' +
           '<p><b>Percentage: </b>' + percentage + '%</p>' +
           '<p><b>Run count: </b>' + lineRuncount + '</p>')
-    .style('left', d3select.event.pageX)
-    .style('top', d3select.event.pageY);
+    .style('left', d3.event.pageX)
+    .style('top', d3.event.pageY);
 };
 
 /**
@@ -175,7 +173,7 @@ CodeHeatmap.prototype.showCodeTooltip_ = function(
  * @param {Object} tooltip - Element representing tooltip.
  */
 CodeHeatmap.prototype.hideCodeTooltip_ = function(element, tooltip) {
-  d3select.select(element).attr('class', 'heatmap-src-line-normal');
+  d3.select(element).attr('class', 'heatmap-src-line-normal');
   tooltip.attr('class', 'content-tooltip content-tooltip-invisible');
 };
 

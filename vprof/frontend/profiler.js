@@ -5,9 +5,7 @@
 'use strict';
 const color = require('./color');
 const common = require('./common');
-const d3select = require('d3-selection');
-const d3interpolate = require('d3-interpolate');
-const d3scale = require('d3-scale');
+const d3 = require('d3');
 
 /**
  * Represents Python profiler output.
@@ -95,7 +93,7 @@ Profiler.prototype.render = function() {
  * @param {Object} node - Object with profiler record info.
  */
 Profiler.prototype.showTooltip_ = function(element, tooltip, node) {
-  d3select.select(element).attr('class', 'profiler-record-highlight');
+  d3.select(element).attr('class', 'profiler-record-highlight');
   let funcName = node[2].replace(/</g, "&lt;").replace(/>/g, "&gt;");
   tooltip.attr('class', 'content-tooltip content-tooltip-visible')
     .html('<p><b>Function name:</b> ' + funcName + '</p>' +
@@ -105,8 +103,8 @@ Profiler.prototype.showTooltip_ = function(element, tooltip, node) {
           '<p><b>Number of calls:</b> ' + node[5] +'</p>' +
           '<p><b>Cumulative calls:</b> ' + node[6] +'</p>' +
           '<p><b>Time per call:</b> ' + node[7] +'s</p>')
-    .style('left', d3select.event.pageX)
-    .style('top', d3select.event.pageY);
+    .style('left', d3.event.pageX)
+    .style('top', d3.event.pageY);
 };
 
 /**
@@ -115,7 +113,7 @@ Profiler.prototype.showTooltip_ = function(element, tooltip, node) {
  * @param {Object} tooltip - Element representing tooltip.
  */
 Profiler.prototype.hideTooltip_ = function(element, tooltip) {
-  d3select.select(element).attr('class', 'profiler-record-normal');
+  d3.select(element).attr('class', 'profiler-record-normal');
   tooltip.attr('class', 'content-tooltip content-tooltip-invisible');
 };
 

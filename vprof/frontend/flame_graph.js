@@ -5,10 +5,7 @@
 'use strict';
 const color = require('./color');
 const common = require('./common');
-const d3hierarchy = require('d3-hierarchy');
-const d3interpolate = require('d3-interpolate');
-const d3scale = require('d3-scale');
-const d3select = require('d3-selection');
+const d3 = require('d3');
 
 /**
  * Represents CPU flame graph.
@@ -34,9 +31,9 @@ function FlameGraph(parent, data) {
     'Sorry, no samples. Seems like run time is less than sampling interval.');
   this.data_ = data;
   this.parent_ = parent;
-  this.xScale_ = d3scale.scaleLinear().domain([0, 1]).range([0, this.WIDTH]);
-  this.yScale_ = d3scale.scaleLinear().range([0, this.HEIGHT]);
-  this.flameGraph_ = d3hierarchy.partition();
+  this.xScale_ = d3.scaleLinear().domain([0, 1]).range([0, this.WIDTH]);
+  this.yScale_ = d3.scaleLinear().range([0, this.HEIGHT]);
+  this.flameGraph_ = d3.partition();
   this.color_ = color.createColorScale();
 }
 
@@ -58,7 +55,7 @@ FlameGraph.prototype.render = function() {
     return;
   }
 
-  let nodes = d3hierarchy.hierarchy(this.data_.callStats)
+  let nodes = d3.hierarchy(this.data_.callStats)
     .each(function(d) { d.value = d.data.sampleCount; });
 
   this.flameGraph_(nodes);
@@ -160,7 +157,7 @@ FlameGraph.prototype.redrawTitles_ = function(titles) {
  * @param {Object} node - Object representing function call info.
  */
 FlameGraph.prototype.showTooltip_ = function(element, tooltip, node) {
-  d3select.select(element).attr('class', 'flame-graph-rect-highlight');
+  d3.select(element).attr('class', 'flame-graph-rect-highlight');
   let funcName = node.stack[0].replace(/</g, "&lt;").replace(/>/g, "&gt;");
   tooltip.attr('class', 'content-tooltip content-tooltip-visible')
     .html('<p><b>Function name:</b> ' + funcName + '</p>' +
@@ -168,8 +165,8 @@ FlameGraph.prototype.showTooltip_ = function(element, tooltip, node) {
           '<p><b>Filename:</b> ' + node.stack[1] +'</p>' +
           '<p><b>Sample count:</b> ' + node.sampleCount + '</p>' +
           '<p><b>Percentage:</b> ' + node.samplePercentage +'%</p>')
-    .style('left', d3select.event.pageX)
-    .style('top', d3select.event.pageY);
+    .style('left', d3.event.pageX)
+    .style('top', d3.event.pageY);
 };
 
 /**
@@ -178,7 +175,7 @@ FlameGraph.prototype.showTooltip_ = function(element, tooltip, node) {
  * @param {Object} tooltip - Element representing tooltip.
  */
 FlameGraph.prototype.hideTooltip_ = function(element, tooltip) {
-  d3select.select(element).attr('class', 'flame-graph-rect-normal');
+  d3.select(element).attr('class', 'flame-graph-rect-normal');
   tooltip.attr('class', 'content-tooltip content-tooltip-invisible');
 };
 
