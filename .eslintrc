@@ -1,6 +1,6 @@
 {
    "env": {
-    "browser": 1
+    "browser": true
   },
   "parserOptions": {
       "ecmaVersion": 6,

@@ -1,5 +1,5 @@
 *.pyc
-vprof/frontend/vprof_min.js
+vprof/ui/vprof_min.js
 .DS_Store
 node_modules
 build

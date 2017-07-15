@@ -11,7 +11,7 @@ from six import BytesIO
 from six.moves import SimpleHTTPServer as http_server
 from six.moves import socketserver
 
-_STATIC_DIR = 'frontend'
+_STATIC_DIR = 'ui'
 _PROFILE_HTML = '%s/profile.html' % _STATIC_DIR
 
 

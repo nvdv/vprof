@@ -1,7 +1,7 @@
 {
   "name": "vprof-frontend",
   "author": "nvdv",
-  "main": "vprof/frontend/main.js",
+  "main": "vprof/ui/main.js",
   "dependencies": {
     "browserify": "13",
     "browserify-css": "latest",
@@ -13,9 +13,9 @@
     "watchify": "3.7.0"
   },
   "scripts": {
-    "lint": "eslint vprof/frontend",
-    "build": "browserify -g browserify-css vprof/frontend/main.js | uglifyjs -o vprof/frontend/vprof_min.js",
-    "watch": "watchify vprof/frontend/main.js -o vprof/frontend/vprof_min.js -v",
+    "lint": "eslint vprof/ui",
+    "build": "browserify -g browserify-css vprof/ui/main.js | uglifyjs -o vprof/ui/vprof_min.js",
+    "watch": "watchify vprof/ui/main.js -o vprof/ui/vprof_min.js -v",
     "test": "jest"
   },
   "browserify": {

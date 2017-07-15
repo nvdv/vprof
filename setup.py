@@ -78,7 +78,7 @@ class RunCleanCommand(cmd.Command):
 
     def run(self):
         subprocess.check_output(
-            shlex.split('rm -rf vprof/frontend/vprof_min.js'))
+            shlex.split('rm -rf vprof/ui/vprof_min.js'))
 
 
 class RunDepsInstallCommand(cmd.Command):
