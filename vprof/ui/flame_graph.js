@@ -56,7 +56,7 @@ FlameGraph.prototype.render = function() {
   }
 
   let nodes = d3.hierarchy(this.data_.callStats)
-    .each(function(d) { d.value = d.data.sampleCount; });
+    .each((d) => d.value = d.data.sampleCount);
 
   this.flameGraph_(nodes);
 
@@ -67,32 +67,31 @@ FlameGraph.prototype.render = function() {
     .attr('class', 'flame-graph-cell');
 
   // Render flame graph nodes.
-  let self = this;
   nodes = cells.append('rect')
     .attr('class', 'flame-graph-rect-normal')
-    .attr('x', function(d) { return self.xScale_(d.x0); })
-    .attr('y', function(d) { return self.yScale_(1 - d.y0 - (d.y1 - d.y0)); })
-    .attr('width', function(d) { return self.xScale_(d.x1 - d.x0); })
-    .attr('height', function(d) { return self.yScale_(d.y1 - d.y0); })
-    .style('fill', function(d) { return self.color_(d.data.colorHash); })
-    .on('mouseover', function(d) { self.showTooltip_(this, tooltip, d.data); })
-    .on('mouseout', function() { self.hideTooltip_(this, tooltip); });
+    .attr('x', (d) => this.xScale_(d.x0))
+    .attr('y', (d) => this.yScale_(1 - d.y0 - (d.y1 - d.y0)))
+    .attr('width', (d) => this.xScale_(d.x1 - d.x0))
+    .attr('height', (d) => this.yScale_(d.y1 - d.y0))
+    .style('fill', (d) => this.color_(d.data.colorHash))
+    .on('mouseover', (d, i, n) => this.showTooltip_(n[i], tooltip, d.data))
+    .on('mouseout', (d, i, n) => this.hideTooltip_(n[i], tooltip));
 
   let titles = cells.append('text')
-    .attr('x', function(d) { return self.xScale_(d.x0) + self.TEXT_OFFSET_X; })
-    .attr('y', function(d) {
-      return self.yScale_(1 - d.y0 - (d.y1 - d.y0)) + self.TEXT_OFFSET_Y; })
-    .text(function(d) {
-      let nodeWidth = this.previousElementSibling.getAttribute('width');
+    .attr('x', (d) => this.xScale_(d.x0) + this.TEXT_OFFSET_X)
+    .attr('y', (d) => this.yScale_(1 - d.y0 - (d.y1 - d.y0)) +
+                                   this.TEXT_OFFSET_Y)
+    .text((d, i, n) => {
+      let nodeWidth = n[i].previousElementSibling.getAttribute('width');
       return FlameGraph.getTruncatedNodeName_(d.data, nodeWidth); })
-    .attr('visibility', function(d) {
-      let nodeHeight = this.previousElementSibling.getAttribute('height');
-      return nodeHeight > self.MIN_TEXT_HEIGHT ? 'visible': 'hidden';
+    .attr('visibility', (d, i, n) => {
+      let nodeHeight = n[i].previousElementSibling.getAttribute('height');
+      return nodeHeight > this.MIN_TEXT_HEIGHT ? 'visible': 'hidden';
     });
 
   // Zoom.
-  nodes.on('click', function(d) { self.zoomIn_(d, nodes, titles); });
-  canvas.on('dblclick', function(d) { self.zoomOut_(nodes, titles); });
+  nodes.on('click', (d) => this.zoomIn_(d, nodes, titles));
+  canvas.on('dblclick', (d) => this.zoomOut_(nodes, titles));
 };
 
 /**
@@ -104,14 +103,13 @@ FlameGraph.prototype.render = function() {
 FlameGraph.prototype.zoomIn_ = function(node, allNodes, titles) {
   this.xScale_.domain([node.x0, node.x0 + node.x1 - node.x0]);
   this.yScale_.domain([0, 1 - node.y0]);
-  let self = this;
-  allNodes.attr('x', function(d) { return self.xScale_(d.x0); })
-    .attr('y', function(d) { return self.yScale_(1 - d.y0 - (d.y1 - d.y0)); })
-    .attr('width', function(d) {
-      return self.xScale_(d.x0 + d.x1 - d.x0) - self.xScale_(d.x0); })
-    .attr('height', function(d) {
-      return self.yScale_(1 - d.y0) -
-             self.yScale_(1 - d.y0 - (d.y1 - d.y0)); });
+  allNodes.attr('x', (d) => this.xScale_(d.x0))
+    .attr('y', (d) => this.yScale_(1 - d.y0 - (d.y1 - d.y0)))
+    .attr('width', (d) => {
+      return this.xScale_(d.x0 + d.x1 - d.x0) - this.xScale_(d.x0); })
+    .attr('height', (d) => {
+      return this.yScale_(1 - d.y0) - this.yScale_(1 - d.y0 - (d.y1 - d.y0));
+    });
   this.redrawTitles_(titles);
 };
 
@@ -124,10 +122,10 @@ FlameGraph.prototype.zoomOut_ = function(allNodes, titles) {
   this.xScale_.domain([0, 1]);
   this.yScale_.domain([0, 1]);
   let self = this;
-  allNodes.attr('x', function(d) { return self.xScale_(d.x0); })
-    .attr('y', function(d) { return self.yScale_(1 - d.y0 - (d.y1 - d.y0)); })
-    .attr('width', function(d) { return self.xScale_(d.x1 - d.x0); })
-    .attr('height', function(d) { return self.yScale_(d.y1 - d.y0); });
+  allNodes.attr('x', (d) => self.xScale_(d.x0))
+    .attr('y', (d) => self.yScale_(1 - d.y0 - (d.y1 - d.y0)))
+    .attr('width', (d) => self.xScale_(d.x1 - d.x0))
+    .attr('height', (d) => self.yScale_(d.y1 - d.y0));
   this.redrawTitles_(titles);
 };
 
@@ -136,17 +134,15 @@ FlameGraph.prototype.zoomOut_ = function(allNodes, titles) {
  * @param {Object} titles - All flame graph node titles.
  */
 FlameGraph.prototype.redrawTitles_ = function(titles) {
-  let self = this;
-  titles.attr('x', function(d) {
-    return self.xScale_(d.x0) + self.TEXT_OFFSET_X; })
-    .attr('y', function(d) {
-      return self.yScale_(1 - d.y0 - (d.y1 - d.y0)) + self.TEXT_OFFSET_Y; })
-    .text(function(d) {
-      let nodeWidth = self.xScale_(d.x0 + d.x1 - d.x0) - self.xScale_(d.x0);
+  titles.attr('x', (d) => this.xScale_(d.x0) + this.TEXT_OFFSET_X)
+    .attr('y', (d) => {
+      return this.yScale_(1 - d.y0 - (d.y1 - d.y0)) + this.TEXT_OFFSET_Y; })
+    .text((d) => {
+      let nodeWidth = this.xScale_(d.x0 + d.x1 - d.x0) - this.xScale_(d.x0);
       return FlameGraph.getTruncatedNodeName_(d.data, nodeWidth); })
-    .attr('visibility', function(d) {
-      let nodeHeight = this.previousElementSibling.getAttribute('height');
-      return (nodeHeight > self.MIN_TEXT_HEIGHT) ? 'visible': 'hidden';
+    .attr('visibility', (d, i, n) => {
+      let nodeHeight = n[i].previousElementSibling.getAttribute('height');
+      return (nodeHeight > this.MIN_TEXT_HEIGHT) ? 'visible': 'hidden';
     });
 };
 

@@ -33,10 +33,10 @@ function createFlameGraphTab_(parent, status) {
   parent.append('li')
     .attr('class', status)
     .text('Flame graph')
-    .on('click', function(d) {
+    .on('click', (d, i, n) => {
       d3.selectAll('li')
         .attr('class', 'main-tab-not-selected');
-      d3.select(this)
+      d3.select(n[i])
         .attr('class', 'main-tab-selected');
       showTab_('flame-graph-tab');
     });
@@ -52,10 +52,10 @@ function createMemoryChartTab_(parent, status) {
   parent.append('li')
     .attr('class', status)
     .text('Memory stats')
-    .on('click', function(d) {
+    .on('click', (d, i, n) => {
       d3.selectAll('li')
         .attr('class', 'main-tab-not-selected');
-      d3.select(this)
+      d3.select(n[i])
         .attr('class', 'main-tab-selected');
       showTab_('memory-chart-tab');
     });
@@ -71,10 +71,10 @@ function createCodeHeatmapTab_(parent, status) {
   parent.append('li')
     .attr('class', status)
     .text('Code heatmap')
-    .on('click', function(d) {
+    .on('click', (d, i, n) => {
       d3.selectAll('li')
         .attr('class', 'main-tab-not-selected');
-      d3.select(this)
+      d3.select(n[i])
         .attr('class', 'main-tab-selected');
       showTab_('code-heatmap-tab');
     });
@@ -90,10 +90,10 @@ function createProfilerTab_(parent, status) {
   parent.append('li')
     .attr('class', status)
     .text('Profiler')
-    .on('click', function(d) {
+    .on('click', (d, i, n) => {
       d3.selectAll('li')
         .attr('class', 'main-tab-not-selected');
-      d3.select(this)
+      d3.select(n[i])
         .attr('class', 'main-tab-selected');
       showTab_('profiler-tab');
     });
@@ -187,13 +187,13 @@ function main() {
     .attr('id', 'main-progress-indicator');
 
   // TODO (nvdv): Simplify this code.
-  d3.json(JSON_URI, function(data) {
+  d3.json(JSON_URI, (data) => {
     if (Object.keys(data).length !== 0) {
       progressIndicator.remove();
       renderPage(data);
     } else {
       let timerId = setInterval(function() {
-        d3.json(JSON_URI, function(data) {
+        d3.json(JSON_URI, (data) => {
           if (Object.keys(data).length !== 0) {
             progressIndicator.remove();
             clearInterval(timerId);

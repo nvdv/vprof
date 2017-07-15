@@ -55,22 +55,19 @@ CodeHeatmap.prototype.render = function() {
   let moduleTooltip = pageContainer.append('div')
     .attr('class', 'content-tooltip content-tooltip-invisible');
 
-  let self = this;
   moduleList.selectAll('.heatmap-module-name')
     .data(this.data_.heatmaps)
     .enter()
     .append('a')
-    .attr('href', function(d) { return '#' + d.name; })
+    .attr('href', (d) => '#' + d.name)
     .append('div')
     .attr('class', 'heatmap-module-name')
-    .style('background-color', function(d) {
-      return self.heatmapScale_(d.runTime); })
-    .on('mouseover', function(d) {
-      self.showModuleTooltip_(moduleTooltip, d.runTime, self.data_.runTime);
-    })
-    .on('mouseout', function() { self.hideModuleTooltip_(moduleTooltip); })
+    .style('background-color', (d) => this.heatmapScale_(d.runTime))
+    .on('mouseover', (d) => this.showModuleTooltip_(
+      moduleTooltip, d.runTime, this.data_.runTime))
+    .on('mouseout', () => this.hideModuleTooltip_(moduleTooltip))
     .append('text')
-    .html(function(d) { return d.name; });
+    .html((d) => d.name);
 
   let codeContainer = pageContainer.append('div')
     .attr('class', 'heatmap-code-container');
@@ -82,11 +79,11 @@ CodeHeatmap.prototype.render = function() {
     .attr('class', 'heatmap-src-file');
 
   heatmapContainer.append('a')
-    .attr('href', function(d) { return '#' + d.name; })
+    .attr('href', (d) => '#' + d.name)
     .attr('class', 'heatmap-src-code-header')
-    .attr('id', function(d) { return d.name; })
+    .attr('id', (d) => d.name)
     .append('text')
-    .html(function(d) { return d.name; });
+    .html((d) => d.name);
 
   let renderedSources = [];
   for (let i = 0; i < this.data_.heatmaps.length; i++) {
@@ -96,22 +93,21 @@ CodeHeatmap.prototype.render = function() {
   let fileContainers = heatmapContainer.append('div')
     .attr('class', 'heatmap-src-code')
     .append('text')
-    .html(function(_, i) { return renderedSources[i].srcCode; })
+    .html((d, i) => renderedSources[i].srcCode)
     .nodes();
 
   let codeTooltip = pageContainer.append('div')
     .attr('class', 'content-tooltip content-tooltip-invisible');
 
-  self = this;
   codeContainer.selectAll('.heatmap-src-file')
-    .each(function(_, i) {
+    .each((d, i) => {
       d3.select(fileContainers[i]).selectAll('.heatmap-src-line-normal')
-        .on('mouseover', function(_, j) {
-          self.showCodeTooltip_(
-            this, codeTooltip, renderedSources, i, j, self.data_.runTime);
+        .on('mouseover', (d, j, nodes) => {
+          this.showCodeTooltip_(
+            nodes[j], codeTooltip, renderedSources, i, j, this.data_.runTime);
         })
-        .on('mouseout', function() {
-          self.hideCodeTooltip_(this, codeTooltip); });
+        .on('mouseout', (d, j, nodes) => {
+          this.hideCodeTooltip_(nodes[j], codeTooltip); });
     });
 };
 

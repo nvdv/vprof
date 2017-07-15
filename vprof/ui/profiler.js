@@ -49,40 +49,37 @@ Profiler.prototype.render = function() {
   this.renderLegend_(content);
   this.renderHelp_();
 
-  let self = this;
   let records = recordsTable.selectAll('.profiler-record-normal')
     .data(this.data_.callStats)
     .enter()
     .append('tr')
     .attr('class', 'profiler-record-normal')
-    .on('mouseover', function(d) { self.showTooltip_(this, tooltip, d); })
-    .on('mouseout', function() { self.hideTooltip_(this, tooltip); });
+    .on('mouseover', (d, i, n) => this.showTooltip_(n[i], tooltip, d))
+    .on('mouseout', (d, i, n) => this.hideTooltip_(n[i], tooltip));
 
   records.append('td')
     .attr('class', 'profiler-record-color')
-    .style('background', function(d) { return self.color_(d[9]); });
+    .style('background', (d) => this.color_(d[9]));
 
   records.append('td')
     .attr('class', 'profiler-record-percentage')
-    .html(function(d) { return d[4] + '%'; });
+    .html((d) => d[4] + '%');
 
   records.append('td')
     .attr('class', 'profiler-record-funcname')
-    .html(function(d) {
-      return d[2].replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    });
+    .html((d) => d[2].replace(/</g, "&lt;").replace(/>/g, "&gt;"));
 
   records.append('td')
     .attr('class', 'profiler-record-filename')
-    .html(function(d) { return common.shortenString(d[0], 70, false); });
+    .html((d) => common.shortenString(d[0], 70, false));
 
   records.append('td')
     .attr('class', 'profiler-record-lineno')
-    .html(function(d) { return d[1]; });
+    .html((d) => d[1]);
 
   records.append('td')
     .attr('class', 'profiler-record-cumtime')
-    .html(function(d) { return d[3] + 's'; });
+    .html((d) => d[3] + 's');
 
 };
 

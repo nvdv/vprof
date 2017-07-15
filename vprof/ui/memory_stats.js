@@ -58,7 +58,7 @@ function MemoryChart(parent, data) {
   this.ZOOM_TRANSLATE_EXTENT = [[0, 0], [this.WIDTH, this.HEIGHT]];
 
   this.xScale_ = d3.scaleLinear()
-    .domain(d3.extent(this.data_.codeEvents, function(d) { return d[0]; }))
+    .domain(d3.extent(this.data_.codeEvents, (d) => d[0]))
     .range([0, this.GRAPH_WIDTH]);
   this.xAxis_ = d3.axisBottom()
     .scale(this.xScale_)
@@ -76,8 +76,7 @@ function MemoryChart(parent, data) {
     this.xAxis_.ticks(this.TICKS_NUMBER);
   }
 
-  this.yRange_ = d3.extent(
-    this.data_.codeEvents, function(d) { return d[2]; });
+  this.yRange_ = d3.extent(this.data_.codeEvents, (d) => d[2]);
   this.yScale_ = d3.scaleLinear()
     .domain([
       this.MIN_RANGE_C * this.yRange_[0], this.MAX_RANGE_C * this.yRange_[1]])
@@ -85,11 +84,10 @@ function MemoryChart(parent, data) {
   this.yAxis_ = d3.axisLeft()
     .scale(this.yScale_);
 
-  let self = this;
   this.memoryGraph_ = d3.area()
-    .x(function(d) { return self.xScale_(d[0]); })
-    .y0(self.GRAPH_HEIGHT)
-    .y1(function(d) { return self.yScale_(d[2]); });
+    .x((d) => this.xScale_(d[0]))
+    .y0(this.GRAPH_HEIGHT)
+    .y1((d) => this.yScale_(d[2]));
 }
 
 /** Renders memory chart. */
@@ -116,8 +114,7 @@ MemoryChart.prototype.render = function() {
     .style('display', 'none')
     .attr('class', 'memory-graph-focus')
     .attr('r', this.FOCUS_RADIUS)
-    .attr('transform',
-      'translate(' + (-100) + ', '  + (-100) + ')');  // Hide focus.
+    .attr('transform', 'translate(' + (-100) + ', '  + (-100) + ')');
   let focusXLine = canvas.append('line')
     .attr('class', 'memory-graph-focus-line')
     .attr('y1', this.GRAPH_HEIGHT);
@@ -145,25 +142,23 @@ MemoryChart.prototype.render = function() {
     .attr('dy', '.71em')
     .text('Memory usage, MB');
 
-  let self = this;
   let zoom = d3.zoom()
-    .scaleExtent(self.ZOOM_SCALE_EXTENT)
-    .translateExtent(self.ZOOM_TRANSLATE_EXTENT)
-    .on('zoom', function() {
+    .scaleExtent(this.ZOOM_SCALE_EXTENT)
+    .translateExtent(this.ZOOM_TRANSLATE_EXTENT)
+    .on('zoom', () => {
       let t = d3.event.transform;
-      xGroup.call(self.xAxis_.scale(t.rescaleX(self.xScale_)));
+      xGroup.call(this.xAxis_.scale(t.rescaleX(this.xScale_)));
       path.attr(
         'transform', 'translate(' + t.x + ' 0) ' + 'scale(' + t.k + ' 1)');
     });
 
   canvas.call(zoom);
   canvas.style('pointer-events', 'all')
-    .on('mouseover', function() {
-      self.showFocus_(focus, focusXLine, focusYLine); })
-    .on('mouseout', function() {
-      self.hideFocus_(focus, tooltip, focusXLine, focusYLine); })
-    .on('mousemove', function() {
-      self.redrawFocus_(canvas, focus, tooltip, focusXLine, focusYLine);  });
+    .on('mouseover', () => this.showFocus_(focus, focusXLine, focusYLine))
+    .on('mouseout', () => this.hideFocus_(
+      focus, tooltip, focusXLine, focusYLine))
+    .on('mousemove', () => this.redrawFocus_(
+      canvas, focus, tooltip, focusXLine, focusYLine));
 };
 
 /** Renders memory chart legend. */
@@ -289,9 +284,9 @@ MemoryChart.prototype.renderObjectsTable_ = function() {
     .attr('class', 'memory-table-row');
 
   countRows.append('td')
-    .text(function(d) { return d[0]; });
+    .text((d) => d[0]);
   countRows.append('td')
-    .text(function(d) { return d[1]; });
+    .text((d) => d[1]);
 };
 
 /**

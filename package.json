@@ -1,5 +1,5 @@
 {
-  "name": "vprof-frontend",
+  "name": "vprof-ui",
   "author": "nvdv",
   "main": "vprof/ui/main.js",
   "dependencies": {
