@@ -2,8 +2,8 @@
 
 const memoryStatsModule = require('../memory_stats.js');
 
-describe('Memory stats test suite', function() {
-  it('Check generateTooltipText_', function() {
+describe('Memory stats test suite', () => {
+  it('Check generateTooltipText_', () => {
     let stats = [10, 11, 15, '<func>', 'foo.py'];
     let expectedResult = (
       '<p><b>Executed line:</b> 10</p>' +

@@ -2,8 +2,8 @@
 
 const commonModule = require('../common.js');
 
-describe('Profiler test suite', function() {
-  it('Check shortenString', function() {
+describe('Profiler test suite', () => {
+  it('Check shortenString', () => {
     expect(commonModule.shortenString('foobar', 6, true)).toBe('foobar');
     expect(commonModule.shortenString('foobarfoobar', 10, true)).toBe(
       '...rfoobar');

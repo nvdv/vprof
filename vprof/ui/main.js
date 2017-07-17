@@ -149,9 +149,8 @@ function renderPage(data) {
     .attr('class', 'help-button')
     .text('?');
 
-  document.addEventListener('click', function(event) {
-    handleHelpDisplay(event, helpButton);
-  });
+  document.addEventListener(
+    'click', (event) => handleHelpDisplay(event, helpButton));
 }
 
 /**

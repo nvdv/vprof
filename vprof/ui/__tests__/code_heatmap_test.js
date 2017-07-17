@@ -2,11 +2,9 @@
 
 const codeHeatmapModule = require('../code_heatmap.js');
 
-describe('Code heatmap test suite', function() {
-  it('Check renderCode', function() {
-    codeHeatmapModule.CodeHeatmap.prototype.formatSrcLine_ = function(n, l, c) {
-      return n;
-    };
+describe('Code heatmap test suite', () => {
+  it('Check renderCode', () => {
+    codeHeatmapModule.CodeHeatmap.prototype.formatSrcLine_ = (n, l, c) => n;
     let data = {}, parent = {};
     let calculator = new codeHeatmapModule.CodeHeatmap(parent, data);
 

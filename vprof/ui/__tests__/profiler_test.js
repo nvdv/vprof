@@ -2,8 +2,8 @@
 
 const profilerModule = require('../profiler.js');
 
-describe('Profiler test suite', function() {
-  it('Dummy test', function() {
+describe('Profiler test suite', () => {
+  it('Dummy test', () => {
     expect(1).toBe(1);
   });
 });
