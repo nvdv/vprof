@@ -11,10 +11,33 @@ except ImportError:
     from unittest import mock
 
 
-# TODO(nvdv): Write unittest for this function.
 class GetPackageCodeUnittest(unittest.TestCase):
-    def testGetPackageCode(self):
-        pass
+
+    @mock.patch('pkgutil.iter_modules')
+    @mock.patch('os.path.exists')
+    @mock.patch('vprof.base_profiler.compile')
+    def testGetPackageCode(self, compile_mock, exists_mock, iter_modules_mock):
+        package_path = mock.MagicMock()
+        _ = mock.MagicMock()
+        modname1, modname2 = 'module1', 'module2'
+        fobj1, fobj2 = mock.MagicMock(), mock.MagicMock()
+        fobj1.path = '/path/to/module'
+        fobj2.path = '/path/to/module'
+        iter_modules_mock.return_value = [
+            (fobj1, modname1, _), (fobj2, modname2, _)]
+        exists_mock.return_value = True
+        code = 'src_code'
+        compiled_code = compile_mock.return_value
+
+        with mock.patch('vprof.base_profiler.open',
+                        mock.mock_open(read_data=code)):
+            result = base_profiler.get_package_code(package_path)
+        print(result)
+
+        self.assertDictEqual(
+            result,
+            {'/path/to/module/module1.py': (code, compiled_code),
+             '/path/to/module/module2.py': (code, compiled_code)})
 
 
 class BaseProfileUnittest(unittest.TestCase):
