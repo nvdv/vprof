@@ -10,7 +10,7 @@ const memoryStatsModule = require('./memory_stats.js');
 const profilerModule = require('./profiler.js');
 
 const JSON_URI = 'profile';
-const POLL_INTERVAL = 200;  // msec
+const POLL_INTERVAL = 100;  // msec
 
 /**
  * Creates empty div with specified ID.
@@ -186,23 +186,15 @@ function main() {
     .append('div')
     .attr('id', 'main-progress-indicator');
 
-  // TODO (nvdv): Simplify this code.
-  d3.json(JSON_URI, (data) => {
-    if (Object.keys(data).length !== 0) {
-      progressIndicator.remove();
-      renderPage(data);
-    } else {
-      let timerId = setInterval(function() {
-        d3.json(JSON_URI, (data) => {
-          if (Object.keys(data).length !== 0) {
-            progressIndicator.remove();
-            clearInterval(timerId);
-            renderPage(data);
-          }
-        });
-      }, POLL_INTERVAL);
-    }
-  });
+  let timerId = setInterval(() => {
+    d3.json(JSON_URI, (data) => {
+      if (Object.keys(data).length !== 0) {
+        progressIndicator.remove();
+        clearInterval(timerId);
+        renderPage(data);
+      }
+    });
+  }, POLL_INTERVAL);
 }
 
 main();
