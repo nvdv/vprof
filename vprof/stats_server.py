@@ -72,10 +72,8 @@ class StatsHandler(http_server.SimpleHTTPRequestHandler):
 
     def _handle_other(self):
         """Handles static files requests."""
-        res_basename = os.path.basename(self.path)
         res_filename = os.path.join(
-            os.path.dirname(__file__), _STATIC_DIR,
-            res_basename)
+            os.path.dirname(__file__), _STATIC_DIR, self.path[1:])
         with io.open(res_filename, 'rb') as res_file:
             content = res_file.read()
         _, extension = os.path.splitext(self.path)

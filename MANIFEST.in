@@ -1,10 +1,10 @@
 include vprof/ui/profile.html
 include vprof/ui/vprof_min.js
-include vprof/ui/code_heatmap.css
-include vprof/ui/flame_graph.css
-include vprof/ui/memory_stats.css
-include vprof/ui/profiler.css
-include vprof/ui/vprof.css
+include vprof/ui/css/code_heatmap.css
+include vprof/ui/css/flame_graph.css
+include vprof/ui/css/memory_stats.css
+include vprof/ui/css/profiler.css
+include vprof/ui/css/vprof.css
 include vprof/ui/progress.gif
 include vprof/ui/favicon.ico
 include requirements.txt

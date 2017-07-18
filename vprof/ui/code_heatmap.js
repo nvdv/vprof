@@ -6,7 +6,7 @@
 const d3 = require('d3');
 const hljs = require('highlight.js');
 try {
-  require('./highlight.css');  // Includes code highlighter CSS.
+  require('./css/highlight.css');  // Includes code highlighter CSS.
 } catch (e) {
   // Do nothing, it's workaround for Jest test runner.
 }
