@@ -1,4 +1,4 @@
-"""Module for statistical profiler."""
+"""Flame graph module."""
 import inspect
 import runpy
 import signal
@@ -35,9 +35,7 @@ class _StatProfiler(object):
         signal.setitimer(signal.ITIMER_PROF, 0)
 
     def sample(self, signum, frame):  #pylint: disable=unused-argument
-        """Samples current stack and stores result in self._stats.
-
-        Used as callback.
+        """Samples current stack and adds result in self._stats.
 
         Args:
             signum: Signal that activates handler.
@@ -57,12 +55,10 @@ class _StatProfiler(object):
     def _insert_stack(stack, sample_count, call_tree):
         """Inserts stack into the call tree.
 
-        Also creates all intermediate nodes in the call tree.
-
         Args:
-            stack: Call stack to be inserted.
-            sample_count: Sample count for call stack.
-            call_tree: Python dict representing the call tree.
+            stack: Call stack.
+            sample_count: Sample count of call stack.
+            call_tree: Call tree.
         """
         curr_level = call_tree
         for func in stack:
@@ -106,7 +102,7 @@ class _StatProfiler(object):
 
     @property
     def call_tree(self):
-        """Returns call tree from statistical profiler."""
+        """Returns call tree."""
         call_tree = {'stack': 'base', 'sampleCount': 0, 'children': []}
         for stack, sample_count in self._stats.items():
             self._insert_stack(reversed(stack), sample_count, call_tree)
@@ -118,13 +114,13 @@ class _StatProfiler(object):
 
 
 class FlameGraphProfiler(base_profiler.BaseProfiler):
-    """Flame graph profiler wrapper.
+    """Statistical profiler wrapper.
 
-    Runs statistical profiler and returns obtained stats.
+    Runs statistical profiler and returns collected stats.
     """
 
     def _profile_package(self):
-        """Runs statistical profiler on packages."""
+        """Runs statistical profiler on a package."""
         with _StatProfiler() as prof:
             prof.base_frame = inspect.currentframe()
             try:
@@ -146,7 +142,7 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
         return base_profiler.run_in_separate_process(self._profile_package)
 
     def _profile_module(self):
-        """Runs statistical profiler on module."""
+        """Runs statistical profiler on a module."""
         with open(self._run_object, 'rb') as srcfile, _StatProfiler() as prof:
             code = compile(srcfile.read(), self._run_object, 'exec')
             prof.base_frame = inspect.currentframe()
@@ -169,7 +165,7 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
         return base_profiler.run_in_separate_process(self._profile_module)
 
     def profile_function(self):
-        """Runs statistical profiler on function."""
+        """Runs statistical profiler on a function."""
         with _StatProfiler() as prof:
             self._run_object(*self._run_args, **self._run_kwargs)
 

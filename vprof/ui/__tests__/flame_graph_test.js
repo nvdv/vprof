@@ -18,5 +18,4 @@ describe('CPU flame graph test suite', () => {
     expect(flameGraphModule.FlameGraph.getTruncatedNodeName_(node, 500))
       .toBe('foo:10 (bar.py)');
   });
-
 });

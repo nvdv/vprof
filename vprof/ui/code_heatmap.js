@@ -1,12 +1,12 @@
 /**
- * @file Code heatmap rendering.
+ * @file Code heatmap UI module.
  */
 
 'use strict';
 const d3 = require('d3');
 const hljs = require('highlight.js');
 try {
-  require('./css/highlight.css');  // Includes code highlighter CSS.
+  require('./css/highlight.css');  // Necessary for code highlighter to work.
 } catch (e) {
   // Do nothing, it's workaround for Jest test runner.
 }
@@ -20,6 +20,7 @@ try {
  * @property {number} MAX_RUN_COUNT - Max value for line execution count.
  * @property {string} MIN_RUN_COLOR - Color that represents MIN_RUN_COUNT.
  * @property {string} MAX_RUN_COLOR - Color that represents MAX_RUN_COUNT.
+ * @property {string} HELP_MESSAGE - Tooltip help message.
  */
 function CodeHeatmap(parent, data) {
   this.MIN_RUN_TIME = 0.000001;
@@ -112,8 +113,8 @@ CodeHeatmap.prototype.render = function() {
 };
 
 /**
- * Shows module tooltip with running time.
- * @param {Object} tooltip - Element representing tooltip.
+ * Shows tooltip with module running time.
+ * @param {Object} tooltip - Tooltip element.
  * @param {number} moduleTime - Module running time.
  * @param {number} totalTime - Total running time.
  */
@@ -129,19 +130,19 @@ CodeHeatmap.prototype.showModuleTooltip_ = function(tooltip, moduleTime,
 };
 
 /**
- * Hides module tooltip.
- * @param {Object} tooltip - Element representing tooltip.
+ * Hides tooltip with module running time.
+ * @param {Object} tooltip - Tooltip element.
  */
 CodeHeatmap.prototype.hideModuleTooltip_ = function(tooltip) {
   tooltip.attr('class', 'content-tooltip content-tooltip-invisible');
 };
 
 /**
- * Shows line execution count inside code tooltip and adds line highlighting.
- * @param {Object} element - Element representing highlighted line.
- * @param {Object} tooltip - Element representing tooltip.
- * @param {Object} sources - Object that represents sources with stats.
- * @param {number} fileIndex - Index of file with source code.
+ * Shows tooltip with line running time.
+ * @param {Object} element - Highlighted line.
+ * @param {Object} tooltip - Tooltip element.
+ * @param {Object} sources - Code and code stats.
+ * @param {number} fileIndex - Index of source code file.
  * @param {number} lineIndex - Index of line in file.
  * @param {number} totalTime - Module running time.
  */
@@ -164,7 +165,7 @@ CodeHeatmap.prototype.showCodeTooltip_ = function(
 };
 
 /**
- * Hides code tooltip and removes line highlighting.
+ * Hides tooltip with line running time.
  * @param {Object} element - Element representing highlighted line.
  * @param {Object} tooltip - Element representing tooltip.
  */
@@ -174,8 +175,8 @@ CodeHeatmap.prototype.hideCodeTooltip_ = function(element, tooltip) {
 };
 
 /**
- * Renders source code.
- * @param {Object} stats - Object that contains source code and all code stats.
+ * Renders profiled sources.
+ * @param {Object} stats - Source code and all code stats.
  * @returns {Object}
  */
 CodeHeatmap.prototype.renderCode_ = function(stats) {
@@ -202,10 +203,10 @@ CodeHeatmap.prototype.renderCode_ = function(stats) {
 };
 
 /**
- * Formats single line of Python source file.
- * @param {number} lineNumber - Line number for code browser.
- * @param {string} codeLine - Source line.
- * @param {number} lineRuntime - Line run time.
+ * Formats single line of source code.
+ * @param {number} lineNumber - Line number in code browser.
+ * @param {string} codeLine - Current line of source code.
+ * @param {number} lineRuntime - Line runtime.
  * @returns {string}
  */
 CodeHeatmap.prototype.formatSrcLine_ = function(lineNumber, codeLine,
@@ -228,8 +229,8 @@ CodeHeatmap.prototype.renderHelp_ = function() {
 };
 
 /**
- * Renders code heatmap and attaches it to parent.
- * @param {Object} parent - Parent element for code heatmap.
+ * Renders code heatmap and attaches it to the parent.
+ * @param {Object} parent - Code heatmap parent element.
  * @param {Object} data - Data for code heatmap rendering.
  */
 function renderCodeHeatmap(data, parent) {

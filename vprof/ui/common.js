@@ -1,5 +1,5 @@
 /**
- * @file Common UI functions.
+ * @file Module for common UI functions.
  */
 
 'use strict';

@@ -1,4 +1,4 @@
-"""Program stats server."""
+"""Profiler server."""
 import functools
 import gzip
 import io
@@ -23,7 +23,6 @@ def compress_data(data):
     """
     out_fileobj = BytesIO()
     with gzip.GzipFile(fileobj=out_fileobj, mode="w") as f:
-        # Convert to bytes for Python 3
         if sys.version_info[0] >= 3 and isinstance(data, str):
             f.write(bytes(data, 'utf-8'))
         else:
@@ -109,17 +108,17 @@ class StatsHandler(http_server.SimpleHTTPRequestHandler):
             self.end_headers()
 
 
-def start(host, port, profile_stats, dont_start_browser, debug_mode):
+def start(host, port, profiler_stats, dont_start_browser, debug_mode):
     """Starts HTTP server with specified parameters.
 
     Args:
-        host: Server hostname.
+        host: Server host name.
         port: Server port.
-        profile_stats: Dict with collected progran stats.
-        dont_start_browser: Whether to start browser after profiling.
+        profiler_stats: A dict with collected program stats.
+        dont_start_browser: Whether to open browser after profiling.
         debug_mode: Whether to redirect stderr to /dev/null.
     """
-    stats_handler = functools.partial(StatsHandler, profile_stats)
+    stats_handler = functools.partial(StatsHandler, profiler_stats)
     if not debug_mode:
         sys.stderr = open(os.devnull, 'w')
     print('Starting HTTP server...')

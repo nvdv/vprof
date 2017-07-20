@@ -1,4 +1,4 @@
-"""Memory profile end to end tests."""
+"""End-to-end tests for memory profiler module."""
 # pylint: disable=missing-docstring, blacklisted-name
 import functools
 import json

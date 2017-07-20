@@ -1,4 +1,4 @@
-"""Module for code heatmap rendering."""
+"""Code heatmap module."""
 import inspect
 import operator
 import os
@@ -13,8 +13,8 @@ from vprof import base_profiler
 class _CodeHeatmapCalculator(object):
     """Calculates Python code heatmap.
 
-    Class that contains all logic related to calculating execution heatmap
-    for Python program.
+    Class that contains all logic related to calculating code heatmap
+    for a Python program.
     """
 
     def __init__(self):
@@ -73,10 +73,7 @@ class _CodeHeatmapCalculator(object):
 
 
 class CodeHeatmapProfiler(base_profiler.BaseProfiler):
-    """Code heatmap wrapper.
-
-    Contains all logic related to heatmap calculation and processing.
-    """
+    """Code heatmap wrapper."""
 
     SKIP_LINES = 10
     MIN_SKIP_SIZE = 100
@@ -88,7 +85,7 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
             abs_path = (modname if os.path.isabs(modname)
                         else os.path.abspath(modname))
             heatmap = prof.heatmap.get(abs_path)
-            if not heatmap:  # If no heatmap - skip module.
+            if not heatmap:
                 continue
             exec_count = prof.execution_count[abs_path]
             sources = src_code.split('\n')
@@ -104,8 +101,8 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
         return sorted(package_heatmap, key=operator.itemgetter('name'))
 
     def _calc_skips(self, heatmap, num_lines):
-        """Calculates line skip map for large sources.
-        Skip map is a list of tuples, where first element of tuple is line
+        """Calculates skip map for large sources.
+        Skip map is a list of tuples where first element of tuple is line
         number and second is length of the skip region:
             [(1, 10), (15, 10)] means skipping 10 lines after line 1 and
             10 lines after line 15.

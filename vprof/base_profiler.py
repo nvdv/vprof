@@ -11,8 +11,7 @@ def get_package_code(package_path):
     Args:
         package_path: Path to Python package.
     Returns:
-        A dict containing non-compiled and compiled code for package
-        specified by package name.
+        A dict containing non-compiled and compiled code for package.
     """
     import pkgutil
 
@@ -28,7 +27,7 @@ def get_package_code(package_path):
 
 
 def hash_name(name):
-    """Hashes name and trims resulting hash."""
+    """Computes hash of the name."""
     return zlib.adler32(name.encode('utf-8'))
 
 
@@ -36,11 +35,10 @@ class ProcessWithException(multiprocessing.Process):
     """Process subclass that propagates exceptions to parent process.
 
     Also handles sending function output to parent process.
-
     Args:
         parent_conn: Parent end of multiprocessing.Pipe.
         child_conn: Child end of multiprocessing.Pipe.
-        result: Result that self._target returns.
+        result: Result of the child process.
     """
 
     def __init__(self, result, *args, **kwargs):
@@ -70,7 +68,7 @@ class ProcessWithException(multiprocessing.Process):
 def run_in_separate_process(func, *args, **kwargs):
     """Runs function in separate process.
 
-    This function is used instead of decorator, since Python multiprocessing
+    This function is used instead of a decorator, since Python multiprocessing
     module can't serialize decorated function on all platforms.
     """
     manager = multiprocessing.Manager()
@@ -92,7 +90,7 @@ class BaseProfiler(object):
         """Initializes wrapper.
 
         Args:
-            run_object: object that will be run under profiler.
+            run_object: object that will be profiled.
         """
         self._set_run_object_type(run_object)
         if self._is_run_obj_module:
@@ -109,7 +107,7 @@ class BaseProfiler(object):
         self._object_name = None
 
     def _set_run_object_type(self, run_object):
-        """Sets type flags depending on run_object value."""
+        """Sets type flags depending on run_object type."""
         self._is_run_obj_function, self._is_run_obj_package = False, False
         self._is_run_obj_module = False
         if isinstance(run_object, tuple):
@@ -132,24 +130,24 @@ class BaseProfiler(object):
     def profile_package(self):
         """Profiles package specified by filesystem path.
 
-        Runs object specified by self._run_object as package specified by
-        path in filesystem. Must be overridden in child classes.
+        Runs object specified by self._run_object as a package specified by
+        filesystem path. Must be overridden.
         """
         raise NotImplementedError
 
     def profile_module(self):
         """Profiles module.
 
-        Runs object specified by self._run_object as Python module.
-        Must be overridden in child classes.
+        Runs object specified by self._run_object as a Python module.
+        Must be overridden.
         """
         raise NotImplementedError
 
     def profile_function(self):
         """Profiles function.
 
-        Runs object specified by self._run_object as Python function with args.
-        Must be overridden in child classes.
+        Runs object specified by self._run_object as a Python function.
+        Must be overridden.
         """
         raise NotImplementedError
 

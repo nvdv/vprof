@@ -1,4 +1,4 @@
-"""Runtime profile end to end tests."""
+"""End-to-end tests for flame graph module."""
 # pylint: disable=missing-docstring, blacklisted-name, protected-access
 import functools
 import json

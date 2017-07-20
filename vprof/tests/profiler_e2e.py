@@ -1,3 +1,4 @@
+"""End-to-end tests for Python profiler wrapper."""
 # pylint: disable=missing-docstring, blacklisted-name
 import functools
 import json

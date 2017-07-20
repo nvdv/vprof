@@ -1,4 +1,4 @@
-"""Module that contains vprof runtime logic."""
+"""Module with functions that run profilers."""
 # pylint: disable=wrong-import-position
 import os
 import psutil
@@ -43,22 +43,22 @@ class AmbiguousConfigurationError(Error):
 
 
 class BadOptionError(Error):
-    """Raised when unknown options is present in configuration."""
+    """Raised when unknown options are present in the configuration."""
     pass
 
 
 def run_profilers(run_object, prof_config, verbose=False):
-    """Runs profilers against run_object.
+    """Runs profilers on run_object.
 
     Args:
-        run_object: An object (string or tuple) to run profilers agaist.
+        run_object: An object (string or tuple) for profiling.
         prof_config: A string with profilers configuration.
         verbose: True if info about running profilers should be shown.
     Returns:
         An ordered dictionary with collected stats.
     Raises:
         AmbiguousConfigurationError: when prof_config is ambiguous.
-        BadOptionError: when unknown option is present in configuration.
+        BadOptionError: when unknown options are present in configuration.
     """
     if len(prof_config) > len(set(prof_config)):
         raise AmbiguousConfigurationError(
@@ -80,14 +80,14 @@ def run_profilers(run_object, prof_config, verbose=False):
 
 
 def run(func, options, args=(), kwargs={}, host='localhost', port=8000):  # pylint: disable=dangerous-default-value
-    """Runs profilers specified by options against func.
+    """Runs profilers on function.
     Args:
         func: Python function object.
-        options: A string with profilers configuration (i.e. 'cmh').
+        options: String with profilers configuration (i.e. 'cmh').
         args: Arguments to pass to func.
         kwargs: Keyword arguments to pass to func.
-        host: Host to send profilers data.
-        port: Port to send profilers.data.
+        host: Host to send collected data to.
+        port: Port to send collected data to.
     """
     run_stats = run_profilers((func, args, kwargs), options)
     post_data = stats_server.compress_data(

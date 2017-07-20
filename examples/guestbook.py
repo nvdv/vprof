@@ -17,8 +17,6 @@ and
     curl --data "name=foo&message=bar" http://127.0.0.1:5000/profile/add
 
 Check profiler_handler source code below for details.
-
-Note that vprof -r should be relaunched after each run.
 """
 
 import contextlib

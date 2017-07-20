@@ -1,5 +1,5 @@
 /**
- * @file CPU flame graph rendering.
+ * @file Flame graph UI module.
  */
 
 'use strict';
@@ -8,7 +8,7 @@ const common = require('./common');
 const d3 = require('d3');
 
 /**
- * Represents CPU flame graph.
+ * Represents flame graph.
  * @constructor
  * @param {Object} parent - Parent element for flame graph.
  * @param {Object} data - Data for flame graph rendering.
@@ -89,7 +89,6 @@ FlameGraph.prototype.render = function() {
       return nodeHeight > this.MIN_TEXT_HEIGHT ? 'visible': 'hidden';
     });
 
-  // Zoom.
   nodes.on('click', (d) => this.zoomIn_(d, nodes, titles));
   canvas.on('dblclick', (d) => this.zoomOut_(nodes, titles));
 };
@@ -130,7 +129,7 @@ FlameGraph.prototype.zoomOut_ = function(allNodes, titles) {
 };
 
 /**
- * Redraws node titles based on current xScale and yScale.
+ * Redraws node titles based on current xScale and yScale states.
  * @param {Object} titles - All flame graph node titles.
  */
 FlameGraph.prototype.redrawTitles_ = function(titles) {
@@ -147,10 +146,10 @@ FlameGraph.prototype.redrawTitles_ = function(titles) {
 };
 
 /**
- * Shows tooltip and flame graph node highlighting.
- * @param {Object} element - Element representing flame graph node.
- * @param {Object} tooltip - Element representing tooltip.
- * @param {Object} node - Object representing function call info.
+ * Shows tooltip and highlights flame graph node.
+ * @param {Object} element - Flame graph node.
+ * @param {Object} tooltip - Tooltip element.
+ * @param {Object} node - Function call info.
  */
 FlameGraph.prototype.showTooltip_ = function(element, tooltip, node) {
   d3.select(element).attr('class', 'flame-graph-rect-highlight');
@@ -166,9 +165,9 @@ FlameGraph.prototype.showTooltip_ = function(element, tooltip, node) {
 };
 
 /**
- * Hides tooltip and removes node highlighting.
- * @param {Object} element - Element representing highlighted rectangle.
- * @param {Object} tooltip - Element representing tooltip.
+ * Hides tooltip.
+ * @param {Object} element - Highlighted flame graph node.
+ * @param {Object} tooltip - Tooltip element.
  */
 FlameGraph.prototype.hideTooltip_ = function(element, tooltip) {
   d3.select(element).attr('class', 'flame-graph-rect-normal');
@@ -212,15 +211,16 @@ FlameGraph.getNodeName_ = function(d) {
 };
 
 /**
- * Truncates function name depending on flame graph rectangle length.
+ * TODO(nvdv): Refactor this function
+ * Truncates function name depending on flame graph node length.
  * @static
- * @param (Object) d - Object representing function info.
- * @param {number} rectLength - Length of flame graph rectangle.
+ * @param {Object} d - Function info.
+ * @param {number} rectLength - Length of flame graph node.
  * @returns {string}
  */
 FlameGraph.getTruncatedNodeName_ = function(d, rectLength) {
   let fullname = FlameGraph.getNodeName_(d);
-  let maxSymbols = rectLength / 10;  // Approx. 10 pixels per character.
+  let maxSymbols = rectLength / 10;  // ~10 pixels per character.
   if (maxSymbols <= 3) {
     return '';  // Return empty string if rectangle is too small.
   }
@@ -228,8 +228,8 @@ FlameGraph.getTruncatedNodeName_ = function(d, rectLength) {
 };
 
 /**
- * Renders flame graph and attaches it to parent.
- * @param {Object} parent - Parent element for flame graph.
+ * Renders flame graph and attaches it to the parent.
+ * @param {Object} parent - Flame graph parent element.
  * @param {Object} data - Data for flame graph rendering.
  */
 function renderFlameGraph(data, parent) {

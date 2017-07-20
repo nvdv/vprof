@@ -1,4 +1,4 @@
-"""Code heatmap end to end tests."""
+"""End-to-end tests for code heatmap module."""
 # pylint: disable=missing-docstring, blacklisted-name
 import functools
 import json

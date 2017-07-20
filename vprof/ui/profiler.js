@@ -1,5 +1,5 @@
 /**
- * @file Profiler output rendering.
+ * @file Profiler wrapper UI module.
  */
 
 'use strict';
@@ -8,10 +8,10 @@ const common = require('./common');
 const d3 = require('d3');
 
 /**
- * Represents Python profiler output.
+ * Represents Python profiler UI.
  * @constructor
  * @param {Object} parent - Parent element for profiler output.
- * @param {Object} data - Data for rendering.
+ * @param {Object} data - Data for output rendering.
  */
 function Profiler(parent, data) {
   this.PATH_CHAR_COUNT = 70;
@@ -84,10 +84,10 @@ Profiler.prototype.render = function() {
 };
 
 /**
- * Shows tooltip.
- * @param {Object} element - Element representing profiler record.
- * @param {Object} tooltip - Element representing tooltip.
- * @param {Object} node - Object with profiler record info.
+ * Shows record tooltip.
+ * @param {Object} element - Profiler record element.
+ * @param {Object} tooltip - Tooltip element.
+ * @param {Object} node - Profiler record info
  */
 Profiler.prototype.showTooltip_ = function(element, tooltip, node) {
   d3.select(element).attr('class', 'profiler-record-highlight');
@@ -105,9 +105,9 @@ Profiler.prototype.showTooltip_ = function(element, tooltip, node) {
 };
 
 /**
- * Hides tooltip.
- * @param {Object} element - Element representing profiler record.
- * @param {Object} tooltip - Element representing tooltip.
+ * Hides record tooltip.
+ * @param {Object} element - Profiler record element.
+ * @param {Object} tooltip - Tooltip element.
  */
 Profiler.prototype.hideTooltip_ = function(element, tooltip) {
   d3.select(element).attr('class', 'profiler-record-normal');
@@ -127,7 +127,7 @@ Profiler.prototype.renderLegend_ = function(parent) {
           '<p><b>Total calls:</b> ' + this.data_.totalCalls + '</p>');
 };
 
-/** Renders profiler output help. */
+/** Renders profiler tab help. */
 Profiler.prototype.renderHelp_ = function() {
   this.parent_.append('div')
     .attr('class', 'tabhelp inactive-tabhelp')
@@ -135,8 +135,8 @@ Profiler.prototype.renderHelp_ = function() {
 };
 
 /**
- * Renders profiler output and attaches it to parent.
- * @param {Object} parent - Parent element for profiler output.
+ * Renders profiler output and attaches it to the parent.
+ * @param {Object} parent - Profiler output parent element.
  * @param {Object} data - Data for profiler output.
  */
 function renderProfilerOutput(data, parent) {

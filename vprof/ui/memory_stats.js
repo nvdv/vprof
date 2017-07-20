@@ -1,5 +1,5 @@
 /**
- * @file Memory chart rendering.
+ * @file Memory profiler UI module.
  */
 
 'use strict';
@@ -32,12 +32,11 @@ function MemoryChart(parent, data) {
   this.data_ = data;
   this.parent_ = parent;
 
-  // Memory view div size should be specified in CSS to render
-  // SVG graph correctly.
+  // Memory view div size should be specified in CSS to render SVG correctly.
   this.memoryView_ = this.parent_.append('div')
     .attr('class', 'memory-info-container');
   this.objectsTable_ = this.memoryView_.append('div')
-    .attr('class', 'memory-table-wrapper') // To display overflow correctly.
+    .attr('class', 'memory-table-wrapper')
     .append('div')
     .attr('class', 'memory-objects-table');
   this.memoryUsageGraph_ = this.memoryView_.append('div')
@@ -65,7 +64,7 @@ function MemoryChart(parent, data) {
     .ticks(this.TICKS_NUMBER)
     .tickFormat(d3.format(',.0f'));
 
-  // Set tick values explicitly when number of events is low.
+  // Set tick values explicitly when number of events is small.
   if (this.data_.codeEvents.length < this.TICKS_NUMBER) {
     let tickValues = [];
     for (let i = 0; i < this.data_.codeEvents.length; i++) {
@@ -122,7 +121,6 @@ MemoryChart.prototype.render = function() {
     .attr('class', 'memory-graph-focus-line')
     .attr('x1', 0);
 
-  // Draw axes.
   let xGroup = canvas.append('g')
     .attr('class', 'x memory-graph-axis')
     .attr('transform', 'translate(0,' + this.GRAPH_HEIGHT + ')')
@@ -172,11 +170,11 @@ MemoryChart.prototype.renderLegend_ = function() {
 };
 
 /**
- * Hides focus, it's guiding lines and tooltip.
- * @param {Object} focus - Object representing focus circle.
- * @param {Object} tooltip - Object representing tooltip.
- * @param {Object} focusXLine - Object representing focus line parallel to OY.
- * @param {Object} focusYLine - Object representing focus line parallel to OX.
+ * Hides graph focus, guiding lines and tooltip.
+ * @param {Object} focus - Focus circle.
+ * @param {Object} tooltip - Graph tooltip.
+ * @param {Object} focusXLine - Guiding line parallel to OY.
+ * @param {Object} focusYLine - Guiding line parallel to OX.
  */
 MemoryChart.prototype.hideFocus_ = function(focus, tooltip, focusXLine,
   focusYLine) {
@@ -187,11 +185,11 @@ MemoryChart.prototype.hideFocus_ = function(focus, tooltip, focusXLine,
 };
 
 /**
- * Shows focus, it's guiding lines and tooltip.
- * @param {Object} focus - Object representing focus circle.
- * @param {Object} tooltip - Object representing tooltip.
- * @param {Object} focusXLine - Object representing focus line parallel to OY.
- * @param {Object} focusYLine - Object representing focus line parallel to OX.
+ * Shows graph focus, guiding lines and tooltip.
+ * @param {Object} focus - Focus circle.
+ * @param {Object} tooltip - Graph tooltip.
+ * @param {Object} focusXLine - Guiding line parallel to OY.
+ * @param {Object} focusYLine - Guiding line parallel to OX.
  */
 MemoryChart.prototype.showFocus_ = function(focus, focusXLine, focusYLine) {
   focus.style('display', null);
@@ -200,12 +198,12 @@ MemoryChart.prototype.showFocus_ = function(focus, focusXLine, focusYLine) {
 };
 
 /**
- * Redraws focus, it's guiding lines and tooltip.
- * @param {Object} canvas - Object representing canvas.
- * @param {Object} focus - Object representing focus circle.
- * @param {Object} tooltip - Object representing tooltip.
- * @param {Object} focusXLine - Object representing focus line parallel to OY.
- * @param {Object} focusYLine - Object representing focus line parallel to OX.
+ * Redraws graph focus, guiding lines and tooltip.
+ * @param {Object} canvas - Graph canvas.
+ * @param {Object} focus - Focus circle.
+ * @param {Object} tooltip - Graph tooltip.
+ * @param {Object} focusXLine - Guiding line parallel to OY.
+ * @param {Object} focusYLine - Guiding line parallel to OX.
  */
 MemoryChart.prototype.redrawFocus_ = function(canvas, focus, tooltip,
   focusXLine, focusYLine) {
@@ -236,8 +234,8 @@ MemoryChart.prototype.redrawFocus_ = function(canvas, focus, tooltip,
 /**
  * Generates tooltip text from line stats.
  * @static
- * @param {Object[]} stats - Line memory stats.
- * @returns {string} - Text for tooltip with line stats.
+ * @param {Object[]} stats - Memory stats of line of code.
+ * @returns {string}
  */
 MemoryChart.generateTooltipText_ = function(stats) {
   let result = '';
@@ -290,8 +288,8 @@ MemoryChart.prototype.renderObjectsTable_ = function() {
 };
 
 /**
- * Renders memory chart and attaches it to parent.
- * @param {Object} parent - Parent element for memory chart.
+ * Renders memory chart and attaches it to the parent.
+ * @param {Object} parent - Memory chart parent element.
  * @param {Object} data - Data for memory chart rendering.
  */
 function renderMemoryStats(data, parent) {
