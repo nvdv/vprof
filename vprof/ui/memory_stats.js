@@ -238,7 +238,7 @@ class MemoryChart {
    * @param {Object[]} stats - Memory stats of line of code.
    * @returns {string}
    */
-  generateTooltipText_(stats) {
+  static generateTooltipText_(stats) {
     let result = '';
     if (stats) {
       let functionName = stats[3].replace('<', '[').replace('>',  ']');
