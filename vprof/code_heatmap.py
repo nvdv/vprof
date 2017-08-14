@@ -1,6 +1,5 @@
 """Code heatmap module."""
 import inspect
-import operator
 import os
 import runpy
 import sys
@@ -20,11 +19,11 @@ class _CodeHeatmapCalculator(object):
     def __init__(self):
         self.all_code = set()
         self.original_trace_function = sys.gettrace()
-        self._execution_count = defaultdict(lambda: defaultdict(int))
-        self._heatmap = defaultdict(lambda: defaultdict(float))
         self.prev_lineno = None
         self.prev_filename = None
         self.prev_timestamp = None
+        self._execution_count = defaultdict(lambda: defaultdict(int))
+        self._heatmap = defaultdict(lambda: defaultdict(float))
 
     def add_code(self, code):
         """Recursively adds code to be examined."""
@@ -78,28 +77,6 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
     SKIP_LINES = 10
     MIN_SKIP_SIZE = 100
 
-    def _consodalidate_stats(self, package_code, prof):
-        """Merges profiler stats and package_code."""
-        package_heatmap = []
-        for modname, (src_code, _) in package_code.items():
-            abs_path = (modname if os.path.isabs(modname)
-                        else os.path.abspath(modname))
-            heatmap = prof.heatmap.get(abs_path)
-            if not heatmap:
-                continue
-            exec_count = prof.execution_count[abs_path]
-            sources = src_code.split('\n')
-            skip_map = self._calc_skips(heatmap, len(sources))
-            run_time = sum(time for time in heatmap.values())
-            package_heatmap.append({
-                'name': modname,
-                'heatmap': heatmap,
-                'executionCount': exec_count,
-                'srcCode': self._skip_lines(sources, skip_map),
-                'runTime': run_time
-            })
-        return sorted(package_heatmap, key=operator.itemgetter('name'))
-
     def _calc_skips(self, heatmap, num_lines):
         """Calculates skip map for large sources.
         Skip map is a list of tuples where first element of tuple is line
@@ -148,17 +125,37 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
                 runpy.run_path(self._run_object, run_name='__main__')
             except SystemExit:
                 pass
-        package_heatmap = self._consodalidate_stats(pkg_code, prof)
-        run_time = sum(heatmap['runTime'] for heatmap in package_heatmap)
+
+        heatmaps = []
+        for filename, heatmap in prof.heatmap.items():
+            heatmaps.append(
+                self._format_heatmap(
+                    filename, heatmap, prof.execution_count[filename]))
+
+        run_time = sum(heatmap['runTime'] for heatmap in heatmaps)
         return {
             'objectName': self._run_object,
             'runTime': run_time,
-            'heatmaps': package_heatmap
+            'heatmaps': heatmaps
         }
 
     def profile_package(self):
         """Runs package profiler in separate process."""
         return base_profiler.run_in_separate_process(self._profile_package)
+
+    def _format_heatmap(self, filename, heatmap, execution_count):
+        """Formats heatmap for UI."""
+        with open(filename) as src_file:
+            file_source = src_file.read().split('\n')
+            skip_map = self._calc_skips(heatmap, len(file_source))
+            run_time = sum(time for time in heatmap.values())
+        return {
+            'name': filename,
+            'heatmap': heatmap,
+            'executionCount': execution_count,
+            'srcCode': self._skip_lines(file_source, skip_map),
+            'runTime': run_time
+        }
 
     def _profile_module(self):
         """Calculates heatmap for module."""
@@ -171,22 +168,18 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
                 exec(code, self._globs, None)
         except SystemExit:
             pass
-        abspath = os.path.abspath(self._run_object)
-        heatmap = prof.heatmap[abspath]
-        execution_count = prof.execution_count[abspath]
-        sources = src_code.split('\n')
-        skip_map = self._calc_skips(heatmap, len(sources))
-        run_time = sum(time for time in heatmap.values())
+
+        heatmaps = []
+        for filename, heatmap in prof.heatmap.items():
+            heatmaps.append(
+                self._format_heatmap(
+                    filename, heatmap, prof.execution_count[filename]))
+
+        run_time = sum(heatmap['runTime'] for heatmap in heatmaps)
         return {
             'objectName': self._run_object,
             'runTime': run_time,
-            'heatmaps': [{
-                'name': self._run_object,
-                'heatmap': heatmap,
-                'executionCount': execution_count,
-                'srcCode': self._skip_lines(sources, skip_map),
-                'runTime': run_time
-            }]
+            'heatmaps': heatmaps
         }
 
     def profile_module(self):

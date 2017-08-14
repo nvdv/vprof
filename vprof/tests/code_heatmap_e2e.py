@@ -55,7 +55,7 @@ class CodeHeatmapModuleEndToEndTest(unittest.TestCase):
         self.assertTrue(stats['runTime'] > 0)
         heatmaps = stats['heatmaps']
         self.assertEqual(len(heatmaps), 1)
-        self.assertEqual(heatmaps[0]['name'], _MODULE_FILENAME)
+        self.assertTrue(_MODULE_FILENAME in heatmaps[0]['name'])
         self.assertDictEqual(heatmaps[0]['executionCount'], {'1': 1})
         self.assertListEqual(heatmaps[0]['srcCode'], _DUMMY_MODULE_SOURCELINES)
 
