@@ -5,3 +5,4 @@ node_modules
 build
 dist
 vprof.egg-info
+.vscode
