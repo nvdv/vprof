@@ -39,15 +39,15 @@ class _CodeHeatmapCalculator(object):
 
     def __exit__(self, exc_type, exc_val, exc_tbf):
         """Disables heatmap calculator."""
+        sys.settrace(self.original_trace_function)
         if self.prev_lineno:
             self._heatmap[self.prev_filename][self.prev_lineno] += (
                 time.time() - self.prev_timestamp)
             self.prev_lineno = None
-        sys.settrace(self.original_trace_function)
 
     def calc_heatmap(self, frame, event, arg):  # pylint: disable=unused-argument
         """Calculates code heatmap."""
-        if event == 'line' and frame.f_code in self.all_code:
+        if event == 'line':
             if self.prev_lineno:
                 self._heatmap[self.prev_filename][self.prev_lineno] += (
                     time.time() - self.prev_timestamp)
@@ -117,10 +117,7 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
 
     def _profile_package(self):
         """Calculates heatmap for package."""
-        pkg_code = base_profiler.get_package_code(self._run_object)
         with _CodeHeatmapCalculator() as prof:
-            for _, compiled_code in pkg_code.values():
-                prof.add_code(compiled_code)
             try:
                 runpy.run_path(self._run_object, run_name='__main__')
             except SystemExit:
@@ -128,9 +125,10 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
 
         heatmaps = []
         for filename, heatmap in prof.heatmap.items():
-            heatmaps.append(
-                self._format_heatmap(
-                    filename, heatmap, prof.execution_count[filename]))
+            if os.path.isfile(filename):
+                heatmaps.append(
+                    self._format_heatmap(
+                        filename, heatmap, prof.execution_count[filename]))
 
         run_time = sum(heatmap['runTime'] for heatmap in heatmaps)
         return {
@@ -164,7 +162,6 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
                     _CodeHeatmapCalculator() as prof:
                 src_code = srcfile.read()
                 code = compile(src_code, self._run_object, 'exec')
-                prof.add_code(code)
                 exec(code, self._globs, None)
         except SystemExit:
             pass
@@ -189,7 +186,6 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
     def profile_function(self):
         """Calculates heatmap for function."""
         with _CodeHeatmapCalculator() as prof:
-            prof.add_code(self._run_object.__code__)
             self._run_object(*self._run_args, **self._run_kwargs)
         code_lines, start_line = inspect.getsourcelines(self._run_object)
         filename = os.path.abspath(inspect.getsourcefile(self._run_object))
