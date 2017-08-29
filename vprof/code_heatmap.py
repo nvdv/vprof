@@ -6,6 +6,7 @@ import sys
 import time
 
 from collections import defaultdict
+from collections import deque
 from vprof import base_profiler
 
 
@@ -20,55 +21,54 @@ class _CodeHeatmapCalculator(object):
         self.all_code = set()
         self.original_trace_function = sys.gettrace()
         self.prev_lineno = None
-        self.prev_filename = None
         self.prev_timestamp = None
+        self.prev_path = None
+        self.lines = deque()
         self._execution_count = defaultdict(lambda: defaultdict(int))
         self._heatmap = defaultdict(lambda: defaultdict(float))
 
-    def add_code(self, code):
-        """Recursively adds code to be examined."""
-        if code not in self.all_code:
-            self.all_code.add(code)
-            for subcode in filter(inspect.iscode, code.co_consts):
-                self.add_code(subcode)
-
     def __enter__(self):
         """Enables heatmap calculator."""
-        sys.settrace(self.calc_heatmap)
+        sys.settrace(self.record_line)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tbf):
         """Disables heatmap calculator."""
         sys.settrace(self.original_trace_function)
-        if self.prev_lineno:
-            self._heatmap[self.prev_filename][self.prev_lineno] += (
-                time.time() - self.prev_timestamp)
-            self.prev_lineno = None
+        if self.prev_timestamp:
+            runtime = time.time() - self.prev_timestamp
+            self.lines.append([self.prev_path, self.prev_lineno, runtime])
 
-    def calc_heatmap(self, frame, event, arg):  # pylint: disable=unused-argument
-        """Calculates code heatmap."""
+    def record_line(self, frame, event, arg):  # pylint: disable=unused-argument
+        """Records line execution time."""
         if event == 'line':
-            if self.prev_lineno:
-                self._heatmap[self.prev_filename][self.prev_lineno] += (
-                    time.time() - self.prev_timestamp)
-                self.prev_lineno = None
-            self._execution_count[frame.f_code.co_filename][frame.f_lineno] += 1
-            self.prev_filename = frame.f_code.co_filename
+            if self.prev_timestamp:
+                runtime = time.time() - self.prev_timestamp
+                self.lines.append([self.prev_path, self.prev_lineno, runtime])
             self.prev_lineno = frame.f_lineno
+            self.prev_path = os.path.abspath(frame.f_code.co_filename)
             self.prev_timestamp = time.time()
-        return self.calc_heatmap
+        return self.record_line
+
+    def fill_heatmap(self):
+        """Fills code heatmap and execution count dictionaries."""
+        for path, lineno, runtime in self.lines:
+            self._execution_count[path][lineno] += 1
+            self._heatmap[path][lineno] += runtime
 
     @property
     def heatmap(self):
         """Returns heatmap with absolute path names."""
-        return {os.path.abspath(fname): self._heatmap[fname]
-                for fname in self._heatmap}
+        if not self._heatmap:
+            self.fill_heatmap()
+        return self._heatmap
 
     @property
     def execution_count(self):
         """Returns execution count map with absolute path names."""
-        return {os.path.abspath(fname): self._execution_count[fname]
-                for fname in self._heatmap}
+        if not self._execution_count:
+            self.fill_heatmap()
+        return self._execution_count
 
 
 class CodeHeatmapProfiler(base_profiler.BaseProfiler):
@@ -168,9 +168,10 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
 
         heatmaps = []
         for filename, heatmap in prof.heatmap.items():
-            heatmaps.append(
-                self._format_heatmap(
-                    filename, heatmap, prof.execution_count[filename]))
+            if os.path.isfile(filename):
+                heatmaps.append(
+                    self._format_heatmap(
+                        filename, heatmap, prof.execution_count[filename]))
 
         run_time = sum(heatmap['runTime'] for heatmap in heatmaps)
         return {
