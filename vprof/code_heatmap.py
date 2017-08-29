@@ -157,11 +157,11 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
 
     def _profile_module(self):
         """Calculates heatmap for module."""
+        with open(self._run_object, 'r') as srcfile:
+            src_code = srcfile.read()
+            code = compile(src_code, self._run_object, 'exec')
         try:
-            with open(self._run_object, 'r') as srcfile, \
-                    _CodeHeatmapCalculator() as prof:
-                src_code = srcfile.read()
-                code = compile(src_code, self._run_object, 'exec')
+            with _CodeHeatmapCalculator() as prof:
                 exec(code, self._globs, None)
         except SystemExit:
             pass
