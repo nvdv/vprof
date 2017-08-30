@@ -32,8 +32,6 @@ class GetPackageCodeUnittest(unittest.TestCase):
         with mock.patch('vprof.base_profiler.open',
                         mock.mock_open(read_data=code)):
             result = base_profiler.get_package_code(package_path)
-        print(result)
-
         self.assertDictEqual(
             result,
             {'/path/to/module/module1.py': (code, compiled_code),

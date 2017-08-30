@@ -10,6 +10,13 @@ from collections import deque
 from vprof import base_profiler
 
 
+#TODO(nvdv): Improve this function.
+def check_standard_dir(path):
+    """Checks whether path belongs to standard library."""
+    return ('site-packages' in path or
+            os.path.commonprefix([path, sys.prefix]) == sys.prefix)
+
+
 class _CodeHeatmapCalculator(object):
     """Calculates Python code heatmap.
 
@@ -50,9 +57,25 @@ class _CodeHeatmapCalculator(object):
             self.prev_timestamp = time.time()
         return self.record_line
 
+    @property
+    def lines_without_stdlib(self):
+        """Filters code from standard library from self.lines."""
+        prev_line = None
+        for line_stats in self.lines:
+            path, _, runtime = line_stats
+            if not prev_line:
+                prev_line = line_stats
+            else:
+                if not check_standard_dir(path):
+                    yield prev_line
+                    prev_line = line_stats
+                else:
+                    prev_line[2] += runtime
+        yield prev_line
+
     def fill_heatmap(self):
         """Fills code heatmap and execution count dictionaries."""
-        for path, lineno, runtime in self.lines:
+        for path, lineno, runtime in self.lines_without_stdlib:
             self._execution_count[path][lineno] += 1
             self._heatmap[path][lineno] += runtime
 
