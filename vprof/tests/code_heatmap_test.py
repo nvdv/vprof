@@ -5,12 +5,6 @@ import unittest
 from collections import defaultdict
 from vprof import code_heatmap
 
-# For Python 2 and Python 3 compatibility.
-try:
-    import mock
-except ImportError:
-    from unittest import mock  # pylint: disable=ungrouped-imports
-
 
 class CodeHeatmapCalculator(unittest.TestCase):
     def setUp(self):
@@ -20,7 +14,44 @@ class CodeHeatmapCalculator(unittest.TestCase):
         self._calc.__init__()
         self.assertEqual(self._calc.all_code, set())
         self.assertEqual(self._calc.original_trace_function, sys.gettrace())
-        self.assertEqual(self._calc.heatmap, defaultdict(int))
+        self.assertEqual(
+            self._calc._heatmap, defaultdict(lambda: defaultdict(float)))
+        self.assertEqual(
+            self._calc._execution_count, defaultdict(lambda: defaultdict(int)))
+
+    def testLinesWithoutStdlibSimple(self):
+        self._calc.lines = [
+            ['foo.py', 1, 0.5],
+            ['foo.py', 2, 0.6],
+            ['foo.py', 3, 0.1],
+        ]
+        result = list(self._calc.lines_without_stdlib)
+        self.assertListEqual(
+            result,
+            [['foo.py', 1, 0.5],
+             ['foo.py', 2, 0.6],
+             ['foo.py', 3, 0.1]]
+        )
+
+    def testLinesWithoutStdlib(self):
+        self._calc.lines = [
+            ['foo.py', 1, 0.5],
+            ['foo.py', 2, 0.6],
+            ['site-packages/bar.py', 1, 0.4],
+            ['foo.py', 3, 0.1],
+            ['site-packages/baz.py', 1, 0.25],
+            ['site-packages/baz.py', 2, 0.11],
+            ['site-packages/baz.py', 3, 0.33],
+            ['foo.py', 4, 0.77],
+        ]
+        result = list(self._calc.lines_without_stdlib)
+        self.assertListEqual(
+            result,
+            [['foo.py', 1, 0.5],
+             ['foo.py', 2, 1.0],
+             ['foo.py', 3, 0.79],
+             ['foo.py', 4, 0.77]]
+        )
 
 
 class CodeHeatmapProfileUnitTest(unittest.TestCase):
