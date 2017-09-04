@@ -9,12 +9,16 @@ from collections import defaultdict
 from collections import deque
 from vprof import base_profiler
 
+_STDLIB_PATHS = [
+    os.path.abspath(path) for path in sys.path
+    if os.path.isdir(path) and path.startswith(sys.prefix)]
+
 
 #TODO(nvdv): Improve this function.
 def check_standard_dir(path):
-    """Checks whether path belongs to standard library."""
+    """Checks whether path belongs to standard library or installed modules."""
     return ('site-packages' in path or
-            os.path.commonprefix([path, sys.prefix]) == sys.prefix)
+            os.path.commonprefix([path] + _STDLIB_PATHS) != '/')
 
 
 class _CodeHeatmapCalculator(object):
@@ -25,7 +29,6 @@ class _CodeHeatmapCalculator(object):
     """
 
     def __init__(self):
-        self.all_code = set()
         self.original_trace_function = sys.gettrace()
         self.prev_lineno = None
         self.prev_timestamp = None
