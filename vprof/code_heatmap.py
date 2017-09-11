@@ -1,5 +1,6 @@
 """Code heatmap module."""
 import inspect
+import fnmatch
 import os
 import runpy
 import sys
@@ -17,8 +18,12 @@ _STDLIB_PATHS = [
 #TODO(nvdv): Improve this function.
 def check_standard_dir(path):
     """Checks whether path belongs to standard library or installed modules."""
-    return ('site-packages' in path or
-            os.path.commonprefix([path] + _STDLIB_PATHS) != '/')
+    if 'site-packages' in path:
+        return True
+    for stdlib_path in _STDLIB_PATHS:
+        if fnmatch.fnmatchcase(path, stdlib_path + '*'):
+            return True
+    return False
 
 
 class _CodeHeatmapCalculator(object):
