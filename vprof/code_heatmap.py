@@ -15,7 +15,6 @@ _STDLIB_PATHS = [
     if os.path.isdir(path) and path.startswith(sys.prefix)]
 
 
-#TODO(nvdv): Improve this function.
 def check_standard_dir(path):
     """Checks whether path belongs to standard library or installed modules."""
     if 'site-packages' in path:

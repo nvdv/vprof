@@ -6,13 +6,39 @@ from collections import defaultdict
 from vprof import code_heatmap
 
 
-class CodeHeatmapCalculator(unittest.TestCase):
+class CheckStandardDirUnittest(unittest.TestCase):
+
+    def setUp(self):
+        self.original_paths = code_heatmap._STDLIB_PATHS
+        code_heatmap._STDLIB_PATHS = ['/usr/local/python/lib']
+
+    def tearDown(self):
+        code_heatmap._STDLIB_PATHS = self.original_paths
+
+    def testCheckStandardDir(self):
+        self.assertTrue(
+            code_heatmap.check_standard_dir(
+                '/usr/local/python/lib/foo'))
+        self.assertTrue(
+            code_heatmap.check_standard_dir(
+                '/usr/local/python/lib/foo/bar'))
+
+        self.assertTrue(
+            code_heatmap.check_standard_dir(
+                '/Users/foobar/test/lib/python3.6/site-packages'))
+
+        self.assertFalse(
+            code_heatmap.check_standard_dir('/usr/local/bin'))
+        self.assertFalse(
+            code_heatmap.check_standard_dir('/usr/local'))
+
+
+class CodeHeatmapCalculatorUnittest(unittest.TestCase):
     def setUp(self):
         self._calc = object.__new__(code_heatmap._CodeHeatmapCalculator)
 
     def testInit(self):
         self._calc.__init__()
-        self.assertEqual(self._calc.all_code, set())
         self.assertEqual(self._calc.original_trace_function, sys.gettrace())
         self.assertEqual(
             self._calc._heatmap, defaultdict(lambda: defaultdict(float)))

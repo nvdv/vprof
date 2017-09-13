@@ -4,7 +4,6 @@ import unittest
 from collections import deque
 from vprof import memory_profiler
 
-# For Python 2 and Python 3 compatibility.
 try:
     import mock
 except ImportError:
