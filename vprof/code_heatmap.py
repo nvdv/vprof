@@ -73,7 +73,7 @@ class _CodeHeatmapCalculator(object):
             if not prev_line:
                 prev_line = line_stats
             else:
-                if not check_standard_dir(path):
+                if not check_standard_dir(path) and path != __file__:
                     yield prev_line
                     prev_line = line_stats
                 else:
