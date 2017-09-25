@@ -49,9 +49,11 @@ class MemoryProfilerModuleEndToEndTest(unittest.TestCase):
         self.assertEqual(stats['objectName'], '%s (module)' % _MODULE_FILENAME)
         self.assertEqual(stats['totalEvents'], 1)
         self.assertEqual(len(stats['codeEvents']), 1)
-        self.assertListEqual(
-            stats['codeEvents'][0],
-            [1, 1, 0.0, '<module>', 'vprof/tests/test_pkg/dummy_module.py'])
+        self.assertEqual(stats['codeEvents'][0][0], 1)
+        self.assertEqual(stats['codeEvents'][0][1], 1)
+        self.assertEqual(stats['codeEvents'][0][3], '<module>')
+        self.assertEqual(
+            stats['codeEvents'][0][4], 'vprof/tests/test_pkg/dummy_module.py')
 
 
 class MemoryProfilerPackageEndToEndTest(unittest.TestCase):

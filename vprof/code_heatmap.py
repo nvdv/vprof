@@ -15,12 +15,12 @@ _STDLIB_PATHS = [
     if os.path.isdir(path) and path.startswith(sys.prefix)]
 
 
-def check_standard_dir(path):
+def check_standard_dir(module_path):
     """Checks whether path belongs to standard library or installed modules."""
-    if 'site-packages' in path:
+    if 'site-packages' in module_path:
         return True
     for stdlib_path in _STDLIB_PATHS:
-        if fnmatch.fnmatchcase(path, stdlib_path + '*'):
+        if fnmatch.fnmatchcase(module_path, stdlib_path + '*'):
             return True
     return False
 
