@@ -68,13 +68,14 @@ class _CodeHeatmapCalculator(object):
     def lines_without_stdlib(self):
         """Filters code from standard library from self.lines."""
         prev_line = None
+        current_module_path = inspect.getabsfile(inspect.currentframe())
         for line_stats in self.lines:
-            path, _, runtime = line_stats
+            module_path, _, runtime = line_stats
             if not prev_line:
                 prev_line = line_stats
             else:
-                if (not check_standard_dir(path) and
-                        path != inspect.getabsfile(inspect.currentframe())):
+                if (not check_standard_dir(module_path) and
+                        module_path != current_module_path):
                     yield prev_line
                     prev_line = line_stats
                 else:
@@ -83,9 +84,9 @@ class _CodeHeatmapCalculator(object):
 
     def fill_heatmap(self):
         """Fills code heatmap and execution count dictionaries."""
-        for path, lineno, runtime in self.lines_without_stdlib:
-            self._execution_count[path][lineno] += 1
-            self._heatmap[path][lineno] += runtime
+        for module_path, lineno, runtime in self.lines_without_stdlib:
+            self._execution_count[module_path][lineno] += 1
+            self._heatmap[module_path][lineno] += runtime
 
     @property
     def heatmap(self):
