@@ -92,7 +92,6 @@ class FlameGraph {
 
     nodes.on('click', (d) => this.zoomIn_(d, nodes, titles));
     canvas.on('dblclick', (d) => this.zoomOut_(nodes, titles));
-
   }
 
   /**

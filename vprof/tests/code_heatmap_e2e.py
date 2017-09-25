@@ -3,6 +3,7 @@
 import functools
 import json
 import threading
+import os
 import unittest
 
 from six.moves import urllib
@@ -84,16 +85,11 @@ class CodeHeatmapPackageEndToEndTest(unittest.TestCase):
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], _PACKAGE_PATH)
         self.assertTrue(stats['runTime'] > 0)
-        heatmaps = stats['heatmaps']
-        self.assertEqual(len(heatmaps), 2)
-        self.assertTrue(
-            'vprof/tests/test_pkg/__main__.py' in heatmaps[0]['name'])
-        self.assertTrue(
-            'vprof/tests/test_pkg/dummy_module.py' in heatmaps[1]['name'])
-        self.assertListEqual(heatmaps[0]['srcCode'], _MAIN_MODULE_SOURCELINES)
-        self.assertTrue(heatmaps[0]['runTime'] > 0)
-        self.assertListEqual(heatmaps[1]['srcCode'], _DUMMY_MODULE_SOURCELINES)
-        self.assertTrue(heatmaps[1]['runTime'] > 0)
+        heatmap_files = {heatmap['name'] for heatmap in stats['heatmaps']}
+        self.assertTrue(os.path.abspath(
+            'vprof/tests/test_pkg/__main__.py') in heatmap_files)
+        self.assertTrue(os.path.abspath(
+            'vprof/tests/test_pkg/dummy_module.py') in heatmap_files)
 
 
 class CodeHeatmapFunctionEndToEndTest(unittest.TestCase):
@@ -129,11 +125,11 @@ class CodeHeatmapFunctionEndToEndTest(unittest.TestCase):
         self.assertEqual(len(heatmaps), 1)
         self.assertTrue('function _func' in heatmaps[0]['name'])
         self.assertDictEqual(
-            heatmaps[0]['executionCount'], {'104': 1, '105': 1})
+            heatmaps[0]['executionCount'], {'100': 1, '101': 1})
         self.assertListEqual(
             heatmaps[0]['srcCode'],
-            [['line', 103, '        def _func(foo, bar):\n'],
-             ['line', 104, u'            baz = foo + bar\n'],
-             ['line', 105, u'            return baz\n']])
+            [['line', 99, '        def _func(foo, bar):\n'],
+             ['line', 100, u'            baz = foo + bar\n'],
+             ['line', 101, u'            return baz\n']])
 
 # pylint: enable=missing-docstring, blacklisted-name
