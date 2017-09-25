@@ -73,7 +73,8 @@ class _CodeHeatmapCalculator(object):
             if not prev_line:
                 prev_line = line_stats
             else:
-                if not check_standard_dir(path) and path != __file__:
+                if (not check_standard_dir(path) and
+                        path != inspect.getabsfile(inspect.currentframe())):
                     yield prev_line
                     prev_line = line_stats
                 else:
