@@ -109,13 +109,13 @@ class Profiler {
    * @param {Object} element - Profiler record element.
    * @param {Object} tooltip - Tooltip element.
    */
-  hideTooltip(element, tooltip) {
+  hideTooltip_(element, tooltip) {
     d3.select(element).attr('class', 'profiler-record-normal');
     tooltip.attr('class', 'content-tooltip content-tooltip-invisible');
   }
 
   /** Renders profiler tab legend. */
-  renderLegend(parent) {
+  renderLegend_(parent) {
     parent.append('div')
       .attr('class', 'profiler-legend')
       .append('div')
