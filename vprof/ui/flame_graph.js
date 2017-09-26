@@ -189,7 +189,7 @@ class FlameGraph {
   }
 
   /** Renders flame graph help. */
-  renderHelp() {
+  renderHelp_() {
     this.parent_.append('div')
       .attr('class', 'tabhelp inactive-tabhelp')
       .html(this.HELP_MESSAGE);

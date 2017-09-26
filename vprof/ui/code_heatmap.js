@@ -208,7 +208,7 @@ class CodeHeatmap {
    * @param {number} lineRuntime - Line runtime.
    * @returns {string}
    */
-  formatSrcLine(lineNumber, codeLine, lineRuntime) {
+  formatSrcLine_(lineNumber, codeLine, lineRuntime) {
     let highlightedLine = hljs.highlight('python', codeLine).value;
     let backgroundColor = lineRuntime ? this.heatmapScale_(lineRuntime) : '';
     return (
