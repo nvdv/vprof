@@ -82,20 +82,13 @@ class _CodeEventsTracker(object):
     Contains all logic related to measuring memory usage.
     """
 
-    def __init__(self):
-        self._all_code = set()
+    def __init__(self, target_modules):
         self._events_list = deque()
         self._original_trace_function = sys.gettrace()
         self._process = psutil.Process(os.getpid())
         self._resulting_events = []
         self.mem_overhead = None
-
-    def add_code(self, code):
-        """Recursively adds code for profiling."""
-        if code not in self._all_code:
-            self._all_code.add(code)
-            for subcode in filter(inspect.iscode, code.co_consts):
-                self.add_code(subcode)
+        self.target_modules = target_modules
 
     def __enter__(self):
         """Enables events tracker."""
@@ -108,7 +101,7 @@ class _CodeEventsTracker(object):
 
     def _trace_memory_usage(self, frame, event, arg):  #pylint: disable=unused-argument
         """Checks memory usage when 'line' event occur."""
-        if event == 'line' and frame.f_code in self._all_code:
+        if event == 'line' and frame.f_code.co_filename in self.target_modules:
             self._events_list.append(
                 (frame.f_lineno, self._process.memory_info().rss,
                  frame.f_code.co_name, frame.f_code.co_filename))
@@ -141,7 +134,6 @@ class _CodeEventsTracker(object):
             self,
             self._resulting_events,
             self._events_list,
-            self._all_code,
             self._process
         ]
         overhead_count = _get_object_count_by_type(overhead)
@@ -164,24 +156,22 @@ class MemoryProfiler(base_profiler.BaseProfiler):
 
     def profile_package(self):
         """Returns memory stats for a package."""
-        pkg_code = base_profiler.get_package_code(self._run_object)
-        with _CodeEventsTracker() as prof:
-            for _, compiled_code in pkg_code.values():
-                prof.add_code(compiled_code)
-            try:
+        target_modules = base_profiler.get_pkg_module_names(self._run_object)
+        try:
+            with _CodeEventsTracker(target_modules) as prof:
                 prof.compute_mem_overhead()
                 runpy.run_path(self._run_object, run_name='__main__')
-            except SystemExit:
-                pass
+        except SystemExit:
+            pass
         return prof
 
     def profile_module(self):
         """Returns memory stats for a module."""
+        target_modules = {self._run_object}
         try:
             with open(self._run_object, 'rb') as srcfile,\
-                _CodeEventsTracker() as prof:
+                _CodeEventsTracker(target_modules) as prof:
                 code = compile(srcfile.read(), self._run_object, 'exec')
-                prof.add_code(code)
                 prof.compute_mem_overhead()
                 exec(code, self._globs, None)
         except SystemExit:
@@ -190,8 +180,8 @@ class MemoryProfiler(base_profiler.BaseProfiler):
 
     def profile_function(self):
         """Returns memory stats for a function."""
-        with _CodeEventsTracker() as prof:
-            prof.add_code(self._run_object.__code__)
+        target_modules = {self._run_object.__code__.co_filename}
+        with _CodeEventsTracker(target_modules) as prof:
             prof.compute_mem_overhead()
             self._run_object(*self._run_args, **self._run_kwargs)
         return prof

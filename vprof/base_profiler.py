@@ -1,29 +1,25 @@
 """Base class for a profile wrapper."""
 import multiprocessing
 import os
+import pkgutil
 import sys
 import zlib
 
 
-def get_package_code(package_path):
-    """Returns source code of Python package.
+def get_pkg_module_names(package_path):
+    """Returns module filenames from package.
 
     Args:
         package_path: Path to Python package.
     Returns:
-        A dict containing non-compiled and compiled code for package.
+        A set of module filenames.
     """
-    import pkgutil
-
-    all_code = {}
+    module_names = set()
     for fobj, modname, _ in pkgutil.iter_modules(path=[package_path]):
         filename = os.path.join(fobj.path, '%s.py' % modname)
         if os.path.exists(filename):
-            with open(filename, 'r') as srcfile:
-                src_code = srcfile.read()
-                compiled_code = compile(src_code, package_path, 'exec')
-                all_code[filename] = src_code, compiled_code
-    return all_code
+            module_names.add(filename)
+    return module_names
 
 
 def hash_name(name):
