@@ -11,12 +11,11 @@ except ImportError:
     from unittest import mock
 
 
-class GetPackageCodeUnittest(unittest.TestCase):
+class GetPkgModuleNamesUnittest(unittest.TestCase):
 
     @mock.patch('pkgutil.iter_modules')
     @mock.patch('os.path.exists')
-    @mock.patch('vprof.base_profiler.compile')
-    def testGetPackageCode(self, compile_mock, exists_mock, iter_modules_mock):
+    def testGetPackageCode(self, exists_mock, iter_modules_mock):
         package_path = mock.MagicMock()
         _ = mock.MagicMock()
         modname1, modname2 = 'module1', 'module2'
@@ -26,16 +25,10 @@ class GetPackageCodeUnittest(unittest.TestCase):
         iter_modules_mock.return_value = [
             (fobj1, modname1, _), (fobj2, modname2, _)]
         exists_mock.return_value = True
-        code = 'src_code'
-        compiled_code = compile_mock.return_value
-
-        with mock.patch('vprof.base_profiler.open',
-                        mock.mock_open(read_data=code)):
-            result = base_profiler.get_package_code(package_path)
-        self.assertDictEqual(
-            result,
-            {'/path/to/module/module1.py': (code, compiled_code),
-             '/path/to/module/module2.py': (code, compiled_code)})
+        result = base_profiler.get_pkg_module_names(package_path)
+        self.assertEqual(
+            result, {'/path/to/module/module1.py',
+                     '/path/to/module/module2.py'})
 
 
 class BaseProfileUnittest(unittest.TestCase):
@@ -129,3 +122,5 @@ class BaseProfileUnittest(unittest.TestCase):
             )
 
 # pylint: enable=protected-access, missing-docstring
+if __name__ == "__main__":
+    unittest.main(module="base_profiler_test")

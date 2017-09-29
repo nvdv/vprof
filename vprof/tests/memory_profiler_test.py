@@ -35,12 +35,6 @@ class CodeEventsTrackerUnittest(unittest.TestCase):
     def setUp(self):
         self._tracker = object.__new__(memory_profiler._CodeEventsTracker)
 
-    def testAddCode(self):
-        code = mock.MagicMock()
-        self._tracker._all_code = set()
-        self._tracker.add_code(code)
-        self.assertIn(code, self._tracker._all_code)
-
     def testTraceMemoryUsage(self):
         self._tracker._process = mock.MagicMock()
         event, arg = 'line', mock.MagicMock()
@@ -57,7 +51,9 @@ class CodeEventsTrackerUnittest(unittest.TestCase):
         name3, name4 = code3.co_name, code4.co_name
         fname1, fname2 = code1.co_filename, code2.co_filename
         fname3, fname4 = code3.co_filename, code4.co_filename
-        self._tracker._all_code = set((code1, code2, code3, code4))
+        self._tracker.target_modules = {
+            code1.co_filename, code2.co_filename,
+            code3.co_filename, code4.co_filename}
         self._tracker._events_list = deque()
 
         self._tracker._trace_memory_usage(frame1, event, arg)
