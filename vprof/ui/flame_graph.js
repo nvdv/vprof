@@ -213,7 +213,6 @@ class FlameGraph {
   }
 
   /**
-   * TODO(nvdv): Refactor this function
    * Truncates function name depending on flame graph node length.
    * @static
    * @param {Object} d - Function info.
@@ -222,11 +221,9 @@ class FlameGraph {
    */
   static getTruncatedNodeName_(d, rectLength) {
     let fullname = FlameGraph.getNodeName_(d);
-    let maxSymbols = rectLength / 10;  // ~10 pixels per character.
-    if (maxSymbols <= 3) {
-      return '';  // Return empty string if rectangle is too small.
-    }
-    return common.shortenString(fullname, maxSymbols, false);
+    let maxSymbols = rectLength / 10;  // ~ 10 pixels per character.
+    return maxSymbols <= 3 ? '' : common.shortenString(
+      fullname, maxSymbols, false);
   }
 }
 
