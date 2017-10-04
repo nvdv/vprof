@@ -18,7 +18,7 @@ def get_pkg_module_names(package_path):
     for fobj, modname, _ in pkgutil.iter_modules(path=[package_path]):
         filename = os.path.join(fobj.path, '%s.py' % modname)
         if os.path.exists(filename):
-            module_names.add(filename)
+            module_names.add(os.path.abspath(filename))
     return module_names
 
 

@@ -48,7 +48,6 @@ class MemoryProfilerModuleEndToEndTest(unittest.TestCase):
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], '%s (module)' % _MODULE_FILENAME)
         self.assertEqual(stats['totalEvents'], 1)
-        self.assertEqual(len(stats['codeEvents']), 1)
         self.assertEqual(stats['codeEvents'][0][0], 1)
         self.assertEqual(stats['codeEvents'][0][1], 1)
         self.assertEqual(stats['codeEvents'][0][3], '<module>')
@@ -79,9 +78,8 @@ class MemoryProfilerPackageEndToEndTest(unittest.TestCase):
         response_data = stats_server.decompress_data(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], '%s (package)' % _PACKAGE_PATH)
-        self.assertTrue('codeEvents' in stats)
-        self.assertTrue('totalEvents' in stats)
-        self.assertTrue('objectsCount' in stats)
+        self.assertTrue(stats['totalEvents'] > 0)
+        self.assertTrue(len(stats['objectsCount']) > 0)
 
 
 class MemoryProfilerFunctionEndToEndTest(unittest.TestCase):
@@ -114,5 +112,11 @@ class MemoryProfilerFunctionEndToEndTest(unittest.TestCase):
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['m']['objectName'], '_func (function)')
         self.assertEqual(stats['m']['totalEvents'], 2)
+        self.assertEqual(stats['m']['codeEvents'][0][0], 1)
+        self.assertEqual(stats['m']['codeEvents'][0][1], 90)
+        self.assertEqual(stats['m']['codeEvents'][0][3], '_func')
+        self.assertEqual(stats['m']['codeEvents'][1][0], 2)
+        self.assertEqual(stats['m']['codeEvents'][1][1], 91)
+        self.assertEqual(stats['m']['codeEvents'][1][3], '_func')
 
 # pylint: enable=missing-docstring, blacklisted-name
