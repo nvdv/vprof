@@ -42,9 +42,9 @@ class FlameGraphModuleEndToEndTest(unittest.TestCase):
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], '%s (module)' % _MODULE_FILENAME)
         self.assertEqual(stats['sampleInterval'], flame_graph._SAMPLE_INTERVAL)
-        self.assertTrue('runTime' in stats)
-        self.assertTrue('callStats' in stats)
-        self.assertTrue('totalSamples' in stats)
+        self.assertTrue(stats['runTime'] > 0)
+        self.assertTrue(len(stats['callStats']) >= 0)
+        self.assertTrue(stats['totalSamples'] >= 0)
 
 
 class FlameGraphPackageEndToEndTest(unittest.TestCase):
@@ -71,9 +71,9 @@ class FlameGraphPackageEndToEndTest(unittest.TestCase):
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], '%s (package)' % _PACKAGE_PATH)
         self.assertEqual(stats['sampleInterval'], flame_graph._SAMPLE_INTERVAL)
-        self.assertTrue('runTime' in stats)
-        self.assertTrue('callStats' in stats)
-        self.assertTrue('totalSamples' in stats)
+        self.assertTrue(stats['runTime'] > 0)
+        self.assertTrue(len(stats['callStats']) >= 0)
+        self.assertTrue(stats['totalSamples'] >= 0)
 
 
 class FlameGraphFunctionEndToEndTest(unittest.TestCase):
@@ -107,8 +107,8 @@ class FlameGraphFunctionEndToEndTest(unittest.TestCase):
         self.assertEqual(stats['c']['objectName'], '_func (function)')
         self.assertEqual(
             stats['c']['sampleInterval'], flame_graph._SAMPLE_INTERVAL)
-        self.assertTrue('runTime' in stats['c'])
-        self.assertTrue('callStats' in stats['c'])
-        self.assertTrue('totalSamples' in stats['c'])
+        self.assertTrue(stats['c']['runTime'] > 0)
+        self.assertTrue(len(stats['c']['callStats']) >= 0)
+        self.assertTrue(stats['c']['totalSamples'] >= 0)
 
 # pylint: enable=missing-docstring, blacklisted-name, protected-access

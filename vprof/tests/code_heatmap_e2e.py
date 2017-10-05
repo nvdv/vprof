@@ -128,7 +128,7 @@ class CodeHeatmapFunctionEndToEndTest(unittest.TestCase):
             heatmaps[0]['executionCount'], {'100': 1, '101': 1})
         self.assertListEqual(
             heatmaps[0]['srcCode'],
-            [['line', 99, '        def _func(foo, bar):\n'],
+            [['line', 99, u'        def _func(foo, bar):\n'],
              ['line', 100, u'            baz = foo + bar\n'],
              ['line', 101, u'            return baz\n']])
 

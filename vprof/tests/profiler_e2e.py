@@ -3,6 +3,7 @@
 import functools
 import json
 import threading
+import time
 import unittest
 
 from six.moves import urllib
@@ -41,10 +42,10 @@ class ProfilerModuleEndToEndTest(unittest.TestCase):
         response_data = stats_server.decompress_data(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], '%s (module)' % _MODULE_FILENAME)
-        self.assertTrue('callStats' in stats)
-        self.assertTrue('totalTime' in stats)
-        self.assertTrue('primitiveCalls' in stats)
-        self.assertTrue('totalCalls' in stats)
+        self.assertTrue(len(stats['callStats']) > 0)
+        self.assertTrue(stats['totalTime'] > 0)
+        self.assertTrue(stats['primitiveCalls'] > 0)
+        self.assertTrue(stats['totalCalls'] > 0)
 
 
 class ProfilerPackageEndToEndTest(unittest.TestCase):
@@ -70,10 +71,10 @@ class ProfilerPackageEndToEndTest(unittest.TestCase):
         response_data = stats_server.decompress_data(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], '%s (package)' % _PACKAGE_PATH)
-        self.assertTrue('callStats' in stats)
-        self.assertTrue('totalTime' in stats)
-        self.assertTrue('primitiveCalls' in stats)
-        self.assertTrue('totalCalls' in stats)
+        self.assertTrue(len(stats['callStats']) > 0)
+        self.assertTrue(stats['totalTime'] > 0)
+        self.assertTrue(stats['primitiveCalls'] > 0)
+        self.assertTrue(stats['totalCalls'] > 0)
 
 
 class ProfilerFunctionEndToEndTest(unittest.TestCase):
@@ -82,6 +83,7 @@ class ProfilerFunctionEndToEndTest(unittest.TestCase):
 
         def _func(foo, bar):
             baz = foo + bar
+            time.sleep(0.1)
             return baz
         self._func = _func
 
@@ -105,9 +107,10 @@ class ProfilerFunctionEndToEndTest(unittest.TestCase):
         response_data = stats_server.decompress_data(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['p']['objectName'], '_func (function)')
-        self.assertTrue('callStats' in stats['p'])
-        self.assertTrue('totalTime' in stats['p'])
-        self.assertTrue('primitiveCalls' in stats['p'])
-        self.assertTrue('totalCalls' in stats['p'])
+        self.assertTrue(len(stats['p']['callStats']) > 0)
+        self.assertTrue(stats['p']['totalTime'] > 0)
+        self.assertTrue(stats['p']['primitiveCalls'] > 0)
+        self.assertTrue(stats['p']['totalCalls'] > 0)
+
 
 # pylint: enable=missing-docstring, blacklisted-name
