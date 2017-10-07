@@ -86,21 +86,19 @@ class BaseProfileUnittest(unittest.TestCase):
             self._profile.profile_function()
 
     def testGetRunDispatcher(self):
-        self._profile._is_run_obj_function = True
+        self._profile._run_obj_type = 'function'
         _func = lambda a: a
         self._profile._run_object = _func
         self.assertEqual(
             self._profile._get_dispatcher(),
             self._profile.profile_function)
 
-        self._profile._is_run_obj_function = False
-        self._profile._is_run_obj_package = True
+        self._profile._run_obj_type = 'package'
         self.assertEqual(
             self._profile._get_dispatcher(),
             self._profile.profile_package)
 
-        self._profile._is_run_obj_package = False
-        self._profile._is_run_obj_module = True
+        self._profile._run_obj_type = 'module'
         self.assertEqual(
             self._profile._get_dispatcher(),
             self._profile.profile_module)

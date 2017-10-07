@@ -89,7 +89,7 @@ class BaseProfiler(object):
             run_object: object that will be profiled.
         """
         self._set_run_object_type(run_object)
-        if self._is_run_obj_module:
+        if self._run_obj_type == 'module':
             self._globs = {
                 '__file__': self._run_object,
                 '__name__': '__main__',
@@ -98,23 +98,21 @@ class BaseProfiler(object):
             program_path = os.path.dirname(self._run_object)
             if sys.path[0] != program_path:
                 sys.path.insert(0, program_path)
-        if not self._is_run_obj_function:
+        if self._run_obj_type != 'function':
             self._replace_sysargs()
         self._object_name = None
 
     def _set_run_object_type(self, run_object):
         """Sets type flags depending on run_object type."""
-        self._is_run_obj_function, self._is_run_obj_package = False, False
-        self._is_run_obj_module = False
         if isinstance(run_object, tuple):
             self._run_object, self._run_args, self._run_kwargs = run_object
-            self._is_run_obj_function = True
+            self._run_obj_type = 'function'
         else:
             self._run_object, _, self._run_args = run_object.partition(' ')
             if os.path.isdir(self._run_object):
-                self._is_run_obj_package = True
+                self._run_obj_type = 'package'
             elif os.path.isfile(self._run_object):
-                self._is_run_obj_module = True
+                self._run_obj_type = 'module'
 
     def _replace_sysargs(self):
         """Replaces sys.argv with proper args to pass to script."""
@@ -149,10 +147,10 @@ class BaseProfiler(object):
 
     def _get_dispatcher(self):
         """Returns dispatcher depending on self._run_object value."""
-        if self._is_run_obj_function:
+        if self._run_obj_type == 'function':
             self._object_name = '%s (function)' % self._run_object.__name__
             return self.profile_function
-        elif self._is_run_obj_package:
+        elif self._run_obj_type == 'package':
             self._object_name = '%s (package)' % self._run_object
             return self.profile_package
         self._object_name = '%s (module)' % self._run_object
