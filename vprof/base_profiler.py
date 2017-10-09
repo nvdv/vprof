@@ -88,10 +88,10 @@ class BaseProfiler(object):
         Args:
             run_object: object to be profiled.
         """
-        self._run_obj_type = self.get_run_object_type(run_object)
-        if self._run_obj_type == 'module':
+        run_obj_type = self.get_run_object_type(run_object)
+        if run_obj_type == 'module':
             self.init_module(run_object)
-        elif self._run_obj_type == 'package':
+        elif run_obj_type == 'package':
             self.init_package(run_object)
         else:
             self.init_function(run_object)
@@ -136,10 +136,9 @@ class BaseProfiler(object):
 
     def _replace_sysargs(self):
         """Replaces sys.argv with proper args to pass to script."""
+        sys.argv[:] = [self._run_object]
         if self._run_args:
-            sys.argv[:] = [self._run_object] + self._run_args.split()
-        else:
-            sys.argv[:] = [self._run_object]
+            sys.argv += self._run_args.split()
 
     def profile_package(self):
         """Profiles package specified by filesystem path.
