@@ -167,7 +167,7 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
     def profile_function(self):
         """Runs statistical profiler on a function."""
         with _StatProfiler() as prof:
-            self._run_object(*self._run_args, **self._run_kwargs)
+            result = self._run_object(*self._run_args, **self._run_kwargs)
 
         call_tree = prof.call_tree
         return {
@@ -175,5 +175,6 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
             'sampleInterval': _SAMPLE_INTERVAL,
             'runTime': prof.run_time,
             'callStats': call_tree,
-            'totalSamples': call_tree.get('sampleCount', 0)
+            'totalSamples': call_tree.get('sampleCount', 0),
+            'result': result
         }

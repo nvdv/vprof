@@ -80,16 +80,28 @@ def run_profilers(run_object, prof_config, verbose=False):
 
 
 def run(func, options, args=(), kwargs={}, host='localhost', port=8000):  # pylint: disable=dangerous-default-value
-    """Runs profilers on function.
+    """Runs profilers on a function.
+
     Args:
-        func: Python function object.
-        options: String with profilers configuration (i.e. 'cmh').
-        args: Arguments to pass to func.
-        kwargs: Keyword arguments to pass to func.
-        host: Host to send collected data to.
-        port: Port to send collected data to.
+        func: A Python function.
+        options: A string with profilers configuration (i.e. 'cmh').
+        args: func non-keyword arguments.
+        kwargs: func keyword arguments.
+        host: Host name to send collected data.
+        port: Port number to send collected data.
+
+    Returns:
+        A result of func execution.
     """
     run_stats = run_profilers((func, args, kwargs), options)
+
+    result = None
+    for prof in run_stats:
+        if not result:
+            result = run_stats[prof]['result']
+        del run_stats[prof]['result']  # Don't send result to remote host
+
     post_data = stats_server.compress_data(
         json.dumps(run_stats).encode('utf-8'))
     urllib.request.urlopen('http://%s:%s' % (host, port), post_data)
+    return result

@@ -163,7 +163,7 @@ class MemoryProfiler(base_profiler.BaseProfiler):
                 runpy.run_path(self._run_object, run_name='__main__')
         except SystemExit:
             pass
-        return prof
+        return prof, None
 
     def profile_module(self):
         """Returns memory stats for a module."""
@@ -176,20 +176,20 @@ class MemoryProfiler(base_profiler.BaseProfiler):
                 exec(code, self._globs, None)
         except SystemExit:
             pass
-        return prof
+        return prof, None
 
     def profile_function(self):
         """Returns memory stats for a function."""
         target_modules = {self._run_object.__code__.co_filename}
         with _CodeEventsTracker(target_modules) as prof:
             prof.compute_mem_overhead()
-            self._run_object(*self._run_args, **self._run_kwargs)
-        return prof
+            result = self._run_object(*self._run_args, **self._run_kwargs)
+        return prof, result
 
     def run(self):
         """Collects memory stats for specified Python program."""
         existing_objects = _get_in_memory_objects()
-        prof = self.profile()
+        prof, result = self.profile()
         new_objects = _get_in_memory_objects()
 
         new_obj_count = _get_obj_count_difference(new_objects, existing_objects)
@@ -202,5 +202,6 @@ class MemoryProfiler(base_profiler.BaseProfiler):
             'objectName': self._object_name,  # Set on run dispatching.
             'codeEvents': prof.code_events,
             'totalEvents': len(prof.code_events),
-            'objectsCount': pretty_obj_count
+            'objectsCount': pretty_obj_count,
+            'result': result
         }

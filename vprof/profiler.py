@@ -82,7 +82,7 @@ class Profiler(base_profiler.BaseProfiler):
         """Runs cProfile on a function."""
         prof = cProfile.Profile()
         prof.enable()
-        self._run_object(*self._run_args, **self._run_kwargs)
+        result = self._run_object(*self._run_args, **self._run_kwargs)
         prof.disable()
         prof_stats = pstats.Stats(prof)
         prof_stats.calc_callees()
@@ -92,4 +92,5 @@ class Profiler(base_profiler.BaseProfiler):
             'totalTime': prof_stats.total_tt,
             'primitiveCalls': prof_stats.prim_calls,
             'totalCalls': prof_stats.total_calls,
+            'result': result
         }

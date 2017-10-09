@@ -219,7 +219,7 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
     def profile_function(self):
         """Calculates heatmap for function."""
         with _CodeHeatmapCalculator() as prof:
-            self._run_object(*self._run_args, **self._run_kwargs)
+            result = self._run_object(*self._run_args, **self._run_kwargs)
         code_lines, start_line = inspect.getsourcelines(self._run_object)
         filename = os.path.abspath(inspect.getsourcefile(self._run_object))
 
@@ -234,6 +234,7 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
         return {
             'objectName': object_name,
             'runTime': run_time,
+            'result': result,
             'heatmaps': [{
                 'name': object_name,
                 'heatmap': heatmap,
