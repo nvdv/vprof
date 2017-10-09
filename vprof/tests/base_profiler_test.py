@@ -4,7 +4,6 @@ import unittest
 
 from vprof import base_profiler
 
-# For Python 2 and Python 3 compatibility.
 try:
     import mock
 except ImportError:
@@ -33,89 +32,88 @@ class GetPkgModuleNamesUnittest(unittest.TestCase):
 
 class BaseProfileUnittest(unittest.TestCase):
     def setUp(self):
-        self._profile = object.__new__(base_profiler.BaseProfiler)
+        self.profiler = object.__new__(base_profiler.BaseProfiler)
 
-    def testInit_RunObjFunction(self):
-        _func = lambda foo: foo
-        self._profile.__init__((_func, ('bar'), {'bar': 'baz'}))
-        self.assertEqual(self._profile._run_object, _func)
-        self.assertEqual(self._profile._run_args, ('bar'))
-        self.assertDictEqual(self._profile._run_kwargs, {'bar': 'baz'})
+    def testGetRunObjectType_Function(self):
+        func = (lambda x: x, ('foo',), ('bar',))
+        self.assertEqual(
+            self.profiler.get_run_object_type(func), 'function')
 
     @mock.patch('os.path.isdir')
-    def testInit_RunObjPackage(self, isdir_mock):
+    def testGetRunObjectType_Module(self, isdir_mock):
+        isdir_mock.return_value = False
+        modpath = 'foo.py -v'
+        self.assertEqual(
+            self.profiler.get_run_object_type(modpath), 'module')
+
+    @mock.patch('os.path.isdir')
+    def testGetRunObjectType_Package(self, isdir_mock):
         isdir_mock.return_value = True
-        self._profile.__init__('test/test_pkg')
-        self.assertEqual(self._profile._run_object, 'test/test_pkg')
-        self.assertEqual(self._profile._run_args, '')
-        self._profile.__init__('test/test_pkg --help')
-        self.assertEqual(self._profile._run_object, 'test/test_pkg')
-        self.assertEqual(self._profile._run_args, '--help')
+        pkgpath = 'foo'
+        self.assertEqual(
+            self.profiler.get_run_object_type(pkgpath), 'package')
+
+    def testInitFunction(self):
+        _func = lambda foo: foo
+        self.profiler.__init__((_func, ('bar'), {'bar': 'baz'}))
+        self.assertEqual(self.profiler._run_object, _func)
+        self.assertEqual(self.profiler._run_args, ('bar'))
+        self.assertDictEqual(self.profiler._run_kwargs, {'bar': 'baz'})
 
     @mock.patch('os.path.isdir')
-    @mock.patch('os.path.isfile')
-    def testInit_RunObjModule(self, isfile_mock, isdir_mock):
-        isfile_mock.return_value, isdir_mock.return_value = True, False
-        self._profile.__init__('foo.py')
-        self.assertEqual(self._profile._run_object, 'foo.py')
-        self.assertEqual(self._profile._run_args, '')
-        self._profile.__init__('foo.py --bar --baz')
-        self.assertEqual(self._profile._run_object, 'foo.py')
-        self.assertEqual(self._profile._run_args, '--bar --baz')
-        self.assertDictEqual(self._profile._globs, {
+    def testInitPackage(self, isdir_mock):
+        isdir_mock.return_value = True
+        self.profiler.__init__('test/test_pkg')
+        self.assertEqual(self.profiler._run_object, 'test/test_pkg')
+        self.assertEqual(self.profiler._run_args, '')
+        self.profiler.__init__('test/test_pkg --help')
+        self.assertEqual(self.profiler._run_object, 'test/test_pkg')
+        self.assertEqual(self.profiler._run_args, '--help')
+
+    @mock.patch('os.path.isdir')
+    def testInitModule(self, isdir_mock):
+        isdir_mock.return_value = False
+        self.profiler.__init__('foo.py')
+        self.assertEqual(self.profiler._run_object, 'foo.py')
+        self.assertEqual(self.profiler._run_args, '')
+        self.profiler.__init__('foo.py --bar --baz')
+        self.assertEqual(self.profiler._run_object, 'foo.py')
+        self.assertEqual(self.profiler._run_args, '--bar --baz')
+        self.assertDictEqual(self.profiler._globs, {
             '__file__': 'foo.py',
             '__name__': '__main__',
             '__package__': None
         })
 
     def testRun(self):
-        self._profile._get_dispatcher = mock.MagicMock(
-            return_value=lambda: 1)
-        self.assertEqual(self._profile.run(), 1)
+        self.profiler.profile = lambda: 1
+        self.assertEqual(self.profiler.run(), 1)
 
     def testRunAsModule(self):
         with self.assertRaises(NotImplementedError):
-            self._profile.profile_module()
+            self.profiler.profile_module()
 
     def testRunAsPackage(self):
         with self.assertRaises(NotImplementedError):
-            self._profile.profile_package()
+            self.profiler.profile_package()
 
     def testRunAsFunction(self):
         with self.assertRaises(NotImplementedError):
-            self._profile.profile_function()
-
-    def testGetRunDispatcher(self):
-        self._profile._run_obj_type = 'function'
-        _func = lambda a: a
-        self._profile._run_object = _func
-        self.assertEqual(
-            self._profile._get_dispatcher(),
-            self._profile.profile_function)
-
-        self._profile._run_obj_type = 'package'
-        self.assertEqual(
-            self._profile._get_dispatcher(),
-            self._profile.profile_package)
-
-        self._profile._run_obj_type = 'module'
-        self.assertEqual(
-            self._profile._get_dispatcher(),
-            self._profile.profile_module)
+            self.profiler.profile_function()
 
     def testReplaceSysargs(self):
-        self._profile._run_object = mock.MagicMock()
-        self._profile._run_args = ''
+        self.profiler._run_object = mock.MagicMock()
+        self.profiler._run_args = ''
         with mock.patch.object(sys, 'argv', []):
-            self._profile._replace_sysargs()
-            self.assertEqual(sys.argv, [self._profile._run_object])
+            self.profiler._replace_sysargs()
+            self.assertEqual(sys.argv, [self.profiler._run_object])
 
-        self._profile._run_args = '-s foo -a bar -e baz'
+        self.profiler._run_args = '-s foo -a bar -e baz'
         with mock.patch.object(sys, 'argv', []):
-            self._profile._replace_sysargs()
+            self.profiler._replace_sysargs()
             self.assertEqual(
                 sys.argv,
-                [self._profile._run_object,
+                [self.profiler._run_object,
                  '-s', 'foo', '-a', 'bar', '-e', 'baz']
             )
 

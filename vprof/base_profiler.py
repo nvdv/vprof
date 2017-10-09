@@ -80,39 +80,59 @@ def run_in_separate_process(func, *args, **kwargs):
 
 
 class BaseProfiler(object):
-    """Base class for a profile wrapper."""
+    """Base class for a profiler."""
 
     def __init__(self, run_object):
-        """Initializes wrapper.
+        """Initializes profiler.
 
         Args:
-            run_object: object that will be profiled.
+            run_object: object to be profiled.
         """
-        self._set_run_object_type(run_object)
+        self._run_obj_type = self.get_run_object_type(run_object)
         if self._run_obj_type == 'module':
-            self._globs = {
-                '__file__': self._run_object,
-                '__name__': '__main__',
-                '__package__': None,
-            }
-            program_path = os.path.dirname(self._run_object)
-            if sys.path[0] != program_path:
-                sys.path.insert(0, program_path)
-        if self._run_obj_type != 'function':
-            self._replace_sysargs()
-        self._object_name = None
-
-    def _set_run_object_type(self, run_object):
-        """Sets type flags depending on run_object type."""
-        if isinstance(run_object, tuple):
-            self._run_object, self._run_args, self._run_kwargs = run_object
-            self._run_obj_type = 'function'
+            self.init_module(run_object)
+        elif self._run_obj_type == 'package':
+            self.init_package(run_object)
         else:
-            self._run_object, _, self._run_args = run_object.partition(' ')
-            if os.path.isdir(self._run_object):
-                self._run_obj_type = 'package'
-            elif os.path.isfile(self._run_object):
-                self._run_obj_type = 'module'
+            self.init_function(run_object)
+
+    @staticmethod
+    def get_run_object_type(run_object):
+        """Determines run object type."""
+        if isinstance(run_object, tuple):
+            return 'function'
+        run_object, _, _ = run_object.partition(' ')
+        if os.path.isdir(run_object):
+            return 'package'
+        return 'module'
+
+    def init_module(self, run_object):
+        """Initializes profiler with a module."""
+        self.profile = self.profile_module
+        self._run_object, _, self._run_args = run_object.partition(' ')
+        self._object_name = '%s (module)' % self._run_object
+        self._globs = {
+            '__file__': self._run_object,
+            '__name__': '__main__',
+            '__package__': None,
+        }
+        program_path = os.path.dirname(self._run_object)
+        if sys.path[0] != program_path:
+            sys.path.insert(0, program_path)
+        self._replace_sysargs()
+
+    def init_package(self, run_object):
+        """Initializes profiler with a package."""
+        self.profile = self.profile_package
+        self._run_object, _, self._run_args = run_object.partition(' ')
+        self._object_name = '%s (package)' % self._run_object
+        self._replace_sysargs()
+
+    def init_function(self, run_object):
+        """Initializes profiler with a function."""
+        self.profile = self.profile_function
+        self._run_object, self._run_args, self._run_kwargs = run_object
+        self._object_name = '%s (function)' % self._run_object.__name__
 
     def _replace_sysargs(self):
         """Replaces sys.argv with proper args to pass to script."""
@@ -124,15 +144,15 @@ class BaseProfiler(object):
     def profile_package(self):
         """Profiles package specified by filesystem path.
 
-        Runs object specified by self._run_object as a package specified by
-        filesystem path. Must be overridden.
+        Runs object self._run_object as a package specified by filesystem path.
+        Must be overridden.
         """
         raise NotImplementedError
 
     def profile_module(self):
         """Profiles module.
 
-        Runs object specified by self._run_object as a Python module.
+        Runs object self._run_object as a Python module.
         Must be overridden.
         """
         raise NotImplementedError
@@ -140,23 +160,11 @@ class BaseProfiler(object):
     def profile_function(self):
         """Profiles function.
 
-        Runs object specified by self._run_object as a Python function.
+        Runs object self._run_object as a Python function.
         Must be overridden.
         """
         raise NotImplementedError
 
-    def _get_dispatcher(self):
-        """Returns dispatcher depending on self._run_object value."""
-        if self._run_obj_type == 'function':
-            self._object_name = '%s (function)' % self._run_object.__name__
-            return self.profile_function
-        elif self._run_obj_type == 'package':
-            self._object_name = '%s (package)' % self._run_object
-            return self.profile_package
-        self._object_name = '%s (module)' % self._run_object
-        return self.profile_module
-
     def run(self):
         """Runs profiler and returns collected stats."""
-        dispatcher = self._get_dispatcher()
-        return dispatcher()
+        return self.profile()
