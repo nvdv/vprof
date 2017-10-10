@@ -118,5 +118,3 @@ class BaseProfileUnittest(unittest.TestCase):
             )
 
 # pylint: enable=protected-access, missing-docstring
-if __name__ == "__main__":
-    unittest.main(module="base_profiler_test")
