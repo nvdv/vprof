@@ -2,6 +2,7 @@
 # pylint: disable=missing-docstring, blacklisted-name
 import functools
 import json
+import inspect
 import threading
 import time
 import unittest
@@ -106,7 +107,9 @@ class ProfilerFunctionEndToEndTest(unittest.TestCase):
             'http://%s:%s/profile' % (_HOST, _PORT))
         response_data = stats_server.decompress_data(response.read())
         stats = json.loads(response_data.decode('utf-8'))
-        self.assertEqual(stats['p']['objectName'], '_func (function)')
+        curr_filename = inspect.getabsfile(inspect.currentframe())
+        self.assertEqual(stats['p']['objectName'],
+                         '_func @ %s (function)' % curr_filename)
         self.assertTrue(len(stats['p']['callStats']) > 0)
         self.assertTrue(stats['p']['totalTime'] > 0)
         self.assertTrue(stats['p']['primitiveCalls'] > 0)

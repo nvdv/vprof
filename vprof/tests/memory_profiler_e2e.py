@@ -2,6 +2,7 @@
 # pylint: disable=missing-docstring, blacklisted-name
 import functools
 import json
+import inspect
 import threading
 import unittest
 
@@ -110,13 +111,15 @@ class MemoryProfilerFunctionEndToEndTest(unittest.TestCase):
             'http://%s:%s/profile' % (_HOST, _PORT))
         response_data = stats_server.decompress_data(response.read())
         stats = json.loads(response_data.decode('utf-8'))
-        self.assertEqual(stats['m']['objectName'], '_func (function)')
+        curr_filename = inspect.getabsfile(inspect.currentframe())
+        self.assertEqual(stats['m']['objectName'],
+                         '_func @ %s (function)' % curr_filename)
         self.assertEqual(stats['m']['totalEvents'], 2)
         self.assertEqual(stats['m']['codeEvents'][0][0], 1)
-        self.assertEqual(stats['m']['codeEvents'][0][1], 90)
+        self.assertEqual(stats['m']['codeEvents'][0][1], 91)
         self.assertEqual(stats['m']['codeEvents'][0][3], '_func')
         self.assertEqual(stats['m']['codeEvents'][1][0], 2)
-        self.assertEqual(stats['m']['codeEvents'][1][1], 91)
+        self.assertEqual(stats['m']['codeEvents'][1][1], 92)
         self.assertEqual(stats['m']['codeEvents'][1][3], '_func')
 
 # pylint: enable=missing-docstring, blacklisted-name

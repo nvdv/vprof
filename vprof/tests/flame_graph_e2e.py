@@ -2,6 +2,7 @@
 # pylint: disable=missing-docstring, blacklisted-name, protected-access
 import functools
 import json
+import inspect
 import threading
 import unittest
 
@@ -104,7 +105,9 @@ class FlameGraphFunctionEndToEndTest(unittest.TestCase):
             'http://%s:%s/profile' % (_HOST, _PORT))
         response_data = stats_server.decompress_data(response.read())
         stats = json.loads(response_data.decode('utf-8'))
-        self.assertEqual(stats['c']['objectName'], '_func (function)')
+        curr_filename = inspect.getabsfile(inspect.currentframe())
+        self.assertEqual(stats['c']['objectName'],
+                         '_func @ %s (function)' % curr_filename)
         self.assertEqual(
             stats['c']['sampleInterval'], flame_graph._SAMPLE_INTERVAL)
         self.assertTrue(stats['c']['runTime'] > 0)

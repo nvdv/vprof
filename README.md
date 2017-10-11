@@ -20,7 +20,7 @@ Feel free to open an issue or send a pull request!
 
 ## Prerequisites
 Dependencies to build ```vprof``` from source code:
- * Python 2.7, Python 3.4 or Python 3.5
+ * Python 2.7 or Python 3.4+
  * `pip`
  * `npm` >= 3.3.12
 

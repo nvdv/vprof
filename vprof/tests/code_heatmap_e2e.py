@@ -2,6 +2,7 @@
 # pylint: disable=missing-docstring, blacklisted-name
 import functools
 import json
+import inspect
 import threading
 import os
 import unittest
@@ -122,14 +123,16 @@ class CodeHeatmapFunctionEndToEndTest(unittest.TestCase):
         stats = json.loads(response_data.decode('utf-8'))
         self.assertTrue(stats['h']['runTime'] > 0)
         heatmaps = stats['h']['heatmaps']
+        curr_filename = inspect.getabsfile(inspect.currentframe())
+        self.assertEqual(stats['h']['objectName'],
+                         '_func @ %s (function)' % curr_filename)
         self.assertEqual(len(heatmaps), 1)
-        self.assertTrue('function _func' in heatmaps[0]['name'])
         self.assertDictEqual(
-            heatmaps[0]['executionCount'], {'100': 1, '101': 1})
+            heatmaps[0]['executionCount'], {'101': 1, '102': 1})
         self.assertListEqual(
             heatmaps[0]['srcCode'],
-            [['line', 99, u'        def _func(foo, bar):\n'],
-             ['line', 100, u'            baz = foo + bar\n'],
-             ['line', 101, u'            return baz\n']])
+            [['line', 100, u'        def _func(foo, bar):\n'],
+             ['line', 101, u'            baz = foo + bar\n'],
+             ['line', 102, u'            return baz\n']])
 
 # pylint: enable=missing-docstring, blacklisted-name

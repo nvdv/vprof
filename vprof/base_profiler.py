@@ -1,4 +1,5 @@
 """Base class for a profile wrapper."""
+import inspect
 import multiprocessing
 import os
 import pkgutil
@@ -132,7 +133,9 @@ class BaseProfiler(object):
         """Initializes profiler with a function."""
         self.profile = self.profile_function
         self._run_object, self._run_args, self._run_kwargs = run_object
-        self._object_name = '%s (function)' % self._run_object.__name__
+        filename = inspect.getsourcefile(self._run_object)
+        self._object_name = '%s @ %s (function)' % (
+            self._run_object.__name__, filename)
 
     def _replace_sysargs(self):
         """Replaces sys.argv with proper args to pass to script."""

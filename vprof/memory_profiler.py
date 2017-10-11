@@ -199,7 +199,7 @@ class MemoryProfiler(base_profiler.BaseProfiler):
         result_obj_count[list] -= 1
         pretty_obj_count = _format_obj_count(result_obj_count)
         return {
-            'objectName': self._object_name,  # Set on run dispatching.
+            'objectName': self._object_name,
             'codeEvents': prof.code_events,
             'totalEvents': len(prof.code_events),
             'objectsCount': pretty_obj_count,
