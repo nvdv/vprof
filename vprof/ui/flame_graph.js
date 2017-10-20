@@ -33,7 +33,7 @@ class FlameGraph {
     this.data_ = data;
     this.parent_ = parent;
     this.xScale_ = d3.scaleLinear().domain([0, 1]).range([0, this.WIDTH]);
-    this.yScale_ = d3.scaleLinear().range([0, this.HEIGHT]);
+    this.yScale_ = d3.scaleLinear().domain([0, 1]).range([0, this.HEIGHT]);
     this.flameGraph_ = d3.partition();
     this.color_ = color.createColorScale();
   }
@@ -42,7 +42,8 @@ class FlameGraph {
   render() {
     let canvas = this.parent_.append('svg')
       .attr('width', this.WIDTH)
-      .attr('height', this.HEIGHT);
+      .attr('height', this.HEIGHT)
+      .attr('transform', 'rotate(180)');
 
     let tooltip = this.parent_.append('div')
       .attr('class', 'content-tooltip content-tooltip-invisible');
@@ -71,7 +72,7 @@ class FlameGraph {
     nodes = cells.append('rect')
       .attr('class', 'flame-graph-rect-normal')
       .attr('x', (d) => this.xScale_(d.x0))
-      .attr('y', (d) => this.yScale_(1 - d.y0 - (d.y1 - d.y0)))
+      .attr('y', (d) => this.yScale_(d.y0))
       .attr('width', (d) => this.xScale_(d.x1 - d.x0))
       .attr('height', (d) => this.yScale_(d.y1 - d.y0))
       .style('fill', (d) => this.color_(d.data.colorHash))
@@ -80,8 +81,15 @@ class FlameGraph {
 
     let titles = cells.append('text')
       .attr('x', (d) => this.xScale_(d.x0) + this.TEXT_OFFSET_X)
-      .attr('y', (d) => this.yScale_(1 - d.y0 - (d.y1 - d.y0)) +
-                                    this.TEXT_OFFSET_Y)
+      .attr('y', (d) => this.yScale_(d.y0) + this.TEXT_OFFSET_Y)
+      .attr('transform', (d) => {
+        // Reverse text back.
+        let rx = this.xScale_(d.x0) + (
+          this.xScale_(d.x1) - this.xScale_(d.x0)) / 2;
+        let ry = this.yScale_(d.y0) + (
+          this.yScale_(d.y1) - this.yScale_(d.y0)) / 2;
+        return 'rotate(180, ' + rx + ', ' + ry + ')';
+      })
       .text((d, i, n) => {
         let nodeWidth = n[i].previousElementSibling.getAttribute('width');
         return FlameGraph.getTruncatedNodeName_(d.data, nodeWidth); })
@@ -101,16 +109,42 @@ class FlameGraph {
    * @param {Object} titles - All flame graph node titles.
    */
   zoomIn_(node, allNodes, titles) {
-    this.xScale_.domain([node.x0, node.x0 + node.x1 - node.x0]);
-    this.yScale_.domain([0, 1 - node.y0]);
+    let leaf = this.getLeafWithMaxY_(node);
+    this.xScale_.domain([node.x0, node.x1]);
+    this.yScale_.domain([node.y0, leaf.y0 + (leaf.y1 - leaf.y0)]);
     allNodes.attr('x', (d) => this.xScale_(d.x0))
-      .attr('y', (d) => this.yScale_(1 - d.y0 - (d.y1 - d.y0)))
-      .attr('width', (d) => {
-        return this.xScale_(d.x0 + d.x1 - d.x0) - this.xScale_(d.x0); })
-      .attr('height', (d) => {
-        return this.yScale_(1 - d.y0) - this.yScale_(1 - d.y0 - (d.y1 - d.y0));
-      });
+      .attr('y', (d) => this.yScale_(d.y0))
+      .attr('width', (d) => this.xScale_(d.x1) - this.xScale_(d.x0))
+      .attr('height', (d) => this.yScale_(d.y1) - this.yScale_(d.y0));
     this.redrawTitles_(titles);
+  }
+
+  /**
+   * Returns leaf node that has max y0 value.
+   * Used to determine zoom region.
+   * @param {Object} node - Focus node.
+   * @returns {Object}
+   */
+  getLeafWithMaxY_(node) {
+    let leaves = [];
+    let getLeaves = (node) => {
+      if (!node.hasOwnProperty('children')) {
+        leaves.push(node);
+      } else {
+        for (let i = 0; i < node.children.length; i++) {
+          getLeaves(node.children[i]);
+        }
+      }
+    };
+    getLeaves(node);
+
+    let leafWithMaxY0 = leaves[0];
+    for (let i = 0; i < leaves.length; i++) {
+      if (leaves[i].y0 > leafWithMaxY0.y0) {
+        leafWithMaxY0 = leaves[i];
+      }
+    }
+    return leafWithMaxY0;
   }
 
   /**
@@ -121,11 +155,10 @@ class FlameGraph {
   zoomOut_(allNodes, titles) {
     this.xScale_.domain([0, 1]);
     this.yScale_.domain([0, 1]);
-    let self = this;
-    allNodes.attr('x', (d) => self.xScale_(d.x0))
-      .attr('y', (d) => self.yScale_(1 - d.y0 - (d.y1 - d.y0)))
-      .attr('width', (d) => self.xScale_(d.x1 - d.x0))
-      .attr('height', (d) => self.yScale_(d.y1 - d.y0));
+    allNodes.attr('x', (d) => this.xScale_(d.x0))
+      .attr('y', (d) => this.yScale_(d.y0))
+      .attr('width', (d) => this.xScale_(d.x1 - d.x0))
+      .attr('height', (d) => this.yScale_(d.y1 - d.y0));
     this.redrawTitles_(titles);
   }
 
@@ -135,11 +168,20 @@ class FlameGraph {
    */
   redrawTitles_(titles) {
     titles.attr('x', (d) => this.xScale_(d.x0) + this.TEXT_OFFSET_X)
-      .attr('y', (d) => {
-        return this.yScale_(1 - d.y0 - (d.y1 - d.y0)) + this.TEXT_OFFSET_Y; })
+      .attr('y', (d) => this.yScale_(d.y0) + this.TEXT_OFFSET_Y)
+      .attr('transform', (d) => {
+        // Reverse text back.
+        let rx = this.xScale_(d.x0) + (
+          this.xScale_(d.x1) - this.xScale_(d.x0)) / 2;
+        let ry = this.yScale_(d.y0) + (
+          this.yScale_(d.y1) - this.yScale_(d.y0)) / 2;
+        return 'rotate(180, ' + rx + ', ' + ry + ')';
+      })
       .text((d) => {
-        let nodeWidth = this.xScale_(d.x0 + d.x1 - d.x0) - this.xScale_(d.x0);
-        return FlameGraph.getTruncatedNodeName_(d.data, nodeWidth); })
+        let nodeWidth = this.xScale_(d.x1) - this.xScale_(d.x0);
+        return FlameGraph.getTruncatedNodeName_(d.data, nodeWidth);
+        return d.data;
+      })
       .attr('visibility', (d, i, n) => {
         let nodeHeight = n[i].previousElementSibling.getAttribute('height');
         return (nodeHeight > this.MIN_TEXT_HEIGHT) ? 'visible': 'hidden';
