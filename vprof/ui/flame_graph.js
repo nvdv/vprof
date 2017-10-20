@@ -109,7 +109,7 @@ class FlameGraph {
    * @param {Object} titles - All flame graph node titles.
    */
   zoomIn_(node, allNodes, titles) {
-    let leaf = this.getLeafWithMaxY_(node);
+    let leaf = FlameGraph.getLeafWithMaxY0_(node);
     this.xScale_.domain([node.x0, node.x1]);
     this.yScale_.domain([node.y0, leaf.y0 + (leaf.y1 - leaf.y0)]);
     allNodes.attr('x', (d) => this.xScale_(d.x0))
@@ -125,7 +125,7 @@ class FlameGraph {
    * @param {Object} node - Focus node.
    * @returns {Object}
    */
-  getLeafWithMaxY_(node) {
+  static getLeafWithMaxY0_(node) {
     let leaves = [];
     let getLeaves = (node) => {
       if (!node.hasOwnProperty('children')) {

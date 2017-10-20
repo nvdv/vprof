@@ -18,4 +18,11 @@ describe('CPU flame graph test suite', () => {
     expect(flameGraphModule.FlameGraph.getTruncatedNodeName_(node, 500))
       .toBe('foo:10 (bar.py)');
   });
+
+  it('Check getLeafWithMaxY0', () => {
+    let node1 = {'y0': 1};
+    let node2 = {'y0': 2};
+    let nodes = {'children': [node1, node2]};
+    expect(flameGraphModule.FlameGraph.getLeafWithMaxY0_(nodes)).toBe(node2);
+  });
 });
