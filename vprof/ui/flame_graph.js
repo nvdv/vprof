@@ -197,10 +197,11 @@ class FlameGraph {
   showTooltip_(element, tooltip, node) {
     d3.select(element).attr('class', 'flame-graph-rect-highlight');
     let funcName = node.stack[0].replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    let filename = node.stack[1].replace(/</g, "&lt;").replace(/>/g, "&gt;");
     tooltip.attr('class', 'content-tooltip content-tooltip-visible')
       .html('<p><b>Function name:</b> ' + funcName + '</p>' +
             '<p><b>Line number:</b> ' + node.stack[2] +'</p>' +
-            '<p><b>Filename:</b> ' + node.stack[1] +'</p>' +
+            '<p><b>Filename:</b> ' + filename +'</p>' +
             '<p><b>Sample count:</b> ' + node.sampleCount + '</p>' +
             '<p><b>Percentage:</b> ' + node.samplePercentage +'%</p>')
       .style('left', d3.event.pageX)
