@@ -264,7 +264,7 @@ class FlameGraph {
    */
   static getTruncatedNodeName_(d, rectLength) {
     let fullname = FlameGraph.getNodeName_(d);
-    let maxSymbols = rectLength / 10;  // ~ 10 pixels per character.
+    let maxSymbols = rectLength / 7;
     return maxSymbols <= 3 ? '' : common.shortenString(
       fullname, maxSymbols, false);
   }
