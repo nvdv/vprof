@@ -1,8 +1,8 @@
-.. |status| image::https://travis-ci.org/nvdv/vprof.svg?branch=master
+.. |status| image:: https://travis-ci.org/nvdv/vprof.svg?branch=master
 
     :target: https://travis-ci.org/nvdv/vprof
 
-.. |pypi| image::https://img.shields.io/pypi/v/vprof.svg
+.. |pypi| image:: https://img.shields.io/pypi/v/vprof.svg
 
     :target: https://pypi.python.org/pypi/vprof/
 
