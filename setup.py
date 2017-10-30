@@ -120,6 +120,12 @@ def get_vprof_version(filename):
         raise RuntimeError('Unable to find version info.')
 
 
+def get_description():
+    """Reads README.rst file."""
+    with open('README.rst') as readme_file:
+        return readme_file.read()
+
+
 setup(
     name='vprof',
     version=get_vprof_version('vprof/__main__.py'),
@@ -151,6 +157,7 @@ setup(
         str(req.req) for req in parse_requirements('requirements.txt',
                                                    session=PipSession())
     ],
+    long_description=get_description(),
     cmdclass={
         'test': RunUnittestsCommand,
         'e2e_test': RunEndToEndTestCommand,
