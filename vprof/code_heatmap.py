@@ -38,6 +38,7 @@ class _CodeHeatmapCalculator(object):
         self.prev_timestamp = None
         self.prev_path = None
         self.lines = deque()
+        self._abspath_cache = {}
         self._execution_count = defaultdict(lambda: defaultdict(int))
         self._heatmap = defaultdict(lambda: defaultdict(float))
 
@@ -59,8 +60,11 @@ class _CodeHeatmapCalculator(object):
             if self.prev_timestamp:
                 runtime = time.time() - self.prev_timestamp
                 self.lines.append([self.prev_path, self.prev_lineno, runtime])
+            filename = frame.f_code.co_filename
+            if filename not in self._abspath_cache:
+                self._abspath_cache[filename] = os.path.abspath(filename)
+            self.prev_path = self._abspath_cache[filename]
             self.prev_lineno = frame.f_lineno
-            self.prev_path = os.path.abspath(frame.f_code.co_filename)
             self.prev_timestamp = time.time()
         return self.record_line
 
