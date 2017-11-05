@@ -36,6 +36,18 @@ _ERR_CODES = {
 }
 
 
+def cut_stats(program_stats, threshold=0.002):
+    """Remove entries from program stats that make less than `threshold` % of
+    the total run time."""
+    if 'h' in program_stats:
+        total_time = sum(h['runTime'] for h in program_stats['h']['heatmaps'])
+        program_stats['h']['heatmaps'] = [
+            h for h in program_stats['h']['heatmaps']
+            if h['runTime'] >= threshold * total_time
+        ]
+    return program_stats
+
+
 def main():
     """Main function of the module."""
     parser = argparse.ArgumentParser(
@@ -96,10 +108,10 @@ def main():
         if args.output_file:
             with open(args.output_file, 'w') as outfile:
                 program_stats['version'] = __version__
-                outfile.write(json.dumps(program_stats, indent=2))
+                outfile.write(json.dumps(cut_stats(program_stats), indent=2))
         else:
             stats_server.start(
-                args.host, args.port, program_stats,
+                args.host, args.port, cut_stats(program_stats),
                 args.dont_start_browser, args.debug_mode)
 
 if __name__ == "__main__":
