@@ -60,7 +60,7 @@ class _CodeHeatmapCalculator(object):
                 runtime = time.time() - self.prev_timestamp
                 self.lines.append([self.prev_path, self.prev_lineno, runtime])
             self.prev_lineno = frame.f_lineno
-            self.prev_path = os.path.abspath(frame.f_code.co_filename)
+            self.prev_path = frame.f_code.co_filename
             self.prev_timestamp = time.time()
         return self.record_line
 
@@ -69,15 +69,15 @@ class _CodeHeatmapCalculator(object):
         """Filters code from standard library from self.lines."""
         prev_line = None
         current_module_path = inspect.getabsfile(inspect.currentframe())
-        for line_stats in self.lines:
-            module_path, _, runtime = line_stats
+        for module_path, lineno, runtime in self.lines:
+            module_abspath = os.path.abspath(module_path)
             if not prev_line:
-                prev_line = line_stats
+                prev_line = [module_abspath, lineno, runtime]
             else:
                 if (not check_standard_dir(module_path) and
-                        module_path != current_module_path):
+                        module_abspath != current_module_path):
                     yield prev_line
-                    prev_line = line_stats
+                    prev_line = [module_abspath, lineno, runtime]
                 else:
                     prev_line[2] += runtime
         yield prev_line
