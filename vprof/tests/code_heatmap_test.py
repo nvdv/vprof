@@ -1,4 +1,5 @@
 # pylint: disable=protected-access, missing-docstring
+import os
 import sys
 import unittest
 
@@ -52,8 +53,11 @@ class CodeHeatmapCalculatorUnittest(unittest.TestCase):
             ['foo.py', 3, 0.1],
         ]
         result = list(self._calc.lines_without_stdlib)
+        basename_result = [
+            [os.path.basename(abspath), lineno, runtime]
+            for abspath, lineno, runtime in result]
         self.assertListEqual(
-            result,
+            basename_result,
             [['foo.py', 1, 0.5],
              ['foo.py', 2, 0.6],
              ['foo.py', 3, 0.1]]
@@ -71,8 +75,11 @@ class CodeHeatmapCalculatorUnittest(unittest.TestCase):
             ['foo.py', 4, 0.77],
         ]
         result = list(self._calc.lines_without_stdlib)
+        basename_result = [
+            [os.path.basename(abspath), lineno, runtime]
+            for abspath, lineno, runtime in result]
         self.assertListEqual(
-            result,
+            basename_result,
             [['foo.py', 1, 0.5],
              ['foo.py', 2, 1.0],
              ['foo.py', 3, 0.79],
