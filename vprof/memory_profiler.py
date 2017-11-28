@@ -71,8 +71,9 @@ def _format_obj_count(objects):
     for obj_type, obj_count in objects.items():
         if obj_count != 0:
             match = re.findall(regex, repr(obj_type))
-            obj_type, obj_name = match[0]
-            result.append(("%s %s" % (obj_type, obj_name), obj_count))
+            if match:
+                obj_type, obj_name = match[0]
+                result.append(("%s %s" % (obj_type, obj_name), obj_count))
     return sorted(result, key=operator.itemgetter(1), reverse=True)
 
 
