@@ -18,7 +18,7 @@ import sys
 from vprof import runner
 from vprof import stats_server
 
-__version__ = '0.37.3'
+__version__ = '0.37.4'
 
 _PROGRAN_NAME = 'vprof'
 _MODULE_DESC = 'Visual profiler for Python'
