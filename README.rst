@@ -18,7 +18,7 @@ expected.
 
 Screenshots
 -----------
-.. |screenshot| image:: http://i.imgur.com/BnqLtRw.gif
+.. |screenshot| image:: https://i.imgur.com/ikBlfvQ.gif
 
 |screenshot|
 
