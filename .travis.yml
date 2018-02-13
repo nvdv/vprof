@@ -15,8 +15,8 @@ install:
 jobs:
   include:
     - stage: lint
-    - script: python setup.py lint
+      script: python setup.py lint
     - stage: unit-tests
-    - script: python setup.py test
+      script: python setup.py test
     - stage: e2e-tests
-    - script: python setup.py e2e_test
+      script: python setup.py e2e_test
