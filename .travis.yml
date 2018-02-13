@@ -12,7 +12,11 @@ before_install:
 install:
   - python setup.py deps_install
 
-script:
-  - python setup.py lint
-  - python setup.py test
-  - python setup.py e2e_test
+jobs:
+  include:
+    - stage: lint
+    - script: python setup.py lint
+    - stage: unit-tests
+    - script: python setup.py test
+    - stage: e2e-tests
+    - script: python setup.py e2e_test
