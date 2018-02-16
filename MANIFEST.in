@@ -9,3 +9,4 @@ include vprof/ui/css/progress.gif
 include vprof/ui/favicon.ico
 include requirements.txt
 include dev_requirements.txt
+include LICENSE
