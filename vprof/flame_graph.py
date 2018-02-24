@@ -176,5 +176,6 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
             'runTime': prof.run_time,
             'callStats': call_tree,
             'totalSamples': call_tree.get('sampleCount', 0),
-            'result': result
+            'result': result,
+            'timestamp': int(time.time())
         }

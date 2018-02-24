@@ -3,6 +3,7 @@ import cProfile
 import operator
 import pstats
 import runpy
+import time
 
 from vprof import base_profiler
 
@@ -92,5 +93,6 @@ class Profiler(base_profiler.BaseProfiler):
             'totalTime': prof_stats.total_tt,
             'primitiveCalls': prof_stats.prim_calls,
             'totalCalls': prof_stats.total_calls,
-            'result': result
+            'result': result,
+            'timestamp': int(time.time())
         }

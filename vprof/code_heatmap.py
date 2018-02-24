@@ -234,6 +234,7 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
             'objectName': self._object_name,
             'runTime': run_time,
             'result': result,
+            'timestamp': int(time.time()),
             'heatmaps': [{
                 'name': self._object_name,
                 'heatmap': heatmap,

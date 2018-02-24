@@ -7,6 +7,7 @@ import psutil
 import re
 import runpy
 import sys
+import time
 
 from collections import deque
 from collections import Counter
@@ -204,5 +205,6 @@ class MemoryProfiler(base_profiler.BaseProfiler):
             'codeEvents': prof.code_events,
             'totalEvents': len(prof.code_events),
             'objectsCount': pretty_obj_count,
-            'result': result
+            'result': result,
+            'timestamp': int(time.time())
         }
