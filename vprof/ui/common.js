@@ -22,6 +22,20 @@ function shortenString(s, maxLength, front) {
   return s.substr(0, maxLength - 3) + '...';
 }
 
+/**
+ * Converts UNIX timestamp to string with specified format.
+ * @param {number} timestamp - UNIX timestamp..
+ * @returns {string}
+ */
+function formatTimestamp(timestamp) {
+  let lt = new Date(timestamp * 1000);
+  return (
+    lt.getMonth() + 1 + "/" + lt.getDate() + "/" + lt.getFullYear() + " " +
+    lt.getHours() + ":" + lt.getMinutes() + ":" +
+    lt.getSeconds());
+}
+
 module.exports = {
   'shortenString': shortenString,
+  'formatTimestamp': formatTimestamp,
 };

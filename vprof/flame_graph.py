@@ -134,7 +134,8 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
             'sampleInterval': _SAMPLE_INTERVAL,
             'runTime': prof.run_time,
             'callStats': call_tree,
-            'totalSamples': call_tree.get('sampleCount', 0)
+            'totalSamples': call_tree.get('sampleCount', 0),
+            'timestamp': int(time.time())
         }
 
     def profile_package(self):
@@ -157,7 +158,8 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
             'sampleInterval': _SAMPLE_INTERVAL,
             'runTime': prof.run_time,
             'callStats': call_tree,
-            'totalSamples': call_tree.get('sampleCount', 0)
+            'totalSamples': call_tree.get('sampleCount', 0),
+            'timestamp': int(time.time())
         }
 
     def profile_module(self):

@@ -116,6 +116,7 @@ class Profiler {
 
   /** Renders profiler tab legend. */
   renderLegend_(parent) {
+    let launchTime = common.formatTimestamp(this.data_.timestamp);
     parent.append('div')
       .attr('class', 'profiler-legend')
       .append('div')
@@ -124,7 +125,8 @@ class Profiler {
       .html('<p><b>Object name:</b> ' + this.data_.objectName + '</p>' +
             '<p><b>Total time:</b> ' + this.data_.totalTime + 's</p>' +
             '<p><b>Primitive calls:</b> ' + this.data_.primitiveCalls + '</p>' +
-            '<p><b>Total calls:</b> ' + this.data_.totalCalls + '</p>');
+            '<p><b>Total calls:</b> ' + this.data_.totalCalls + '</p>' +
+            '<p><b>Timestamp:</b> ' + launchTime +'</p>');
   }
 
   /** Renders profiler tab help. */

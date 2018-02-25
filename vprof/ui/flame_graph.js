@@ -220,13 +220,15 @@ class FlameGraph {
 
   /** Renders flame graph legend. */
   renderLegend_() {
+    let launchTime = common.formatTimestamp(this.data_.timestamp);
     this.parent_.append('div')
       .attr('class', 'content-legend')
       .html('<p><b>Object name:</b> ' + this.data_.objectName + '</p>' +
             '<p><b>Run time:</b> ' + this.data_.runTime + ' s</p>' +
             '<p><b>Total samples:</b> ' + this.data_.totalSamples + '</p>' +
             '<p><b>Sample interval:</b> ' + this.data_.sampleInterval +
-            ' s</p>')
+            ' s</p>' +
+            '<p><b>Timestamp:</b> ' + launchTime +'</p>')
       .style('left', this.LEGEND_X)
       .style('top', this.LEGEND_Y);
   }

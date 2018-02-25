@@ -3,6 +3,7 @@
  */
 
 'use strict';
+const common = require('./common');
 const d3 = require('d3');
 
 /**
@@ -162,11 +163,12 @@ class MemoryChart {
 
   /** Renders memory chart legend. */
   renderLegend_() {
+    let launchTime = common.formatTimestamp(this.data_.timestamp);
     this.parent_.append('div')
       .attr('class', 'content-legend')
       .html('<p><b>Object name:</b> ' + this.data_.objectName + '</p>' +
             '<p><b>Total lines executed:</b> ' + this.data_.totalEvents +
-            '</p>')
+            '</p>' + '<p><b>Timestamp:</b> ' + launchTime +'</p>')
       .style('left', this.LEGEND_X)
       .style('top', this.LEGEND_Y);
   }

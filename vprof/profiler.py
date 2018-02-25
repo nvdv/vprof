@@ -50,6 +50,7 @@ class Profiler(base_profiler.BaseProfiler):
             'totalTime': prof_stats.total_tt,
             'primitiveCalls': prof_stats.prim_calls,
             'totalCalls': prof_stats.total_calls,
+            'timestamp': int(time.time())
         }
 
     def profile_package(self):
@@ -73,6 +74,7 @@ class Profiler(base_profiler.BaseProfiler):
             'totalTime': prof_stats.total_tt,
             'primitiveCalls': prof_stats.prim_calls,
             'totalCalls': prof_stats.total_calls,
+            'timestamp': int(time.time())
         }
 
     def profile_module(self):
