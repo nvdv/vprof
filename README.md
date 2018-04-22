@@ -11,7 +11,7 @@ The project is in active development and some of its features might not work as
 expected.
 
 ## Screenshots
-![vprof-gif](http://i.imgur.com/ikBlfvQ.gifv)
+![vprof-gif](http://i.imgur.com/ikBlfvQ.gif)
 
 ## Contributing
 All contributions are highly encouraged! You can add new features,
