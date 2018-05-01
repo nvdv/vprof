@@ -6,11 +6,10 @@ import shlex
 import subprocess
 import unittest
 
+import pkg_resources
 from distutils import cmd
 from setuptools import setup
 from setuptools.command.install import install
-from pip.download import PipSession
-from pip.req import parse_requirements
 
 
 class RunUnittestsCommand(cmd.Command):
@@ -126,6 +125,11 @@ def get_description():
         return readme_file.read()
 
 
+def get_requirements():
+    with open('requirements.txt') as fp:
+        return [str(r) for r in pkg_resources.parse_requirements(fp)]
+
+
 setup(
     name='vprof',
     version=get_vprof_version('vprof/__main__.py'),
@@ -153,10 +157,7 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Topic :: Software Development',
     ],
-    install_requires=[
-        str(req.req) for req in parse_requirements('requirements.txt',
-                                                   session=PipSession())
-    ],
+    install_requires=get_requirements(),
     long_description=get_description(),
     cmdclass={
         'test': RunUnittestsCommand,
