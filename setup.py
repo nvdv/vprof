@@ -91,10 +91,9 @@ class RunDepsInstallCommand(cmd.Command):
         pass
 
     def run(self):
-        pip.main(['install', '-r', 'requirements.txt'])
-        pip.main(['install', '-r', 'dev_requirements.txt'])
-        subprocess.check_call(
-            shlex.split('npm install'))
+        subprocess.check_call(["python", '-m', 'pip', 'install', '-r', 'requirements.txt'])
+        subprocess.check_call(["python", '-m', 'pip', 'install', '-r', 'dev_requirements.txt'])
+        subprocess.check_call(shlex.split('npm install'))
 
 
 class VProfBuild(install):
