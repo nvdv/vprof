@@ -158,6 +158,7 @@ setup(
     ],
     install_requires=get_requirements(),
     long_description=get_description(),
+    long_description_content_type="text/markdown",
     cmdclass={
         'test': RunUnittestsCommand,
         'e2e_test': RunEndToEndTestCommand,
