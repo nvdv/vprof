@@ -78,7 +78,7 @@ def _format_obj_count(objects):
     return sorted(result, key=operator.itemgetter(1), reverse=True)
 
 
-class _CodeEventsTracker(object):
+class _CodeEventsTracker(object):  # pylint: disable=useless-object-inheritance
     """Tracks specified events during code execution.
 
     Contains all logic related to measuring memory usage.

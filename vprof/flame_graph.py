@@ -10,7 +10,7 @@ from vprof import base_profiler
 _SAMPLE_INTERVAL = 0.001
 
 
-class _StatProfiler(object):
+class _StatProfiler(object): #pylint: disable=useless-object-inheritance
     """Statistical profiler.
 
     Samples call stack at regulal intervals specified by _SAMPLE_INTERVAL.
