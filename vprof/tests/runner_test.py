@@ -13,7 +13,7 @@ class RunnerUnittest(unittest.TestCase):
 
     @mock.patch('vprof.runner.run_profilers')
     @mock.patch('vprof.stats_server.compress_data')
-    @mock.patch('urllib.request.urlopen')
+    @mock.patch('six.moves.urllib.request.urlopen')
     def testRun_CheckResult(self, unused_urlopen_mock,
                             unused_compress_mock, run_mock):
         run_mock.return_value = {
@@ -26,7 +26,7 @@ class RunnerUnittest(unittest.TestCase):
 
     @mock.patch('vprof.runner.run_profilers')
     @mock.patch('vprof.stats_server.compress_data')
-    @mock.patch('urllib.request.urlopen')
+    @mock.patch('six.moves.urllib.request.urlopen')
     @mock.patch('json.dumps')
     def testRun_CheckStats(self, json_mock, unused_urlopen_mock, # pylint: disable=no-self-use
                            unused_compress_mock, run_mock):
