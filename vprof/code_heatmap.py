@@ -25,7 +25,7 @@ def check_standard_dir(module_path):
     return False
 
 
-class _CodeHeatmapCalculator(object):  # pylint: disable=useless-object-inheritance
+class _CodeHeatmapCalculator(object):
     """Calculates Python code heatmap.
 
     Class that contains all logic related to calculating code heatmap

@@ -80,7 +80,7 @@ def run_in_separate_process(func, *args, **kwargs):
     return process.output
 
 
-class BaseProfiler(object):  # pylint: disable=useless-object-inheritance
+class BaseProfiler(object):
     """Base class for a profiler."""
 
     def __init__(self, run_object):
