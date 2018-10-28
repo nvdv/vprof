@@ -1,15 +1,11 @@
 """Profiler's main module."""
 # pylint: disable=wrong-import-position
+import builtins
 import os
 import psutil
 
 # Take process RSS in order to compute profiler memory overhead.
-try:
-    import __builtin__ as builtins
-except ImportError:  # __builtin__ was renamed to builtins in Python 3.
-    import builtins
 builtins.initial_rss_size = psutil.Process(os.getpid()).memory_info().rss
-# pylint: disable=wrong-import-position
 
 import argparse
 import json
@@ -18,7 +14,7 @@ import sys
 from vprof import runner
 from vprof import stats_server
 
-__version__ = '0.37.6'
+__version__ = '0.38'
 
 _PROGRAN_NAME = 'vprof'
 _MODULE_DESC = 'Visual profiler for Python'

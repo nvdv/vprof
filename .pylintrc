@@ -1,6 +1,6 @@
 [MESSAGES CONTROL]
-disable=locally-disabled, exec-used, too-many-instance-attributes,
-        wrong-import-order,superfluous-parens, fixme, invalid-name, no-member, too-many-arguments, locally-enabled, too-many-locals, useless-object-inheritance, duplicate-code
+disable=exec-used, wrong-import-order, fixme,
+        invalid-name, no-member, too-many-arguments, too-many-locals, duplicate-code
         # Disable duplicate-code globally, since can't disable locally
         # https://github.com/PyCQA/pylint/issues/214
 [FORMAT]

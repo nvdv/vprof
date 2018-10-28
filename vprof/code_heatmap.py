@@ -25,7 +25,7 @@ def check_standard_dir(module_path):
     return False
 
 
-class _CodeHeatmapCalculator(object):
+class _CodeHeatmapCalculator:
     """Calculates Python code heatmap.
 
     Class that contains all logic related to calculating code heatmap

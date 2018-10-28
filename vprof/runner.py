@@ -1,28 +1,23 @@
 """Module with functions that run profilers."""
 # pylint: disable=wrong-import-position
+import builtins
+import gzip
 import os
 import psutil
-
-try:
-    import __builtin__ as builtins
-except ImportError:  # __builtin__ was renamed to builtins in Python 3.
-    import builtins
+import urllib.request
 
 # Take initial RSS in order to compute profiler memory overhead
 # when profiling single functions.
 if not hasattr(builtins, 'initial_rss_size'):
     builtins.initial_rss_size = psutil.Process(os.getpid()).memory_info().rss
-# pylint: disable=wrong-import-position
 
 import json
 
 from collections import OrderedDict
-from six.moves import urllib
 from vprof import code_heatmap
 from vprof import flame_graph
 from vprof import memory_profiler
 from vprof import profiler
-from vprof import stats_server
 
 _PROFILERS = (
     ('m', memory_profiler.MemoryProfiler),
@@ -101,7 +96,7 @@ def run(func, options, args=(), kwargs={}, host='localhost', port=8000):  # pyli
             result = run_stats[prof]['result']
         del run_stats[prof]['result']  # Don't send result to remote host
 
-    post_data = stats_server.compress_data(
+    post_data = gzip.compress(
         json.dumps(run_stats).encode('utf-8'))
     urllib.request.urlopen('http://%s:%s' % (host, port), post_data)
     return result

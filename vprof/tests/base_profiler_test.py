@@ -3,11 +3,7 @@ import sys
 import unittest
 
 from vprof import base_profiler
-
-try:
-    import mock
-except ImportError:
-    from unittest import mock
+from unittest import mock
 
 
 class GetPkgModuleNamesUnittest(unittest.TestCase):

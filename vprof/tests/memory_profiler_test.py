@@ -4,10 +4,7 @@ import unittest
 from collections import deque
 from vprof import memory_profiler
 
-try:
-    import mock
-except ImportError:
-    from unittest import mock  # pylint: disable=ungrouped-imports
+from unittest import mock  # pylint: disable=ungrouped-imports
 
 
 class GetObjectCountByTypeUnittest(unittest.TestCase):

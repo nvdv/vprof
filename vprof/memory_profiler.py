@@ -1,4 +1,5 @@
 """Memory profiler module."""
+import builtins
 import gc
 import inspect
 import os
@@ -13,10 +14,6 @@ from collections import deque
 from collections import Counter
 from vprof import base_profiler
 
-try:
-    import __builtin__ as builtins
-except ImportError:  # __builtin__ was renamed to builtins in Python 3.
-    import builtins
 
 _BYTES_IN_MB = 1024 * 1024
 
@@ -78,7 +75,7 @@ def _format_obj_count(objects):
     return sorted(result, key=operator.itemgetter(1), reverse=True)
 
 
-class _CodeEventsTracker(object):
+class _CodeEventsTracker:
     """Tracks specified events during code execution.
 
     Contains all logic related to measuring memory usage.

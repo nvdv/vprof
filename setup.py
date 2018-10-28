@@ -1,6 +1,5 @@
 """Setup script for vprof."""
 import glob
-import pip
 import re
 import shlex
 import subprocess
@@ -91,8 +90,10 @@ class RunDepsInstallCommand(cmd.Command):
         pass
 
     def run(self):
-        subprocess.check_call(["python", '-m', 'pip', 'install', '-r', 'requirements.txt'])
-        subprocess.check_call(["python", '-m', 'pip', 'install', '-r', 'dev_requirements.txt'])
+        subprocess.check_call(
+            ["python3", '-m', 'pip', 'install', '-r', 'requirements.txt'])
+        subprocess.check_call(
+            ["python3", '-m', 'pip', 'install', '-r', 'dev_requirements.txt'])
         subprocess.check_call(shlex.split('npm install'))
 
 
@@ -150,10 +151,7 @@ setup(
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
         'Topic :: Software Development',
     ],
     install_requires=get_requirements(),
