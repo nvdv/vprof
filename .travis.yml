@@ -10,9 +10,9 @@ before_install:
     - nvm install 6
 
 install:
-  - python setup.py deps_install
+  - python3 setup.py deps_install
 
 script:
-  - python setup.py lint
-  - python setup.py test
-  - python setup.py e2e_test
+  - python3 setup.py lint
+  - python3 setup.py test
+  - python3 setup.py e2e_test
