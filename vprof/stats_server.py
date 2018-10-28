@@ -43,7 +43,7 @@ class StatsHandler(server.SimpleHTTPRequestHandler):
 
     def _handle_profile(self):
         """Handles profile stats requests."""
-        return json.dumps(self._profile_json), 'text/json'
+        return json.dumps(self._profile_json).encode(), 'text/json'
 
     def _handle_other(self):
         """Handles static files requests."""
@@ -58,7 +58,7 @@ class StatsHandler(server.SimpleHTTPRequestHandler):
         """Handles HTTP GET requests."""
         handler = self.uri_map.get(self.path) or self._handle_other
         content, content_type = handler()
-        compressed_content = gzip.compress(content.encode())
+        compressed_content = gzip.compress(content)
         self._send_response(
             200, headers=(('Content-type', '%s; charset=utf-8' % content_type),
                           ('Content-Encoding', 'gzip'),
