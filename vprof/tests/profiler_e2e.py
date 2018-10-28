@@ -1,13 +1,13 @@
 """End-to-end tests for Python profiler wrapper."""
 # pylint: disable=missing-docstring, blacklisted-name
 import functools
+import gzip
 import json
 import inspect
 import threading
 import time
 import unittest
-
-from six.moves import urllib
+import urllib.request
 
 from vprof import profiler
 from vprof import stats_server
@@ -40,7 +40,7 @@ class ProfilerModuleEndToEndTest(unittest.TestCase):
     def testRequest(self):
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
-        response_data = stats_server.decompress_data(response.read())
+        response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], '%s (module)' % _MODULE_FILENAME)
         self.assertTrue(len(stats['callStats']) > 0)
@@ -69,7 +69,7 @@ class ProfilerPackageEndToEndTest(unittest.TestCase):
     def testRequest(self):
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
-        response_data = stats_server.decompress_data(response.read())
+        response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], '%s (package)' % _PACKAGE_PATH)
         self.assertTrue(len(stats['callStats']) > 0)
@@ -105,7 +105,7 @@ class ProfilerFunctionEndToEndTest(unittest.TestCase):
             self._func, 'p', ('foo', 'bar'), host=_HOST, port=_PORT)
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
-        response_data = stats_server.decompress_data(response.read())
+        response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         curr_filename = inspect.getabsfile(inspect.currentframe())
         self.assertEqual(stats['p']['objectName'],

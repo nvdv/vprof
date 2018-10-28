@@ -2,12 +2,7 @@
 import unittest
 
 from vprof import profiler
-
-# For Python 2 and Python 3 compatibility.
-try:
-    import mock
-except ImportError:
-    from unittest import mock  # pylint: disable=ungrouped-imports
+from unittest import mock
 
 
 class ProfilerUnittest(unittest.TestCase):

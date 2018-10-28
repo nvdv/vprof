@@ -1,12 +1,12 @@
 """End-to-end tests for memory profiler module."""
 # pylint: disable=missing-docstring, blacklisted-name
 import functools
+import gzip
 import json
 import inspect
 import threading
 import unittest
-
-from six.moves import urllib
+import urllib.request
 
 from vprof import memory_profiler
 from vprof import stats_server
@@ -45,7 +45,7 @@ class MemoryProfilerModuleEndToEndTest(unittest.TestCase):
     def testRequest(self):
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
-        response_data = stats_server.decompress_data(response.read())
+        response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], '%s (module)' % _MODULE_FILENAME)
         self.assertEqual(stats['totalEvents'], 1)
@@ -76,7 +76,7 @@ class MemoryProfilerPackageEndToEndTest(unittest.TestCase):
     def testRequest(self):
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
-        response_data = stats_server.decompress_data(response.read())
+        response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], '%s (package)' % _PACKAGE_PATH)
         self.assertTrue(stats['totalEvents'] > 0)
@@ -109,7 +109,7 @@ class MemoryProfilerFunctionEndToEndTest(unittest.TestCase):
             self._func, 'm', ('foo', 'bar'), host=_HOST, port=_PORT)
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
-        response_data = stats_server.decompress_data(response.read())
+        response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         curr_filename = inspect.getabsfile(inspect.currentframe())
         self.assertEqual(stats['m']['objectName'],

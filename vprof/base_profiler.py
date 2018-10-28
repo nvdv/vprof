@@ -80,7 +80,7 @@ def run_in_separate_process(func, *args, **kwargs):
     return process.output
 
 
-class BaseProfiler(object):
+class BaseProfiler:
     """Base class for a profiler."""
 
     def __init__(self, run_object):

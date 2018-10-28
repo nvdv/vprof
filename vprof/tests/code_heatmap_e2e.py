@@ -1,13 +1,13 @@
 """End-to-end tests for code heatmap module."""
 # pylint: disable=missing-docstring, blacklisted-name
 import functools
+import gzip
 import json
 import inspect
 import threading
 import os
 import unittest
-
-from six.moves import urllib
+import urllib.request
 
 from vprof import code_heatmap
 from vprof import stats_server
@@ -51,7 +51,7 @@ class CodeHeatmapModuleEndToEndTest(unittest.TestCase):
     def testRequest(self):
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
-        response_data = stats_server.decompress_data(response.read())
+        response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], _MODULE_FILENAME)
         self.assertTrue(stats['runTime'] > 0)
@@ -82,7 +82,7 @@ class CodeHeatmapPackageEndToEndTest(unittest.TestCase):
     def testRequest(self):
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
-        response_data = stats_server.decompress_data(response.read())
+        response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], _PACKAGE_PATH)
         self.assertTrue(stats['runTime'] > 0)
@@ -119,7 +119,7 @@ class CodeHeatmapFunctionEndToEndTest(unittest.TestCase):
             self._func, 'h', ('foo', 'bar'), host=_HOST, port=_PORT)
         response = urllib.request.urlopen(
             'http://%s:%s/profile' % (_HOST, _PORT))
-        response_data = stats_server.decompress_data(response.read())
+        response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertTrue(stats['h']['runTime'] > 0)
         heatmaps = stats['h']['heatmaps']
