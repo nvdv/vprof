@@ -40,13 +40,13 @@ pip install vprof
 To build `vprof` from sources, clone this repository and execute
 
 ```sh
-python setup.py deps_install && python setup.py build_ui && python setup.py install
+python3 setup.py deps_install && python3 setup.py build_ui && python3 setup.py install
 ```
 
 To install just `vprof` dependencies, run
 
 ```sh
-python setup.py deps_install
+python3 setup.py deps_install
 ```
 
 ## Usage
@@ -135,7 +135,7 @@ Also you can check `examples` directory for more profiling examples.
 ## Testing
 
 ```sh
-python setup.py test && python setup.py e2e_test
+python3 setup.py test && python3 setup.py e2e_test
 ```
 
 ## License
