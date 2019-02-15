@@ -56,7 +56,7 @@ vprof -c <config> <src>
 ```
 `<config>` is a combination of supported modes:
 
-* `c` - CPU flame graph
+* `c` - CPU flame graph  ⚠️ **Not available for windows [#62](https://github.com/nvdv/vprof/issues/62)**
 
 Shows CPU flame graph for `<src>`.
 
