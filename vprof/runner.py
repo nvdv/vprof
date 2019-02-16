@@ -29,17 +29,17 @@ _PROFILERS = (
 
 class Error(Exception):
     """Base exception for current module."""
-    pass
+    pass  # pylint: disable=unnecessary-pass
 
 
 class AmbiguousConfigurationError(Error):
     """Raised when profiler configuration is ambiguous."""
-    pass
+    pass  # pylint: disable=unnecessary-pass
 
 
 class BadOptionError(Error):
     """Raised when unknown options are present in the configuration."""
-    pass
+    pass  # pylint: disable=unnecessary-pass
 
 
 def run_profilers(run_object, prof_config, verbose=False):
