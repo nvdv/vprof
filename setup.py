@@ -12,6 +12,7 @@ from setuptools.command.install import install
 
 
 class RunUnittestsCommand(cmd.Command):
+    """Class that represents run unittests command."""
     description = 'Run all unittests'
     user_options = []
 
@@ -29,6 +30,7 @@ class RunUnittestsCommand(cmd.Command):
 
 
 class RunEndToEndTestCommand(cmd.Command):
+    """Class that represents run end-to-end tests command."""
     description = 'Run all end to end tests'
     user_options = []
 
@@ -45,6 +47,7 @@ class RunEndToEndTestCommand(cmd.Command):
 
 
 class RunLintCommand(cmd.Command):
+    """Class that represents run linter command."""
     description = 'Run linter'
     user_options = []
 
@@ -65,6 +68,7 @@ class RunLintCommand(cmd.Command):
 
 
 class RunCleanCommand(cmd.Command):
+    """Class that represents cleanup command."""
     description = 'Clean temporary files'
     user_options = []
 
@@ -80,6 +84,7 @@ class RunCleanCommand(cmd.Command):
 
 
 class RunDepsInstallCommand(cmd.Command):
+    """Class that represents install dependencies command."""
     description = 'Install dependencies'
     user_options = []
 
@@ -98,13 +103,13 @@ class RunDepsInstallCommand(cmd.Command):
 
 
 class VProfBuild(install):
-
+    """Class that represents UI build command."""
     def run(self):
         subprocess.check_call(shlex.split('npm run build'))
 
 
 class VProfInstall(install):
-
+    """Class that represents install command."""
     def run(self):
         install.run(self)
 
@@ -126,6 +131,7 @@ def get_description():
 
 
 def get_requirements():
+    """Reads package dependencies."""
     with open('requirements.txt') as fp:
         return [str(r) for r in pkg_resources.parse_requirements(fp)]
 
