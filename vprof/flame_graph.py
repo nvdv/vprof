@@ -13,7 +13,7 @@ _SAMPLE_INTERVAL = 0.001
 class _StatProfiler:
     """Statistical profiler.
 
-    Samples call stack at regulal intervals specified by _SAMPLE_INTERVAL.
+    Samples call stack at regular intervals specified by _SAMPLE_INTERVAL.
     """
 
     def __init__(self):
