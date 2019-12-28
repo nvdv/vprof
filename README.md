@@ -1,4 +1,3 @@
-[![Build Status](https://travis-ci.org/nvdv/vprof.svg?branch=master)](https://travis-ci.org/nvdv/vprof)
 [![PyPI](https://img.shields.io/pypi/v/vprof.svg)](https://pypi.python.org/pypi/vprof/)
 
 # vprof
@@ -135,7 +134,7 @@ Also you can check `examples` directory for more profiling examples.
 ## Testing
 
 ```sh
-python3 setup.py test && python3 setup.py e2e_test
+python3 setup.py test_python && python3 setup.py test_javascript && python3 setup.py e2e_test
 ```
 
 ## License

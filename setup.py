@@ -11,9 +11,9 @@ from setuptools import setup
 from setuptools.command.install import install
 
 
-class RunUnittestsCommand(cmd.Command):
-    """Class that represents run unittests command."""
-    description = 'Run all unittests'
+class RunUnittestsBackendCommand(cmd.Command):
+    """Class that runs backend unit tests."""
+    description = 'Run backend unittests'
     user_options = []
 
     def initialize_options(self):
@@ -26,11 +26,25 @@ class RunUnittestsCommand(cmd.Command):
         suite = unittest.TestLoader().discover(
             'vprof/tests/.', pattern="*_test.py")
         unittest.TextTestRunner(verbosity=2, buffer=True).run(suite)
+
+
+class RunUnittestsFrontendCommand(cmd.Command):
+    """Class that runs frontend unit tests."""
+    description = 'Run frontend unittests'
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
         subprocess.check_call(shlex.split('npm run test'))
 
 
 class RunEndToEndTestCommand(cmd.Command):
-    """Class that represents run end-to-end tests command."""
+    """Class that runs end-to-end tests."""
     description = 'Run all end to end tests'
     user_options = []
 
@@ -46,9 +60,29 @@ class RunEndToEndTestCommand(cmd.Command):
         unittest.TextTestRunner(verbosity=2, buffer=True).run(suite)
 
 
-class RunLintCommand(cmd.Command):
-    """Class that represents run linter command."""
-    description = 'Run linter'
+class RunLintBackendCommand(cmd.Command):
+    """Class that runs Python linter."""
+    description = 'Run Python linter'
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        subprocess.check_call(shlex.split(
+            'pylint --reports=n --rcfile=.pylintrc ' + ' '.join(
+                glob.glob('vprof/*.py'))))
+        subprocess.check_call(shlex.split(
+            'pylint --reports=n --rcfile=.pylintrc ' + ' '.join(
+                glob.glob('vprof/tests/*.py'))))
+
+
+class RunLintFrontendCommand(cmd.Command):
+    """Class that runs Javascript linter."""
+    description = 'Run Javascript linter'
     user_options = []
 
     def initialize_options(self):
@@ -59,17 +93,11 @@ class RunLintCommand(cmd.Command):
 
     def run(self):
         subprocess.check_call(shlex.split('npm run lint'))
-        subprocess.check_call(shlex.split(
-            'pylint --reports=n --rcfile=.pylintrc ' + ' '.join(
-                glob.glob('vprof/*.py'))))
-        subprocess.check_call(shlex.split(
-            'pylint --reports=n --rcfile=.pylintrc ' + ' '.join(
-                glob.glob('vprof/tests/*.py'))))
 
 
 class RunCleanCommand(cmd.Command):
-    """Class that represents cleanup command."""
-    description = 'Clean temporary files'
+    """Class that runs cleanup command."""
+    description = 'Clean temporary files up'
     user_options = []
 
     def initialize_options(self):
@@ -84,7 +112,7 @@ class RunCleanCommand(cmd.Command):
 
 
 class RunDepsInstallCommand(cmd.Command):
-    """Class that represents install dependencies command."""
+    """Class that installs dependencies."""
     description = 'Install dependencies'
     user_options = []
 
@@ -164,9 +192,11 @@ setup(
     long_description=get_description(),
     long_description_content_type="text/markdown",
     cmdclass={
-        'test': RunUnittestsCommand,
+        'test_python': RunUnittestsBackendCommand,
+        'test_javascript': RunUnittestsFrontendCommand,
         'e2e_test': RunEndToEndTestCommand,
-        'lint': RunLintCommand,
+        'lint_python': RunLintBackendCommand,
+        'lint_javascript': RunLintFrontendCommand,
         'deps_install': RunDepsInstallCommand,
         'build_ui': VProfBuild,
         'install': VProfInstall,
