@@ -58,7 +58,7 @@ jobs:
       run:
         python setup.py lint_javascript
 
-  unittest:
+  unittest_python:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -75,7 +75,26 @@ jobs:
         python setup.py deps_install
     - name: Run tests
       run:
-        python setup.py test
+        python setup.py test_python
+
+  unittest_javascript:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8]
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python setup.py deps_install
+    - name: Run tests
+      run:
+        python setup.py test_javascript
 
   e2e_tests:
     runs-on: ubuntu-latest
