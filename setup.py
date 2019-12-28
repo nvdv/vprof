@@ -46,9 +46,29 @@ class RunEndToEndTestCommand(cmd.Command):
         unittest.TextTestRunner(verbosity=2, buffer=True).run(suite)
 
 
-class RunLintCommand(cmd.Command):
+class RunLintBackendCommand(cmd.Command):
     """Class that represents run linter command."""
-    description = 'Run linter'
+    description = 'Run Python linter'
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        subprocess.check_call(shlex.split(
+            'pylint --reports=n --rcfile=.pylintrc ' + ' '.join(
+                glob.glob('vprof/*.py'))))
+        subprocess.check_call(shlex.split(
+            'pylint --reports=n --rcfile=.pylintrc ' + ' '.join(
+                glob.glob('vprof/tests/*.py'))))
+
+
+class RunLintFrontendCommand(cmd.Command):
+    """Class that represents run linter command."""
+    description = 'Run Javascript linter'
     user_options = []
 
     def initialize_options(self):
@@ -59,12 +79,6 @@ class RunLintCommand(cmd.Command):
 
     def run(self):
         subprocess.check_call(shlex.split('npm run lint'))
-        subprocess.check_call(shlex.split(
-            'pylint --reports=n --rcfile=.pylintrc ' + ' '.join(
-                glob.glob('vprof/*.py'))))
-        subprocess.check_call(shlex.split(
-            'pylint --reports=n --rcfile=.pylintrc ' + ' '.join(
-                glob.glob('vprof/tests/*.py'))))
 
 
 class RunCleanCommand(cmd.Command):
@@ -166,7 +180,8 @@ setup(
     cmdclass={
         'test': RunUnittestsCommand,
         'e2e_test': RunEndToEndTestCommand,
-        'lint': RunLintCommand,
+        'lint_python': RunLintBackendCommand,
+        'lint_javascript': RunLintFrontendCommand,
         'deps_install': RunDepsInstallCommand,
         'build_ui': VProfBuild,
         'install': VProfInstall,
