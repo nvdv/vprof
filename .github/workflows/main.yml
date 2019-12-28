@@ -58,7 +58,7 @@ jobs:
       run:
         python setup.py test
 
-   e2e_tests:
+  e2e_tests:
     runs-on: ubuntu-latest
     strategy:
       matrix:
