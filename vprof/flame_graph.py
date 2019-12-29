@@ -35,7 +35,7 @@ class _StatProfiler:
         signal.setitimer(signal.ITIMER_PROF, 0)
 
     def sample(self, signum, frame):  #pylint: disable=unused-argument
-        """Samples current stack and adds result in self._stats.
+        """Samples current stack and writes result in self._stats.
 
         Args:
             signum: Signal that activates handler.
@@ -53,7 +53,7 @@ class _StatProfiler:
 
     @staticmethod
     def _insert_stack(stack, sample_count, call_tree):
-        """Inserts stack into the call tree.
+        """Inserts a stack into the call tree.
 
         Args:
             stack: Call stack.
@@ -139,7 +139,7 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
         }
 
     def profile_package(self):
-        """Runs package profiler in separate process."""
+        """Runs package profiler in a separate process."""
         return base_profiler.run_in_separate_process(self._profile_package)
 
     def _profile_module(self):
@@ -163,7 +163,7 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
         }
 
     def profile_module(self):
-        """Runs module profiler in separate process."""
+        """Runs module profiler in a separate process."""
         return base_profiler.run_in_separate_process(self._profile_module)
 
     def profile_function(self):
