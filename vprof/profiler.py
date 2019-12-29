@@ -54,7 +54,7 @@ class Profiler(base_profiler.BaseProfiler):
         }
 
     def profile_package(self):
-        """Runs package profiler in separate process."""
+        """Runs package profiler in a separate process."""
         return base_profiler.run_in_separate_process(self._profile_package)
 
     def _profile_module(self):
@@ -78,7 +78,7 @@ class Profiler(base_profiler.BaseProfiler):
         }
 
     def profile_module(self):
-        """Runs module profiler in separate process."""
+        """Runs module profiler in a separate process."""
         return base_profiler.run_in_separate_process(self._profile_module)
 
     def profile_function(self):

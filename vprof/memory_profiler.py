@@ -19,7 +19,7 @@ _BYTES_IN_MB = 1024 * 1024
 
 
 def _remove_duplicates(objects):
-    """Removes duplicate objects.
+    """Removes duplicate objects from collection.
 
     http://www.peterbe.com/plog/uniqifiers-benchmark.
     """
@@ -126,7 +126,7 @@ class _CodeEventsTracker:
 
     @property
     def obj_overhead(self):
-        """Returns all objects that are considered a profiler overhead.
+        """Returns all objects that are considered as profiler overhead.
         Objects are hardcoded for convenience.
         """
         overhead = [
@@ -186,7 +186,7 @@ class MemoryProfiler(base_profiler.BaseProfiler):
         return prof, result
 
     def run(self):
-        """Collects memory stats for specified Python program."""
+        """Collects memory stats for a specified Python program."""
         existing_objects = _get_in_memory_objects()
         prof, result = self.profile()
         new_objects = _get_in_memory_objects()

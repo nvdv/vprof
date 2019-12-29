@@ -1,4 +1,4 @@
-"""Base class for a profile wrapper."""
+"""Base class of a profiler wrapper."""
 import inspect
 import multiprocessing
 import os
@@ -81,7 +81,7 @@ def run_in_separate_process(func, *args, **kwargs):
 
 
 class BaseProfiler:
-    """Base class for a profiler."""
+    """Base class for a profiler wrapper."""
 
     def __init__(self, run_object):
         """Initializes profiler.
@@ -152,7 +152,7 @@ class BaseProfiler:
         raise NotImplementedError
 
     def profile_module(self):
-        """Profiles module.
+        """Profiles a module.
 
         Runs object self._run_object as a Python module.
         Must be overridden.
@@ -160,7 +160,7 @@ class BaseProfiler:
         raise NotImplementedError
 
     def profile_function(self):
-        """Profiles function.
+        """Profiles a function.
 
         Runs object self._run_object as a Python function.
         Must be overridden.
@@ -168,5 +168,5 @@ class BaseProfiler:
         raise NotImplementedError
 
     def run(self):
-        """Runs profiler and returns collected stats."""
+        """Runs a profiler and returns collected stats."""
         return self.profile()

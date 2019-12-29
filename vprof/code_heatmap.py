@@ -111,8 +111,8 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
 
     def _calc_skips(self, heatmap, num_lines):
         """Calculates skip map for large sources.
-        Skip map is a list of tuples where first element of tuple is line
-        number and second is length of the skip region:
+        Skip map is a list of tuples where first element of tuple is a line
+        number and second is a length of the skip region:
             [(1, 10), (15, 10)] means skipping 10 lines after line 1 and
             10 lines after line 15.
         """
@@ -130,7 +130,7 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
 
     @staticmethod
     def _skip_lines(src_code, skip_map):
-        """Skips lines in src_code specified by skip map."""
+        """Skips lines in src_code specified by a skip map."""
         if not skip_map:
             return [['line', j + 1, l] for j, l in enumerate(src_code)]
         code_with_skips, i = [], 0
@@ -148,7 +148,7 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
         return code_with_skips
 
     def _profile_package(self):
-        """Calculates heatmap for package."""
+        """Calculates heatmap for a package."""
         with _CodeHeatmapCalculator() as prof:
             try:
                 runpy.run_path(self._run_object, run_name='__main__')
@@ -170,7 +170,7 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
         }
 
     def profile_package(self):
-        """Runs package profiler in separate process."""
+        """Runs package profiler in a separate process."""
         return base_profiler.run_in_separate_process(self._profile_package)
 
     def _format_heatmap(self, filename, heatmap, execution_count):
@@ -188,7 +188,7 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
         }
 
     def _profile_module(self):
-        """Calculates heatmap for module."""
+        """Calculates heatmap for a module."""
         with open(self._run_object, 'r') as srcfile:
             src_code = srcfile.read()
             code = compile(src_code, self._run_object, 'exec')
@@ -213,11 +213,11 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
         }
 
     def profile_module(self):
-        """Runs module profiler in separate process."""
+        """Runs module profiler in a separate process."""
         return base_profiler.run_in_separate_process(self._profile_module)
 
     def profile_function(self):
-        """Calculates heatmap for function."""
+        """Calculates heatmap for a function."""
         with _CodeHeatmapCalculator() as prof:
             result = self._run_object(*self._run_args, **self._run_kwargs)
         code_lines, start_line = inspect.getsourcelines(self._run_object)

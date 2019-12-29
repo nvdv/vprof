@@ -1,4 +1,4 @@
-"""Profiler's main module."""
+"""Main module of the profiler."""
 # pylint: disable=wrong-import-position
 import builtins
 import os
