@@ -6,3 +6,4 @@ build
 dist
 vprof.egg-info
 .vscode
+.pypirc
