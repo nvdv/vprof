@@ -92,7 +92,7 @@ def run(func, options, args=(), kwargs={}, host='localhost', port=8000):  # pyli
 
     result = None
     for prof in run_stats:
-        if not result:
+        if result is None:
             result = run_stats[prof]['result']
         del run_stats[prof]['result']  # Don't send result to remote host
 
