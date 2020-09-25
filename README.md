@@ -111,6 +111,11 @@ where `cmhp` is profiling mode, `host` and `port` are hostname and port of
 `vprof` server launched in remote mode. Obtained stats will be rendered in new
 tab of default web browser, opened by `vprof -r` command.
 
+On the other hand, you can also configure `vprof` server by setting these following environment variables:
+
+* `VPROF__REMOTE_SERVER_HOST`
+* `VPROF__REMOTE_SERVER_PORT`
+
 `vprof` can save profile stats to file and render visualizations from
 previously saved file.
 
