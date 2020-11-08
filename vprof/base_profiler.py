@@ -39,7 +39,7 @@ class ProcessWithException(multiprocessing.Process):
     """
 
     def __init__(self, result, *args, **kwargs):
-        super(ProcessWithException, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.parent_conn, self.child_conn = multiprocessing.Pipe()
         self.result = result
 
