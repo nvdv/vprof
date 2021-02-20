@@ -7,3 +7,4 @@ dist
 vprof.egg-info
 .vscode
 .pypirc
+.venv
