@@ -23,7 +23,7 @@ reported.
 * Include screenshots if it helps to demonstrate the problem.
 * Include version vprof, Python, name and version of OS you are using.
 
-### Suggesting enchanchements
+### Suggesting enhancements
 Before creating feature request, please check if the feature has already been
 requested or implemented.
 
