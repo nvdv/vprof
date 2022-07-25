@@ -18,7 +18,10 @@ __version__ = '0.38'
 
 _PROGRAN_NAME = 'vprof'
 _MODULE_DESC = 'Visual profiler for Python'
-_HOST, _PORT = 'localhost', 8000
+_HOST, _PORT = (
+    os.getenv('VPROF__REMOTE_SERVER_HOST','localhost'),
+    os.getenv('VPROF__REMOTE_SERVER_PORT', 8000)
+)
 _CONFIG_DESC = (
     """profile program SRC with configuration CONFIG
 available CONFIG options
@@ -70,11 +73,11 @@ def main():
                 print('Incorrect profiler version - %s. %s is required.' % (
                     saved_stats['version'], __version__))
                 sys.exit(_ERR_CODES['input_file_error'])
-            stats_server.start(args.host, args.port, saved_stats,
+            stats_server.start(args.host, int(args.port), saved_stats,
                                args.dont_start_browser, args.debug_mode)
     # Launch in remote mode.
     elif args.remote:
-        stats_server.start(args.host, args.port, {},
+        stats_server.start(args.host, int(args.port), {},
                            args.dont_start_browser, args.debug_mode)
     # Profiler mode.
     else:
@@ -95,7 +98,7 @@ def main():
                 outfile.write(json.dumps(program_stats, indent=2))
         else:
             stats_server.start(
-                args.host, args.port, program_stats,
+                args.host, int(args.port), program_stats,
                 args.dont_start_browser, args.debug_mode)
 
 if __name__ == "__main__":
