@@ -180,7 +180,6 @@ class FlameGraph {
       .text((d) => {
         let nodeWidth = this.xScale_(d.x1) - this.xScale_(d.x0);
         return FlameGraph.getTruncatedNodeName_(d.data, nodeWidth);
-        return d.data;
       })
       .attr('visibility', (d, i, n) => {
         let nodeHeight = n[i].previousElementSibling.getAttribute('height');
@@ -216,7 +215,7 @@ class FlameGraph {
   hideTooltip_(element, tooltip) {
     d3.select(element).attr('class', 'flame-graph-rect-normal');
     tooltip.attr('class', 'content-tooltip content-tooltip-invisible');
-  };
+  }
 
   /** Renders flame graph legend. */
   renderLegend_() {

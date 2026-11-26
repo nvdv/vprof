@@ -13,7 +13,7 @@ const MAX_COLOR_DOMAIN_VALUE = Math.pow(2, 32);
 function createColorScale() {
   return d3.scaleSequential(d3.interpolateRainbow)
     .domain([0, MAX_COLOR_DOMAIN_VALUE]);
-};
+}
 
 module.exports = {
   'createColorScale': createColorScale

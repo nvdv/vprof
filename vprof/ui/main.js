@@ -118,30 +118,34 @@ function renderPage(data) {
     let status = (i === 0) ? 'main-tab-selected' : 'main-tab-not-selected';
     let displayClass = (i === 0) ? 'active-tab' : 'inactive-tab';
     switch (props[i]) {
-    case 'c':
+    case 'c': {
       createFlameGraphTab_(tabHeader, status);
       let flameGraph = createTabContent_('flame-graph-tab');
       flameGraphModule.renderFlameGraph(data.c, flameGraph);
       flameGraph.classed(displayClass, true);
       break;
-    case 'm':
+    }
+    case 'm': {
       createMemoryChartTab_(tabHeader, status);
       let memoryChart = createTabContent_('memory-chart-tab');
       memoryStatsModule.renderMemoryStats(data.m, memoryChart);
       memoryChart.classed(displayClass, true);
       break;
-    case 'h':
+    }
+    case 'h': {
       createCodeHeatmapTab_(tabHeader, status);
       let codeHeatmap = createTabContent_('code-heatmap-tab');
       codeHeatmapModule.renderCodeHeatmap(data.h, codeHeatmap);
       codeHeatmap.classed(displayClass, true);
       break;
-    case 'p':
+    }
+    case 'p': {
       createProfilerTab_(tabHeader, status);
       let profilerOutput = createTabContent_('profiler-tab');
       profilerModule.renderProfilerOutput(data.p, profilerOutput);
       profilerOutput.classed(displayClass, true);
       break;
+    }
     }
   }
 
