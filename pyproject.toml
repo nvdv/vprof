@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=77.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vprof"
+version = "0.38"
+description = "Visual profiler for Python"
+readme = "README.md"
+license = "BSD-2-Clause"
+authors = [
+    { name = "nvdv", email = "nick.volynets@gmail.com" },
+]
+keywords = ["debugging", "profiling"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Software Development",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "psutil>=5.9.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/nvdv/vprof"
+Repository = "https://github.com/nvdv/vprof"
+
+[project.scripts]
+vprof = "vprof.__main__:main"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.10.0",
+    "pylint>=3.0.0",
+]
+
+[tool.setuptools]
+packages = ["vprof"]
+include-package-data = false
+
+[tool.setuptools.package-data]
+vprof = [
+    "ui/profile.html",
+    "ui/vprof_min.js",
+    "ui/favicon.ico",
+    "ui/css/*.css",
+    "ui/css/*.gif",
+]
