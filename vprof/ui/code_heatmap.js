@@ -4,12 +4,9 @@
 
 'use strict';
 const d3 = require('d3');
-const hljs = require('highlight.js');
-try {
-  require('./css/highlight.css');  // Necessary for code highlighter to work.
-} catch (e) {
-  // Do nothing, it's workaround for Jest test runner.
-}
+const hljs = require('highlight.js/lib/core');
+const python = require('highlight.js/lib/languages/python');
+hljs.registerLanguage('python', python);
 
 /**
  * Represents code heatmap.
@@ -209,7 +206,8 @@ class CodeHeatmap {
    * @returns {string}
    */
   formatSrcLine_(lineNumber, codeLine, lineRuntime) {
-    let highlightedLine = hljs.highlight('python', codeLine).value;
+    let highlightedLine = hljs.highlight(
+      codeLine, {language: 'python'}).value;
     let backgroundColor = lineRuntime ? this.heatmapScale_(lineRuntime) : '';
     return (
       "<div class='heatmap-src-line-normal' style='background-color: " +

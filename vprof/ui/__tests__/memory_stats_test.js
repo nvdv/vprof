@@ -1,5 +1,7 @@
 'use strict';
 
+const assert = require('node:assert/strict');
+const {describe, it} = require('node:test');
 const memoryStatsModule = require('../memory_stats.js');
 
 describe('Memory stats test suite', () => {
@@ -12,7 +14,8 @@ describe('Memory stats test suite', () => {
       '<p><b>Filename:</b> foo.py</p>' +
       '<p><b>Memory usage:</b> 15 MB</p>');
 
-    expect(memoryStatsModule.MemoryChart.generateTooltipText_(stats)).toBe(
+    assert.strictEqual(
+      memoryStatsModule.MemoryChart.generateTooltipText_(stats),
       expectedResult);
   });
 });

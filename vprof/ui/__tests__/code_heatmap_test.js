@@ -1,10 +1,12 @@
 'use strict';
 
+const assert = require('node:assert/strict');
+const {describe, it} = require('node:test');
 const codeHeatmapModule = require('../code_heatmap.js');
 
 describe('Code heatmap test suite', () => {
   it('Check renderCode', () => {
-    codeHeatmapModule.CodeHeatmap.prototype.formatSrcLine_ = (n, l, c) => n;
+    codeHeatmapModule.CodeHeatmap.prototype.formatSrcLine_ = (n) => n;
     let data = {}, parent = {};
     let calculator = new codeHeatmapModule.CodeHeatmap(parent, data);
 
@@ -18,11 +20,11 @@ describe('Code heatmap test suite', () => {
     };
 
     let expectedResult = {
-      'srcCode': "123",
+      'srcCode': '123',
       'timeMap': {0: 0.1, 1: 0.2, 2: 0.2},
       'countMap': {0: 1, 1: 1, 2: 1}
     };
-    expect(calculator.renderCode_(codeStats)).toEqual(expectedResult);
+    assert.deepStrictEqual(calculator.renderCode_(codeStats), expectedResult);
 
     srcCode = [
       ['line', 1, 'foo'], ['line', 2, 'bar'],
@@ -40,6 +42,6 @@ describe('Code heatmap test suite', () => {
       'timeMap': {0: 0.1, 1: 0.1, 2: 0.3},
       'countMap': {0: 1, 1: 1, 2: 1}
     };
-    expect(calculator.renderCode_(codeStats)).toEqual(expectedResult);
+    assert.deepStrictEqual(calculator.renderCode_(codeStats), expectedResult);
   });
 });

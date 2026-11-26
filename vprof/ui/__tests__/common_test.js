@@ -1,13 +1,16 @@
 'use strict';
 
+const assert = require('node:assert/strict');
+const {describe, it} = require('node:test');
 const commonModule = require('../common.js');
 
 describe('Profiler test suite', () => {
   it('Check shortenString', () => {
-    expect(commonModule.shortenString('foobar', 6, true)).toBe('foobar');
-    expect(commonModule.shortenString('foobarfoobar', 10, true)).toBe(
-      '...rfoobar');
-    expect(commonModule.shortenString('foobarfoobar', 10, false)).toBe(
-      'foobarf...');
+    assert.strictEqual(
+      commonModule.shortenString('foobar', 6, true), 'foobar');
+    assert.strictEqual(
+      commonModule.shortenString('foobarfoobar', 10, true), '...rfoobar');
+    assert.strictEqual(
+      commonModule.shortenString('foobarfoobar', 10, false), 'foobarf...');
   });
 });

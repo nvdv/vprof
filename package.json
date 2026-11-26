@@ -3,29 +3,21 @@
   "author": "nvdv",
   "main": "vprof/ui/main.js",
   "dependencies": {
-    "browserify": "13",
-    "browserify-css": "latest",
-    "d3": "4.9.1",
-    "eslint": "latest",
-    "highlight.js": "latest",
-    "jest": "18.0.0",
-    "uglify-es": "3.0.24",
-    "watchify": "3.7.0"
+    "d3": "^4.13.0",
+    "highlight.js": "^11.11.1"
+  },
+  "devDependencies": {
+    "browserify": "^17.0.1",
+    "eslint": "^9.0.0"
   },
   "scripts": {
     "lint": "eslint vprof/ui",
-    "build": "browserify -g browserify-css vprof/ui/main.js | uglifyjs -o vprof/ui/vprof_min.js",
-    "watch": "watchify vprof/ui/main.js -o vprof/ui/vprof_min.js -v",
-    "test": "jest"
-  },
-  "browserify": {
-    "transform": [
-      "browserify-css"
-    ]
+    "build": "browserify vprof/ui/main.js -o vprof/ui/vprof_min.js",
+    "test": "node --test 'vprof/ui/__tests__/*_test.js'"
   },
   "license": "BSD-2-Clause",
   "repository": {
     "type": "git",
-    "url": "http://github.com/nvdv/vprof.git"
+    "url": "https://github.com/nvdv/vprof.git"
   }
 }

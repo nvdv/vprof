@@ -1,5 +1,6 @@
 @import "code_heatmap.css";
 @import "flame_graph.css";
+@import "highlight.css";
 @import "memory_stats.css";
 @import "profiler.css";
 
