@@ -1,5 +1,5 @@
 """End-to-end tests for Python profiler wrapper."""
-# pylint: disable=missing-docstring, blacklisted-name
+# pylint: disable=missing-docstring, disallowed-name
 import functools
 import gzip
 import json
@@ -38,11 +38,11 @@ class ProfilerModuleEndToEndTest(unittest.TestCase):
         self.server.server_close()
 
     def testRequest(self):
-        response = urllib.request.urlopen(
-            'http://%s:%s/profile' % (_HOST, _PORT))
-        response_data = gzip.decompress(response.read())
+        with urllib.request.urlopen(
+                f'http://{_HOST}:{_PORT}/profile') as response:
+            response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
-        self.assertEqual(stats['objectName'], '%s (module)' % _MODULE_FILENAME)
+        self.assertEqual(stats['objectName'], f'{_MODULE_FILENAME} (module)')
         self.assertTrue(len(stats['callStats']) > 0)
         self.assertTrue(stats['totalTime'] > 0)
         self.assertTrue(stats['primitiveCalls'] > 0)
@@ -67,11 +67,11 @@ class ProfilerPackageEndToEndTest(unittest.TestCase):
         self.server.server_close()
 
     def testRequest(self):
-        response = urllib.request.urlopen(
-            'http://%s:%s/profile' % (_HOST, _PORT))
-        response_data = gzip.decompress(response.read())
+        with urllib.request.urlopen(
+                f'http://{_HOST}:{_PORT}/profile') as response:
+            response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
-        self.assertEqual(stats['objectName'], '%s (package)' % _PACKAGE_PATH)
+        self.assertEqual(stats['objectName'], f'{_PACKAGE_PATH} (package)')
         self.assertTrue(len(stats['callStats']) > 0)
         self.assertTrue(stats['totalTime'] > 0)
         self.assertTrue(stats['primitiveCalls'] > 0)
@@ -103,17 +103,17 @@ class ProfilerFunctionEndToEndTest(unittest.TestCase):
     def testRequest(self):
         runner.run(
             self._func, 'p', ('foo', 'bar'), host=_HOST, port=_PORT)
-        response = urllib.request.urlopen(
-            'http://%s:%s/profile' % (_HOST, _PORT))
-        response_data = gzip.decompress(response.read())
+        with urllib.request.urlopen(
+                f'http://{_HOST}:{_PORT}/profile') as response:
+            response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         curr_filename = inspect.getabsfile(inspect.currentframe())
         self.assertEqual(stats['p']['objectName'],
-                         '_func @ %s (function)' % curr_filename)
+                         f'_func @ {curr_filename} (function)')
         self.assertTrue(len(stats['p']['callStats']) > 0)
         self.assertTrue(stats['p']['totalTime'] > 0)
         self.assertTrue(stats['p']['primitiveCalls'] > 0)
         self.assertTrue(stats['p']['totalCalls'] > 0)
 
 
-# pylint: enable=missing-docstring, blacklisted-name
+# pylint: enable=missing-docstring, disallowed-name

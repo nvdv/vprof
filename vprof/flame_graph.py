@@ -90,7 +90,7 @@ class _StatProfiler:
         funcname, filename, _ = node['stack']
         sample_percent = self._get_percentage(
             node['sampleCount'], total_samples)
-        color_hash = base_profiler.hash_name('%s @ %s' % (funcname, filename))
+        color_hash = base_profiler.hash_name(f'{funcname} @ {filename}')
         return {
             'stack': node['stack'],
             'children': [self._format_tree(child, total_samples)

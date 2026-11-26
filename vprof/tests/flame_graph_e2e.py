@@ -1,5 +1,5 @@
 """End-to-end tests for flame graph module."""
-# pylint: disable=missing-docstring, protected-access,  blacklisted-name
+# pylint: disable=missing-docstring, protected-access, disallowed-name
 import functools
 import gzip
 import json
@@ -37,11 +37,11 @@ class FlameGraphModuleEndToEndTest(unittest.TestCase):
         self.server.server_close()
 
     def testRequest(self):
-        response = urllib.request.urlopen(
-            'http://%s:%s/profile' % (_HOST, _PORT))
-        response_data = gzip.decompress(response.read())
+        with urllib.request.urlopen(
+                f'http://{_HOST}:{_PORT}/profile') as response:
+            response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
-        self.assertEqual(stats['objectName'], '%s (module)' % _MODULE_FILENAME)
+        self.assertEqual(stats['objectName'], f'{_MODULE_FILENAME} (module)')
         self.assertEqual(stats['sampleInterval'], flame_graph._SAMPLE_INTERVAL)
         self.assertTrue(stats['runTime'] > 0)
         self.assertTrue(len(stats['callStats']) >= 0)
@@ -66,11 +66,11 @@ class FlameGraphPackageEndToEndTest(unittest.TestCase):
         self.server.server_close()
 
     def testRequest(self):
-        response = urllib.request.urlopen(
-            'http://%s:%s/profile' % (_HOST, _PORT))
-        response_data = gzip.decompress(response.read())
+        with urllib.request.urlopen(
+                f'http://{_HOST}:{_PORT}/profile') as response:
+            response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
-        self.assertEqual(stats['objectName'], '%s (package)' % _PACKAGE_PATH)
+        self.assertEqual(stats['objectName'], f'{_PACKAGE_PATH} (package)')
         self.assertEqual(stats['sampleInterval'], flame_graph._SAMPLE_INTERVAL)
         self.assertTrue(stats['runTime'] > 0)
         self.assertTrue(len(stats['callStats']) >= 0)
@@ -101,17 +101,17 @@ class FlameGraphFunctionEndToEndTest(unittest.TestCase):
     def testRequest(self):
         runner.run(
             self._func, 'c', ('foo', 'bar'), host=_HOST, port=_PORT)
-        response = urllib.request.urlopen(
-            'http://%s:%s/profile' % (_HOST, _PORT))
-        response_data = gzip.decompress(response.read())
+        with urllib.request.urlopen(
+                f'http://{_HOST}:{_PORT}/profile') as response:
+            response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         curr_filename = inspect.getabsfile(inspect.currentframe())
         self.assertEqual(stats['c']['objectName'],
-                         '_func @ %s (function)' % curr_filename)
+                         f'_func @ {curr_filename} (function)')
         self.assertEqual(
             stats['c']['sampleInterval'], flame_graph._SAMPLE_INTERVAL)
         self.assertTrue(stats['c']['runTime'] > 0)
         self.assertTrue(len(stats['c']['callStats']) >= 0)
         self.assertTrue(stats['c']['totalSamples'] >= 0)
 
-# pylint: enable=missing-docstring, blacklisted-name, protected-access
+# pylint: enable=missing-docstring, disallowed-name, protected-access

@@ -1,5 +1,5 @@
 """End-to-end tests for code heatmap module."""
-# pylint: disable=missing-docstring, blacklisted-name
+# pylint: disable=missing-docstring, disallowed-name
 import functools
 import gzip
 import json
@@ -49,9 +49,9 @@ class CodeHeatmapModuleEndToEndTest(unittest.TestCase):
         self.server.server_close()
 
     def testRequest(self):
-        response = urllib.request.urlopen(
-            'http://%s:%s/profile' % (_HOST, _PORT))
-        response_data = gzip.decompress(response.read())
+        with urllib.request.urlopen(
+                f'http://{_HOST}:{_PORT}/profile') as response:
+            response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], _MODULE_FILENAME)
         self.assertTrue(stats['runTime'] > 0)
@@ -80,9 +80,9 @@ class CodeHeatmapPackageEndToEndTest(unittest.TestCase):
         self.server.server_close()
 
     def testRequest(self):
-        response = urllib.request.urlopen(
-            'http://%s:%s/profile' % (_HOST, _PORT))
-        response_data = gzip.decompress(response.read())
+        with urllib.request.urlopen(
+                f'http://{_HOST}:{_PORT}/profile') as response:
+            response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], _PACKAGE_PATH)
         self.assertTrue(stats['runTime'] > 0)
@@ -117,22 +117,22 @@ class CodeHeatmapFunctionEndToEndTest(unittest.TestCase):
     def testRequest(self):
         runner.run(
             self._func, 'h', ('foo', 'bar'), host=_HOST, port=_PORT)
-        response = urllib.request.urlopen(
-            'http://%s:%s/profile' % (_HOST, _PORT))
-        response_data = gzip.decompress(response.read())
+        with urllib.request.urlopen(
+                f'http://{_HOST}:{_PORT}/profile') as response:
+            response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertTrue(stats['h']['runTime'] > 0)
         heatmaps = stats['h']['heatmaps']
         curr_filename = inspect.getabsfile(inspect.currentframe())
         self.assertEqual(stats['h']['objectName'],
-                         '_func @ %s (function)' % curr_filename)
+                         f'_func @ {curr_filename} (function)')
         self.assertEqual(len(heatmaps), 1)
         self.assertDictEqual(
             heatmaps[0]['executionCount'], {'101': 1, '102': 1})
         self.assertListEqual(
             heatmaps[0]['srcCode'],
-            [['line', 100, u'        def _func(foo, bar):\n'],
-             ['line', 101, u'            baz = foo + bar\n'],
-             ['line', 102, u'            return baz\n']])
+            [['line', 100, '        def _func(foo, bar):\n'],
+             ['line', 101, '            baz = foo + bar\n'],
+             ['line', 102, '            return baz\n']])
 
-# pylint: enable=missing-docstring, blacklisted-name
+# pylint: enable=missing-docstring, disallowed-name

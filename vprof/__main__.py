@@ -59,16 +59,16 @@ def main():
                         action='store_true', default=False,
                         help="don't suppress error messages")
     parser.add_argument('--version', action='version',
-                        version='vprof %s' % __version__)
+                        version=f'vprof {__version__}')
     args = parser.parse_args()
 
     # Render UI from file.
     if args.input_file:
-        with open(args.input_file) as ifile:
+        with open(args.input_file, encoding='utf-8') as ifile:
             saved_stats = json.loads(ifile.read())
             if saved_stats['version'] != __version__:
-                print('Incorrect profiler version - %s. %s is required.' % (
-                    saved_stats['version'], __version__))
+                print(f"Incorrect profiler version - {saved_stats['version']}. "
+                      f"{__version__} is required.")
                 sys.exit(_ERR_CODES['input_file_error'])
             stats_server.start(args.host, args.port, saved_stats,
                                args.dont_start_browser, args.debug_mode)
@@ -82,15 +82,15 @@ def main():
         try:
             program_stats = runner.run_profilers(source, config, verbose=True)
         except runner.AmbiguousConfigurationError:
-            print('Profiler configuration %s is ambiguous. '
-                  'Please, remove duplicates.' % config)
+            print(f'Profiler configuration {config} is ambiguous. '
+                  'Please, remove duplicates.')
             sys.exit(_ERR_CODES['ambiguous_configuration'])
         except runner.BadOptionError as exc:
             print(exc)
             sys.exit(_ERR_CODES['bad_option'])
 
         if args.output_file:
-            with open(args.output_file, 'w') as outfile:
+            with open(args.output_file, 'w', encoding='utf-8') as outfile:
                 program_stats['version'] = __version__
                 outfile.write(json.dumps(program_stats, indent=2))
         else:

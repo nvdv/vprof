@@ -13,7 +13,6 @@ if not hasattr(builtins, 'initial_rss_size'):
 
 import json
 
-from collections import OrderedDict
 from vprof import code_heatmap
 from vprof import flame_graph
 from vprof import memory_profiler
@@ -57,19 +56,19 @@ def run_profilers(run_object, prof_config, verbose=False):
     """
     if len(prof_config) > len(set(prof_config)):
         raise AmbiguousConfigurationError(
-            'Profiler configuration %s is ambiguous' % prof_config)
+            f'Profiler configuration {prof_config} is ambiguous')
 
     available_profilers = {opt for opt, _ in _PROFILERS}
     for option in prof_config:
         if option not in available_profilers:
-            raise BadOptionError('Unknown option: %s' % option)
+            raise BadOptionError(f'Unknown option: {option}')
 
-    run_stats = OrderedDict()
+    run_stats = {}
     present_profilers = ((o, p) for o, p in _PROFILERS if o in prof_config)
     for option, prof in present_profilers:
         curr_profiler = prof(run_object)
         if verbose:
-            print('Running %s...' % curr_profiler.__class__.__name__)
+            print(f'Running {curr_profiler.__class__.__name__}...')
         run_stats[option] = curr_profiler.run()
     return run_stats
 
@@ -91,12 +90,13 @@ def run(func, options, args=(), kwargs={}, host='localhost', port=8000):  # pyli
     run_stats = run_profilers((func, args, kwargs), options)
 
     result = None
-    for prof in run_stats:
+    for prof_stats in run_stats.values():
         if result is None:
-            result = run_stats[prof]['result']
-        del run_stats[prof]['result']  # Don't send result to remote host
+            result = prof_stats['result']
+        del prof_stats['result']  # Don't send result to remote host
 
     post_data = gzip.compress(
         json.dumps(run_stats).encode('utf-8'))
-    urllib.request.urlopen('http://%s:%s' % (host, port), post_data)
+    with urllib.request.urlopen(f'http://{host}:{port}', post_data):
+        pass
     return result

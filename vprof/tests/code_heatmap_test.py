@@ -39,7 +39,7 @@ class CodeHeatmapCalculatorUnittest(unittest.TestCase):
         self._calc = object.__new__(code_heatmap._CodeHeatmapCalculator)
 
     def testInit(self):
-        self._calc.__init__()
+        self._calc = code_heatmap._CodeHeatmapCalculator()
         self.assertEqual(self._calc.original_trace_function, sys.gettrace())
         self.assertEqual(
             self._calc._heatmap, defaultdict(lambda: defaultdict(float)))

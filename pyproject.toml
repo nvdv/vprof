@@ -51,3 +51,19 @@ vprof = [
     "ui/css/*.css",
     "ui/css/*.gif",
 ]
+
+[tool.pylint."messages control"]
+disable = [
+    "duplicate-code",
+    "exec-used",
+    "fixme",
+    "invalid-name",
+    "no-member",
+    "too-many-arguments",
+    "too-many-locals",
+    "too-many-positional-arguments",
+    "wrong-import-order",
+]
+
+[tool.pylint.format]
+max-line-length = 80

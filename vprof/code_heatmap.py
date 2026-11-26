@@ -175,7 +175,7 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
 
     def _format_heatmap(self, filename, heatmap, execution_count):
         """Formats heatmap for UI."""
-        with open(filename) as src_file:
+        with open(filename, encoding='utf-8') as src_file:
             file_source = src_file.read().split('\n')
             skip_map = self._calc_skips(heatmap, len(file_source))
         run_time = sum(time for time in heatmap.values())
@@ -189,7 +189,7 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
 
     def _profile_module(self):
         """Calculates heatmap for a module."""
-        with open(self._run_object, 'r') as srcfile:
+        with open(self._run_object, 'r', encoding='utf-8') as srcfile:
             src_code = srcfile.read()
             code = compile(src_code, self._run_object, 'exec')
         try:

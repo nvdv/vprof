@@ -50,8 +50,10 @@ class BaseProfileUnittest(unittest.TestCase):
             self.profiler.get_run_object_type(pkgpath), 'package')
 
     def testInitFunction(self):
-        _func = lambda foo: foo
-        self.profiler.__init__((_func, ('bar'), {'bar': 'baz'}))
+        def _func(arg):
+            return arg
+        self.profiler = base_profiler.BaseProfiler(
+            (_func, ('bar'), {'bar': 'baz'}))
         self.assertEqual(self.profiler._run_object, _func)
         self.assertEqual(self.profiler._run_args, ('bar'))
         self.assertDictEqual(self.profiler._run_kwargs, {'bar': 'baz'})
@@ -59,20 +61,20 @@ class BaseProfileUnittest(unittest.TestCase):
     @mock.patch('os.path.isdir')
     def testInitPackage(self, isdir_mock):
         isdir_mock.return_value = True
-        self.profiler.__init__('test/test_pkg')
+        self.profiler = base_profiler.BaseProfiler('test/test_pkg')
         self.assertEqual(self.profiler._run_object, 'test/test_pkg')
         self.assertEqual(self.profiler._run_args, '')
-        self.profiler.__init__('test/test_pkg --help')
+        self.profiler = base_profiler.BaseProfiler('test/test_pkg --help')
         self.assertEqual(self.profiler._run_object, 'test/test_pkg')
         self.assertEqual(self.profiler._run_args, '--help')
 
     @mock.patch('os.path.isdir')
     def testInitModule(self, isdir_mock):
         isdir_mock.return_value = False
-        self.profiler.__init__('foo.py')
+        self.profiler = base_profiler.BaseProfiler('foo.py')
         self.assertEqual(self.profiler._run_object, 'foo.py')
         self.assertEqual(self.profiler._run_args, '')
-        self.profiler.__init__('foo.py --bar --baz')
+        self.profiler = base_profiler.BaseProfiler('foo.py --bar --baz')
         self.assertEqual(self.profiler._run_object, 'foo.py')
         self.assertEqual(self.profiler._run_args, '--bar --baz')
         self.assertDictEqual(self.profiler._globs, {

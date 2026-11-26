@@ -16,7 +16,8 @@ class RunnerUnittest(unittest.TestCase):
             'h': {'result': 'foobar', 'total': 200},
             'p': {'result': 'foobar', 'total': 500}
         }
-        func = lambda x, y: x + y
+        def func(x, y):
+            return x + y
         result = runner.run(func, 'hp', args=('foo', 'bar'))
         self.assertEqual(result, 'foobar')
 
@@ -24,13 +25,14 @@ class RunnerUnittest(unittest.TestCase):
     @mock.patch('gzip.compress')
     @mock.patch('urllib.request.urlopen')
     @mock.patch('json.dumps')
-    def testRun_CheckStats(self, json_mock, unused_urlopen_mock, # pylint: disable=no-self-use
+    def testRun_CheckStats(self, json_mock, unused_urlopen_mock,
                            unused_compress_mock, run_mock):
         run_mock.return_value = {
             'h': {'result': 'foobar', 'total': 200},
             'p': {'result': 'foobar', 'total': 500}
         }
-        func = lambda x, y: x + y
+        def func(x, y):
+            return x + y
         runner.run(func, 'hp', args=('foo', 'bar'))
         json_mock.assert_called_with({
             'h': {'total': 200},

@@ -17,7 +17,7 @@ def get_pkg_module_names(package_path):
     """
     module_names = set()
     for fobj, modname, _ in pkgutil.iter_modules(path=[package_path]):
-        filename = os.path.join(fobj.path, '%s.py' % modname)
+        filename = os.path.join(fobj.path, f'{modname}.py')
         if os.path.exists(filename):
             module_names.add(os.path.abspath(filename))
     return module_names
@@ -111,7 +111,7 @@ class BaseProfiler:
         """Initializes profiler with a module."""
         self.profile = self.profile_module
         self._run_object, _, self._run_args = run_object.partition(' ')
-        self._object_name = '%s (module)' % self._run_object
+        self._object_name = f'{self._run_object} (module)'
         self._globs = {
             '__file__': self._run_object,
             '__name__': '__main__',
@@ -126,7 +126,7 @@ class BaseProfiler:
         """Initializes profiler with a package."""
         self.profile = self.profile_package
         self._run_object, _, self._run_args = run_object.partition(' ')
-        self._object_name = '%s (package)' % self._run_object
+        self._object_name = f'{self._run_object} (package)'
         self._replace_sysargs()
 
     def init_function(self, run_object):
@@ -134,8 +134,8 @@ class BaseProfiler:
         self.profile = self.profile_function
         self._run_object, self._run_args, self._run_kwargs = run_object
         filename = inspect.getsourcefile(self._run_object)
-        self._object_name = '%s @ %s (function)' % (
-            self._run_object.__name__, filename)
+        self._object_name = (
+            f'{self._run_object.__name__} @ {filename} (function)')
 
     def _replace_sysargs(self):
         """Replaces sys.argv with proper args to pass to script."""

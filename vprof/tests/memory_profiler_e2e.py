@@ -1,5 +1,6 @@
 """End-to-end tests for memory profiler module."""
-# pylint: disable=missing-docstring, blacklisted-name
+# pylint: disable=missing-docstring, disallowed-name
+import builtins
 import functools
 import gzip
 import json
@@ -11,12 +12,8 @@ import urllib.request
 from vprof import memory_profiler
 from vprof import stats_server
 from vprof import runner
-from vprof.tests import test_pkg # pylint: disable=unused-import
+from vprof.tests import test_pkg  # pylint: disable=unused-import
 
-try:
-    import __builtin__ as builtins
-except ImportError:  # __builtin__ was renamed to builtins in Python 3.
-    import builtins
 builtins.initial_rss_size = 0
 
 _HOST, _PORT = 'localhost', 12345
@@ -43,11 +40,11 @@ class MemoryProfilerModuleEndToEndTest(unittest.TestCase):
         self.server.server_close()
 
     def testRequest(self):
-        response = urllib.request.urlopen(
-            'http://%s:%s/profile' % (_HOST, _PORT))
-        response_data = gzip.decompress(response.read())
+        with urllib.request.urlopen(
+                f'http://{_HOST}:{_PORT}/profile') as response:
+            response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
-        self.assertEqual(stats['objectName'], '%s (module)' % _MODULE_FILENAME)
+        self.assertEqual(stats['objectName'], f'{_MODULE_FILENAME} (module)')
         self.assertEqual(stats['totalEvents'], 1)
         self.assertEqual(stats['codeEvents'][0][0], 1)
         self.assertEqual(stats['codeEvents'][0][1], 1)
@@ -74,11 +71,11 @@ class MemoryProfilerPackageEndToEndTest(unittest.TestCase):
         self.server.server_close()
 
     def testRequest(self):
-        response = urllib.request.urlopen(
-            'http://%s:%s/profile' % (_HOST, _PORT))
-        response_data = gzip.decompress(response.read())
+        with urllib.request.urlopen(
+                f'http://{_HOST}:{_PORT}/profile') as response:
+            response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
-        self.assertEqual(stats['objectName'], '%s (package)' % _PACKAGE_PATH)
+        self.assertEqual(stats['objectName'], f'{_PACKAGE_PATH} (package)')
         self.assertTrue(stats['totalEvents'] > 0)
         self.assertTrue(len(stats['objectsCount']) > 0)
 
@@ -107,19 +104,19 @@ class MemoryProfilerFunctionEndToEndTest(unittest.TestCase):
     def testRequest(self):
         runner.run(
             self._func, 'm', ('foo', 'bar'), host=_HOST, port=_PORT)
-        response = urllib.request.urlopen(
-            'http://%s:%s/profile' % (_HOST, _PORT))
-        response_data = gzip.decompress(response.read())
+        with urllib.request.urlopen(
+                f'http://{_HOST}:{_PORT}/profile') as response:
+            response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         curr_filename = inspect.getabsfile(inspect.currentframe())
         self.assertEqual(stats['m']['objectName'],
-                         '_func @ %s (function)' % curr_filename)
+                         f'_func @ {curr_filename} (function)')
         self.assertEqual(stats['m']['totalEvents'], 2)
         self.assertEqual(stats['m']['codeEvents'][0][0], 1)
-        self.assertEqual(stats['m']['codeEvents'][0][1], 91)
+        self.assertEqual(stats['m']['codeEvents'][0][1], 88)
         self.assertEqual(stats['m']['codeEvents'][0][3], '_func')
         self.assertEqual(stats['m']['codeEvents'][1][0], 2)
-        self.assertEqual(stats['m']['codeEvents'][1][1], 92)
+        self.assertEqual(stats['m']['codeEvents'][1][1], 89)
         self.assertEqual(stats['m']['codeEvents'][1][3], '_func')
 
-# pylint: enable=missing-docstring, blacklisted-name
+# pylint: enable=missing-docstring, disallowed-name

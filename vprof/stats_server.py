@@ -1,7 +1,6 @@
 """Profiler server."""
 import functools
 import gzip
-import io
 import json
 import os
 import socketserver
@@ -11,7 +10,7 @@ import webbrowser
 from http import server
 
 _STATIC_DIR = 'ui'
-_PROFILE_HTML = '%s/profile.html' % _STATIC_DIR
+_PROFILE_HTML = f'{_STATIC_DIR}/profile.html'
 
 
 class StatsServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
@@ -28,16 +27,14 @@ class StatsHandler(server.SimpleHTTPRequestHandler):
             '/': self._handle_root,
             '/profile': self._handle_profile,
         }
-        # Since this class is old-style - call parent method directly.
-        server.SimpleHTTPRequestHandler.__init__(
-            self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @staticmethod
     def _handle_root():
         """Handles index.html requests."""
         res_filename = os.path.join(
             os.path.dirname(__file__), _PROFILE_HTML)
-        with io.open(res_filename, 'rb') as res_file:
+        with open(res_filename, 'rb') as res_file:
             content = res_file.read()
         return content, 'text/html'
 
@@ -49,10 +46,10 @@ class StatsHandler(server.SimpleHTTPRequestHandler):
         """Handles static files requests."""
         res_filename = os.path.join(
             os.path.dirname(__file__), _STATIC_DIR, self.path[1:])
-        with io.open(res_filename, 'rb') as res_file:
+        with open(res_filename, 'rb') as res_file:
             content = res_file.read()
         _, extension = os.path.splitext(self.path)
-        return content, 'text/%s' % extension[1:]  # Skip dot in the extension.
+        return content, f'text/{extension[1:]}'  # Skip dot in the extension.
 
     def do_GET(self):
         """Handles HTTP GET requests."""
@@ -60,7 +57,7 @@ class StatsHandler(server.SimpleHTTPRequestHandler):
         content, content_type = handler()
         compressed_content = gzip.compress(content)
         self._send_response(
-            200, headers=(('Content-type', '%s; charset=utf-8' % content_type),
+            200, headers=(('Content-type', f'{content_type}; charset=utf-8'),
                           ('Content-Encoding', 'gzip'),
                           ('Content-Length', len(compressed_content))))
         self.wfile.write(compressed_content)
@@ -71,7 +68,7 @@ class StatsHandler(server.SimpleHTTPRequestHandler):
         json_data = gzip.decompress(post_data)
         self._profile_json.update(json.loads(json_data.decode('utf-8')))
         self._send_response(
-            200, headers=(('Content-type', '%s; charset=utf-8' % 'text/json'),
+            200, headers=(('Content-type', 'text/json; charset=utf-8'),
                           ('Content-Encoding', 'gzip'),
                           ('Content-Length', len(post_data))))
 
@@ -96,10 +93,11 @@ def start(host, port, profiler_stats, dont_start_browser, debug_mode):
     """
     stats_handler = functools.partial(StatsHandler, profiler_stats)
     if not debug_mode:
-        sys.stderr = open(os.devnull, 'w')
+        # pylint: disable=consider-using-with
+        sys.stderr = open(os.devnull, 'w', encoding='utf-8')
     print('Starting HTTP server...')
     if not dont_start_browser:
-        webbrowser.open('http://{}:{}/'.format(host, port))
+        webbrowser.open(f'http://{host}:{port}/')
     try:
         StatsServer((host, port), stats_handler).serve_forever()
     except KeyboardInterrupt:
