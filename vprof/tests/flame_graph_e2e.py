@@ -112,7 +112,7 @@ class FlameGraphFunctionEndToEndTest(unittest.TestCase):
                 f'http://{_HOST}:{_PORT}/profile') as response:
             response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
-        curr_filename = inspect.getabsfile(inspect.currentframe())
+        curr_filename = inspect.getsourcefile(self._func)
         self.assertEqual(stats['c']['objectName'],
                          f'_func @ {curr_filename} (function)')
         self.assertEqual(

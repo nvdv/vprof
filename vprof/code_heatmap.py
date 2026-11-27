@@ -68,7 +68,8 @@ class _CodeHeatmapCalculator:
     def lines_without_stdlib(self):
         """Filters code from standard library from self.lines."""
         prev_line = None
-        current_module_path = inspect.getabsfile(inspect.currentframe())
+        current_module_path = os.path.abspath(
+            inspect.getsourcefile(inspect.currentframe()))
         for module_path, lineno, runtime in self.lines:
             module_abspath = os.path.abspath(module_path)
             if not prev_line:

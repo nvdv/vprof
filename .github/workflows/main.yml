@@ -96,3 +96,20 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Run E2E tests
         run: uv run python -m unittest discover -s vprof/tests -p "*_e2e.py" -v -b
+
+  ci-success:
+    name: CI Success
+    if: always()
+    needs:
+      - build
+      - lint-python
+      - typecheck-python
+      - lint-javascript
+      - unittest-python
+      - unittest-javascript
+      - e2e-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check all jobs succeeded
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: exit 1

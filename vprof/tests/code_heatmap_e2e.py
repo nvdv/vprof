@@ -57,7 +57,8 @@ class CodeHeatmapModuleEndToEndTest(unittest.TestCase):
         self.assertTrue(stats['runTime'] > 0)
         heatmaps = stats['heatmaps']
         self.assertEqual(len(heatmaps), 1)
-        self.assertTrue(_MODULE_FILENAME in heatmaps[0]['name'])
+        self.assertTrue(
+            os.path.abspath(_MODULE_FILENAME) in heatmaps[0]['name'])
         self.assertDictEqual(heatmaps[0]['executionCount'], {'1': 1})
         self.assertListEqual(heatmaps[0]['srcCode'], _DUMMY_MODULE_SOURCELINES)
 
@@ -123,16 +124,16 @@ class CodeHeatmapFunctionEndToEndTest(unittest.TestCase):
         stats = json.loads(response_data.decode('utf-8'))
         self.assertTrue(stats['h']['runTime'] > 0)
         heatmaps = stats['h']['heatmaps']
-        curr_filename = inspect.getabsfile(inspect.currentframe())
+        curr_filename = inspect.getsourcefile(self._func)
         self.assertEqual(stats['h']['objectName'],
                          f'_func @ {curr_filename} (function)')
         self.assertEqual(len(heatmaps), 1)
         self.assertDictEqual(
-            heatmaps[0]['executionCount'], {'101': 1, '102': 1})
+            heatmaps[0]['executionCount'], {'102': 1, '103': 1})
         self.assertListEqual(
             heatmaps[0]['srcCode'],
-            [['line', 100, '        def _func(foo, bar):\n'],
-             ['line', 101, '            baz = foo + bar\n'],
-             ['line', 102, '            return baz\n']])
+            [['line', 101, '        def _func(foo, bar):\n'],
+             ['line', 102, '            baz = foo + bar\n'],
+             ['line', 103, '            return baz\n']])
 
 # pylint: enable=missing-docstring, disallowed-name
