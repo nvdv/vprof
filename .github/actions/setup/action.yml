@@ -1,0 +1,42 @@
+name: 'Set up vprof environment'
+description: 'Sets up Python (via uv) and/or Node.js dependencies'
+inputs:
+  python-version:
+    description: 'Python version to install (leave empty to skip Python setup)'
+    required: false
+    default: ''
+  setup-node:
+    description: 'Whether to set up Node.js and install npm dependencies'
+    required: false
+    default: 'false'
+  node-version:
+    description: 'Node.js version to install'
+    required: false
+    default: '22'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up uv and Python ${{ inputs.python-version }}
+      if: inputs.python-version != ''
+      uses: astral-sh/setup-uv@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+        enable-cache: true
+
+    - name: Install Python dependencies
+      if: inputs.python-version != ''
+      shell: bash
+      run: uv sync --locked
+
+    - name: Set up Node.js ${{ inputs.node-version }}
+      if: inputs.setup-node == 'true'
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: 'npm'
+
+    - name: Install JavaScript dependencies
+      if: inputs.setup-node == 'true'
+      shell: bash
+      run: npm ci

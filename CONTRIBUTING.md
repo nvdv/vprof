@@ -36,4 +36,4 @@ requested or implemented.
 
 ## Styleguide
 * PEP 8 for Python.
-* Check `.eslintrc` in the root folder of the project for Javascript styleguide.
+* Check `eslint.config.js` in the root folder of the project for Javascript styleguide.

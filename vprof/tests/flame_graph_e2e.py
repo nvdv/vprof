@@ -4,6 +4,7 @@ import functools
 import gzip
 import json
 import inspect
+import signal
 import threading
 import unittest
 import urllib.request
@@ -19,6 +20,8 @@ _PACKAGE_PATH = 'vprof/tests/test_pkg/'
 _POLL_INTERVAL = 0.01
 
 
+@unittest.skipUnless(
+    hasattr(signal, 'SIGPROF'), 'SIGPROF is not available on this platform')
 class FlameGraphModuleEndToEndTest(unittest.TestCase):
 
     def setUp(self):
@@ -48,6 +51,8 @@ class FlameGraphModuleEndToEndTest(unittest.TestCase):
         self.assertTrue(stats['totalSamples'] >= 0)
 
 
+@unittest.skipUnless(
+    hasattr(signal, 'SIGPROF'), 'SIGPROF is not available on this platform')
 class FlameGraphPackageEndToEndTest(unittest.TestCase):
 
     def setUp(self):
@@ -77,6 +82,8 @@ class FlameGraphPackageEndToEndTest(unittest.TestCase):
         self.assertTrue(stats['totalSamples'] >= 0)
 
 
+@unittest.skipUnless(
+    hasattr(signal, 'SIGPROF'), 'SIGPROF is not available on this platform')
 class FlameGraphFunctionEndToEndTest(unittest.TestCase):
 
     def setUp(self):

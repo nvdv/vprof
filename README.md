@@ -1,16 +1,16 @@
-[![PyPI](https://img.shields.io/pypi/v/vprof.svg)](https://pypi.python.org/pypi/vprof/)
+[![PyPI](https://img.shields.io/pypi/v/vprof.svg)](https://pypi.org/project/vprof/)
 
 # vprof
 
 vprof is a Python package providing rich and interactive visualizations for
 various Python program characteristics such as running time and memory usage.
-It supports Python 3.4+ and distributed under BSD license.
+It supports Python 3.10+ and distributed under BSD license.
 
 The project is in active development and some of its features might not work as
 expected.
 
 ## Screenshots
-![vprof-gif](http://i.imgur.com/ikBlfvQ.gif)
+![vprof-gif](https://i.imgur.com/ikBlfvQ.gif)
 
 ## Contributing
 All contributions are highly encouraged! You can add new features,
@@ -19,33 +19,35 @@ Feel free to open an issue or send a pull request!
 
 ## Prerequisites
 Dependencies to build `vprof` from source code:
- * Python 3.4+
- * `pip`
- * `npm` >= 3.3.12
+ * Python 3.10+
+ * `uv`
+ * `npm`
 
 `npm` is required to build `vprof` from sources only.
 
 ## Dependencies
-All Python and `npm` module dependencies are listed in `package.json` and
-`requirements.txt`.
+All Python and `npm` module dependencies are listed in `pyproject.toml` and
+`package.json`.
 
 ## Installation
 `vprof` can be installed from PyPI
 
 ```sh
+uv tool install vprof
+# or
 pip install vprof
 ```
 
 To build `vprof` from sources, clone this repository and execute
 
 ```sh
-python3 setup.py deps_install && python3 setup.py build_ui && python3 setup.py install
+uv sync && npm install && npm run build && uv build
 ```
 
 To install just `vprof` dependencies, run
 
 ```sh
-python3 setup.py deps_install
+uv sync && npm install
 ```
 
 ## Usage
@@ -134,7 +136,15 @@ Also you can check `examples` directory for more profiling examples.
 ## Testing
 
 ```sh
-python3 setup.py test_python && python3 setup.py test_javascript && python3 setup.py e2e_test
+uv run python -m unittest discover -s vprof/tests -p "*_test.py" -v -b && \
+npm test && \
+uv run python -m unittest discover -s vprof/tests -p "*_e2e.py" -v -b
+```
+
+## Linting & Type Checking
+
+```sh
+uv run pylint vprof/*.py vprof/tests/*.py && uv run mypy vprof && npm run lint
 ```
 
 ## License
