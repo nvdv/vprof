@@ -1,13 +1,14 @@
 """Profiler server."""
 import functools
 import gzip
+from http import server
 import json
+import mimetypes
 import os
 import socketserver
 import sys
+import urllib.parse
 import webbrowser
-
-from http import server
 
 _STATIC_DIR = 'ui'
 _PROFILE_HTML = f'{_STATIC_DIR}/profile.html'
@@ -26,13 +27,19 @@ class StatsServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
 class StatsHandler(server.SimpleHTTPRequestHandler):
     """Program stats request handler."""
 
-    def __init__(self, profile_json, *args, **kwargs):
+    def __init__(self, profile_json, *args, debug_mode=True, **kwargs):
         self._profile_json = profile_json
+        self._debug_mode = debug_mode
         self.uri_map = {
             '/': self._handle_root,
             '/profile': self._handle_profile,
         }
         super().__init__(*args, **kwargs)
+
+    def log_message(self, *args):
+        """Logs HTTP server messages only when debug_mode is enabled."""
+        if self._debug_mode:
+            super().log_message(*args)
 
     @staticmethod
     def _handle_root():
@@ -45,26 +52,34 @@ class StatsHandler(server.SimpleHTTPRequestHandler):
 
     def _handle_profile(self):
         """Handles profile stats requests."""
-        return json.dumps(self._profile_json).encode(), 'text/json'
+        return json.dumps(self._profile_json).encode(), 'application/json'
 
     def _handle_other(self):
         """Handles static files requests."""
-        res_filename = os.path.join(
-            os.path.dirname(__file__), _STATIC_DIR, self.path[1:])
+        static_root = os.path.realpath(
+            os.path.join(os.path.dirname(__file__), _STATIC_DIR))
+        rel_path = urllib.parse.unquote(self.path.split('?', 1)[0]).lstrip('/')
+        res_filename = os.path.realpath(os.path.join(static_root, rel_path))
+        if (os.path.commonpath([static_root, res_filename]) != static_root or
+                not os.path.isfile(res_filename)):
+            return None, None
         with open(res_filename, 'rb') as res_file:
             content = res_file.read()
-        _, extension = os.path.splitext(self.path)
-        return content, f'text/{extension[1:]}'  # Skip dot in the extension.
+        content_type, _ = mimetypes.guess_type(res_filename)
+        return content, content_type or 'application/octet-stream'
 
     def do_GET(self):
         """Handles HTTP GET requests."""
         handler = self.uri_map.get(self.path) or self._handle_other
         content, content_type = handler()
+        if content is None:
+            self.send_error(404, 'File not found')
+            return
         compressed_content = gzip.compress(content)
         self._send_response(
             200, headers=(('Content-type', f'{content_type}; charset=utf-8'),
                           ('Content-Encoding', 'gzip'),
-                          ('Content-Length', len(compressed_content))))
+                          ('Content-Length', str(len(compressed_content)))))
         self.wfile.write(compressed_content)
 
     def do_POST(self):
@@ -73,9 +88,9 @@ class StatsHandler(server.SimpleHTTPRequestHandler):
         json_data = gzip.decompress(post_data)
         self._profile_json.update(json.loads(json_data.decode('utf-8')))
         self._send_response(
-            200, headers=(('Content-type', 'text/json; charset=utf-8'),
+            200, headers=(('Content-type', 'application/json; charset=utf-8'),
                           ('Content-Encoding', 'gzip'),
-                          ('Content-Length', len(post_data))))
+                          ('Content-Length', str(len(post_data)))))
 
     def _send_response(self, http_code, message=None, headers=None):
         """Sends HTTP response code, message and headers."""
@@ -94,12 +109,10 @@ def start(host, port, profiler_stats, dont_start_browser, debug_mode):
         port: Server port.
         profiler_stats: A dict with collected program stats.
         dont_start_browser: Whether to open browser after profiling.
-        debug_mode: Whether to redirect stderr to /dev/null.
+        debug_mode: Whether to log HTTP requests to stderr.
     """
-    stats_handler = functools.partial(StatsHandler, profiler_stats)
-    if not debug_mode:
-        # pylint: disable=consider-using-with
-        sys.stderr = open(os.devnull, 'w', encoding='utf-8')
+    stats_handler = functools.partial(
+        StatsHandler, profiler_stats, debug_mode=debug_mode)
     print('Starting HTTP server...')
     if not dont_start_browser:
         webbrowser.open(f'http://{host}:{port}/')
