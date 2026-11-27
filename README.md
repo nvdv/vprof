@@ -136,9 +136,7 @@ Also you can check `examples` directory for more profiling examples.
 ## Testing
 
 ```sh
-uv run python -m unittest discover -s vprof/tests -p "*_test.py" -v -b && \
-npm test && \
-uv run python -m unittest discover -s vprof/tests -p "*_e2e.py" -v -b
+uv run python -m vprof.tests unit && npm test && uv run python -m vprof.tests e2e
 ```
 
 ## Linting & Type Checking

@@ -16,7 +16,7 @@ from vprof import stats_server
 
 __version__ = '0.38'
 
-_PROGRAN_NAME = 'vprof'
+_PROGRAM_NAME = 'vprof'
 _MODULE_DESC = 'Visual profiler for Python'
 _HOST, _PORT = 'localhost', 8000
 _CONFIG_DESC = (
@@ -24,7 +24,8 @@ _CONFIG_DESC = (
 available CONFIG options
   c - flame graph
   m - memory graph
-  h - code heatmap""")
+  h - code heatmap
+  p - profiler""")
 _ERR_CODES = {
     'ambiguous_configuration': 1,
     'bad_option': 2,
@@ -35,7 +36,7 @@ _ERR_CODES = {
 def main():
     """Main function of the module."""
     parser = argparse.ArgumentParser(
-        prog=_PROGRAN_NAME, description=_MODULE_DESC,
+        prog=_PROGRAM_NAME, description=_MODULE_DESC,
         formatter_class=argparse.RawTextHelpFormatter)
     launch_modes = parser.add_mutually_exclusive_group(required=True)
     launch_modes.add_argument('-r', '--remote', dest='remote',

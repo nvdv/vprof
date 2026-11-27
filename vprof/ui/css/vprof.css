@@ -74,7 +74,7 @@ a:hover {
   font-size: 15px;
   cursor: pointer;
   display: inline-block;
-  padding: 3 30px;
+  padding: 3px 30px;
 }
 
 .help-button {
@@ -112,7 +112,7 @@ svg {
 .content-legend {
   background: #BCBCBC;
   border: 0px;
-  border-radius: 5px-container;
+  border-radius: 5px;
   font: 15px sans-serif;
   opacity: 0.9;
   padding: 8px;

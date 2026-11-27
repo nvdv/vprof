@@ -17,9 +17,9 @@ function shortenString(s, maxLength, front) {
     return s;
   }
   if (front) {
-    return '...' + s.substr(3 + (s.length - maxLength), s.length);
+    return '...' + s.slice(s.length - maxLength + 3);
   }
-  return s.substr(0, maxLength - 3) + '...';
+  return s.slice(0, maxLength - 3) + '...';
 }
 
 /**

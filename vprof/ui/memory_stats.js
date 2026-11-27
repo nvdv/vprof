@@ -210,10 +210,15 @@ class MemoryChart {
    */
   redrawFocus_(canvas, focus, tooltip,
     focusXLine, focusYLine) {
+    if (!this.data_.codeEvents.length) {
+      return;
+    }
     let t = d3.zoomTransform(canvas.node());
     let crds = d3.mouse(canvas.node());
     let xCoord = (crds[0] - t.x) / t.k;
-    let closestIndex = Math.round(this.xScale_.invert(xCoord)) - 1;
+    let maxIndex = this.data_.codeEvents.length - 1;
+    let closestIndex = Math.min(
+      Math.max(Math.round(this.xScale_.invert(xCoord)) - 1, 0), maxIndex);
     let closestY = this.yScale_(this.data_.codeEvents[closestIndex][2]);
     let closestX = t.k * this.xScale_(
       this.data_.codeEvents[closestIndex][0]) + t.x;
