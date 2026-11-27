@@ -1,3 +1,6 @@
+[MAIN]
+ignore=test_pkg
+
 [MESSAGES CONTROL]
 disable=exec-used, wrong-import-order, fixme,
         invalid-name, no-member, too-many-arguments,

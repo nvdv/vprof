@@ -142,7 +142,7 @@ uv run python -m vprof.tests unit && npm test && uv run python -m vprof.tests e2
 ## Linting & Type Checking
 
 ```sh
-uv run pylint vprof/*.py vprof/tests/*.py && uv run mypy vprof && npm run lint
+uv run pylint vprof && uv run mypy vprof && npm run lint
 ```
 
 ## License

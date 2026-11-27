@@ -52,6 +52,9 @@ vprof = [
     "ui/css/*.gif",
 ]
 
+[tool.pylint.main]
+ignore = ["test_pkg"]
+
 [tool.pylint."messages control"]
 disable = [
     "duplicate-code",
