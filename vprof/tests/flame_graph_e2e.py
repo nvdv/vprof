@@ -14,7 +14,7 @@ from vprof import stats_server
 from vprof import runner
 from vprof.tests import test_pkg # pylint: disable=unused-import
 
-_HOST, _PORT = 'localhost', 12345
+_HOST, _PORT = 'localhost', 0
 _MODULE_FILENAME = 'vprof/tests/test_pkg/dummy_module.py'
 _PACKAGE_PATH = 'vprof/tests/test_pkg/'
 _POLL_INTERVAL = 0.01
@@ -41,7 +41,7 @@ class FlameGraphModuleEndToEndTest(unittest.TestCase):
 
     def testRequest(self):
         with urllib.request.urlopen(
-                f'http://{_HOST}:{_PORT}/profile') as response:
+                f'http://{_HOST}:{self.server.server_port}/profile') as response:
             response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], f'{_MODULE_FILENAME} (module)')
@@ -72,7 +72,7 @@ class FlameGraphPackageEndToEndTest(unittest.TestCase):
 
     def testRequest(self):
         with urllib.request.urlopen(
-                f'http://{_HOST}:{_PORT}/profile') as response:
+                f'http://{_HOST}:{self.server.server_port}/profile') as response:
             response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], f'{_PACKAGE_PATH} (package)')
@@ -107,9 +107,10 @@ class FlameGraphFunctionEndToEndTest(unittest.TestCase):
 
     def testRequest(self):
         runner.run(
-            self._func, 'c', ('foo', 'bar'), host=_HOST, port=_PORT)
+            self._func, 'c', ('foo', 'bar'),
+            host=_HOST, port=self.server.server_port)
         with urllib.request.urlopen(
-                f'http://{_HOST}:{_PORT}/profile') as response:
+                f'http://{_HOST}:{self.server.server_port}/profile') as response:
             response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         curr_filename = inspect.getsourcefile(self._func)

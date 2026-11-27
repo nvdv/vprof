@@ -14,7 +14,7 @@ from vprof import stats_server
 from vprof import runner
 from vprof.tests import test_pkg # pylint: disable=unused-import
 
-_HOST, _PORT = 'localhost', 12345
+_HOST, _PORT = 'localhost', 0
 _MODULE_FILENAME = 'vprof/tests/test_pkg/dummy_module.py'
 _PACKAGE_PATH = 'vprof/tests/test_pkg/'
 _DUMMY_MODULE_SOURCELINES = [
@@ -50,7 +50,7 @@ class CodeHeatmapModuleEndToEndTest(unittest.TestCase):
 
     def testRequest(self):
         with urllib.request.urlopen(
-                f'http://{_HOST}:{_PORT}/profile') as response:
+                f'http://{_HOST}:{self.server.server_port}/profile') as response:
             response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], _MODULE_FILENAME)
@@ -82,7 +82,7 @@ class CodeHeatmapPackageEndToEndTest(unittest.TestCase):
 
     def testRequest(self):
         with urllib.request.urlopen(
-                f'http://{_HOST}:{_PORT}/profile') as response:
+                f'http://{_HOST}:{self.server.server_port}/profile') as response:
             response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], _PACKAGE_PATH)
@@ -117,23 +117,26 @@ class CodeHeatmapFunctionEndToEndTest(unittest.TestCase):
 
     def testRequest(self):
         runner.run(
-            self._func, 'h', ('foo', 'bar'), host=_HOST, port=_PORT)
+            self._func, 'h', ('foo', 'bar'),
+            host=_HOST, port=self.server.server_port)
         with urllib.request.urlopen(
-                f'http://{_HOST}:{_PORT}/profile') as response:
+                f'http://{_HOST}:{self.server.server_port}/profile') as response:
             response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertTrue(stats['h']['runTime'] > 0)
         heatmaps = stats['h']['heatmaps']
         curr_filename = inspect.getsourcefile(self._func)
+        _, start_line = inspect.getsourcelines(self._func)
         self.assertEqual(stats['h']['objectName'],
                          f'_func @ {curr_filename} (function)')
         self.assertEqual(len(heatmaps), 1)
         self.assertDictEqual(
-            heatmaps[0]['executionCount'], {'102': 1, '103': 1})
+            heatmaps[0]['executionCount'],
+            {str(start_line + 1): 1, str(start_line + 2): 1})
         self.assertListEqual(
             heatmaps[0]['srcCode'],
-            [['line', 101, '        def _func(foo, bar):\n'],
-             ['line', 102, '            baz = foo + bar\n'],
-             ['line', 103, '            return baz\n']])
+            [['line', start_line, '        def _func(foo, bar):\n'],
+             ['line', start_line + 1, '            baz = foo + bar\n'],
+             ['line', start_line + 2, '            return baz\n']])
 
 # pylint: enable=missing-docstring, disallowed-name

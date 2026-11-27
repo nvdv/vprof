@@ -16,7 +16,7 @@ from vprof.tests import test_pkg  # pylint: disable=unused-import
 
 builtins.initial_rss_size = 0
 
-_HOST, _PORT = 'localhost', 12345
+_HOST, _PORT = 'localhost', 0
 _MODULE_FILENAME = 'vprof/tests/test_pkg/dummy_module.py'
 _PACKAGE_PATH = 'vprof/tests/test_pkg/'
 _POLL_INTERVAL = 0.01
@@ -41,7 +41,7 @@ class MemoryProfilerModuleEndToEndTest(unittest.TestCase):
 
     def testRequest(self):
         with urllib.request.urlopen(
-                f'http://{_HOST}:{_PORT}/profile') as response:
+                f'http://{_HOST}:{self.server.server_port}/profile') as response:
             response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], f'{_MODULE_FILENAME} (module)')
@@ -72,7 +72,7 @@ class MemoryProfilerPackageEndToEndTest(unittest.TestCase):
 
     def testRequest(self):
         with urllib.request.urlopen(
-                f'http://{_HOST}:{_PORT}/profile') as response:
+                f'http://{_HOST}:{self.server.server_port}/profile') as response:
             response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], f'{_PACKAGE_PATH} (package)')
@@ -103,20 +103,22 @@ class MemoryProfilerFunctionEndToEndTest(unittest.TestCase):
 
     def testRequest(self):
         runner.run(
-            self._func, 'm', ('foo', 'bar'), host=_HOST, port=_PORT)
+            self._func, 'm', ('foo', 'bar'),
+            host=_HOST, port=self.server.server_port)
         with urllib.request.urlopen(
-                f'http://{_HOST}:{_PORT}/profile') as response:
+                f'http://{_HOST}:{self.server.server_port}/profile') as response:
             response_data = gzip.decompress(response.read())
         stats = json.loads(response_data.decode('utf-8'))
         curr_filename = inspect.getsourcefile(self._func)
+        _, start_line = inspect.getsourcelines(self._func)
         self.assertEqual(stats['m']['objectName'],
                          f'_func @ {curr_filename} (function)')
         self.assertEqual(stats['m']['totalEvents'], 2)
         self.assertEqual(stats['m']['codeEvents'][0][0], 1)
-        self.assertEqual(stats['m']['codeEvents'][0][1], 88)
+        self.assertEqual(stats['m']['codeEvents'][0][1], start_line + 1)
         self.assertEqual(stats['m']['codeEvents'][0][3], '_func')
         self.assertEqual(stats['m']['codeEvents'][1][0], 2)
-        self.assertEqual(stats['m']['codeEvents'][1][1], 89)
+        self.assertEqual(stats['m']['codeEvents'][1][1], start_line + 2)
         self.assertEqual(stats['m']['codeEvents'][1][3], '_func')
 
 # pylint: enable=missing-docstring, disallowed-name
