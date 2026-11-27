@@ -67,3 +67,10 @@ disable = [
 
 [tool.pylint.format]
 max-line-length = 80
+
+[tool.mypy]
+disable_error_code = [
+    "attr-defined",
+    "import-not-found",
+    "import-untyped",
+]
