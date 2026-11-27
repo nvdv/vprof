@@ -35,31 +35,27 @@ class ProcessWithException(multiprocessing.Process):
     Args:
         parent_conn: Parent end of multiprocessing.Pipe.
         child_conn: Child end of multiprocessing.Pipe.
-        result: Result of the child process.
     """
 
-    def __init__(self, result, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.parent_conn, self.child_conn = multiprocessing.Pipe()
-        self.result = result
 
     def run(self):
         try:
-            self.result.update(
-                self._target(*self._args, **self._kwargs))
-            self.child_conn.send(None)
+            output = self._target(*self._args, **self._kwargs)
+            self.child_conn.send((output, None))
         except Exception as exc:  # pylint: disable=broad-except
-            self.child_conn.send(exc)
+            self.child_conn.send((None, exc))
+        finally:
+            self.child_conn.close()
 
-    @property
-    def exception(self):
-        """Returns exception from child process."""
-        return self.parent_conn.recv()
-
-    @property
-    def output(self):
-        """Returns target function output."""
-        return self.result._getvalue()  # pylint: disable=protected-access
+    def recv_result(self):
+        """Returns (output, exception) tuple from child process."""
+        try:
+            return self.parent_conn.recv()
+        finally:
+            self.parent_conn.close()
 
 
 def run_in_separate_process(func, *args, **kwargs):
@@ -68,16 +64,13 @@ def run_in_separate_process(func, *args, **kwargs):
     This function is used instead of a decorator, since Python multiprocessing
     module can't serialize decorated function on all platforms.
     """
-    manager = multiprocessing.Manager()
-    manager_dict = manager.dict()
-    process = ProcessWithException(
-        manager_dict, target=func, args=args, kwargs=kwargs)
+    process = ProcessWithException(target=func, args=args, kwargs=kwargs)
     process.start()
+    output, exc = process.recv_result()
     process.join()
-    exc = process.exception
     if exc:
         raise exc
-    return process.output
+    return output
 
 
 class BaseProfiler:
