@@ -10,9 +10,11 @@ from collections import defaultdict
 from collections import deque
 from vprof import base_profiler
 
+_PREFIXES = (
+    sys.prefix, sys.base_prefix, sys.exec_prefix, sys.base_exec_prefix)
 _STDLIB_PATHS = [
     os.path.abspath(path) for path in sys.path
-    if os.path.isdir(path) and path.startswith(sys.prefix)]
+    if os.path.isdir(path) and path.startswith(_PREFIXES)]
 
 
 def check_standard_dir(module_path):
