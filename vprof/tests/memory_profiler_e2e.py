@@ -41,8 +41,8 @@ class MemoryProfilerModuleEndToEndTest(unittest.TestCase):
 
     def testRequest(self):
         with urllib.request.urlopen(
-                f'http://{_HOST}:{self.server.server_port}/profile') as response:
-            response_data = gzip.decompress(response.read())
+                f'http://{_HOST}:{self.server.server_port}/profile') as resp:
+            response_data = gzip.decompress(resp.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], f'{_MODULE_FILENAME} (module)')
         self.assertEqual(stats['totalEvents'], 1)
@@ -72,8 +72,8 @@ class MemoryProfilerPackageEndToEndTest(unittest.TestCase):
 
     def testRequest(self):
         with urllib.request.urlopen(
-                f'http://{_HOST}:{self.server.server_port}/profile') as response:
-            response_data = gzip.decompress(response.read())
+                f'http://{_HOST}:{self.server.server_port}/profile') as resp:
+            response_data = gzip.decompress(resp.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], f'{_PACKAGE_PATH} (package)')
         self.assertTrue(stats['totalEvents'] > 0)
@@ -106,8 +106,8 @@ class MemoryProfilerFunctionEndToEndTest(unittest.TestCase):
             self._func, 'm', ('foo', 'bar'),
             host=_HOST, port=self.server.server_port)
         with urllib.request.urlopen(
-                f'http://{_HOST}:{self.server.server_port}/profile') as response:
-            response_data = gzip.decompress(response.read())
+                f'http://{_HOST}:{self.server.server_port}/profile') as resp:
+            response_data = gzip.decompress(resp.read())
         stats = json.loads(response_data.decode('utf-8'))
         curr_filename = inspect.getsourcefile(self._func)
         _, start_line = inspect.getsourcelines(self._func)

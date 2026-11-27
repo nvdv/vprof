@@ -17,6 +17,11 @@ class StatsServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     """Declares multithreaded HTTP server."""
     allow_reuse_address = True
 
+    @property
+    def server_port(self):
+        """Returns bound server port."""
+        return self.server_address[1]
+
 
 class StatsHandler(server.SimpleHTTPRequestHandler):
     """Program stats request handler."""

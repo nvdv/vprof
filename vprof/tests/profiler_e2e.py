@@ -39,8 +39,8 @@ class ProfilerModuleEndToEndTest(unittest.TestCase):
 
     def testRequest(self):
         with urllib.request.urlopen(
-                f'http://{_HOST}:{self.server.server_port}/profile') as response:
-            response_data = gzip.decompress(response.read())
+                f'http://{_HOST}:{self.server.server_port}/profile') as resp:
+            response_data = gzip.decompress(resp.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], f'{_MODULE_FILENAME} (module)')
         self.assertTrue(len(stats['callStats']) > 0)
@@ -68,8 +68,8 @@ class ProfilerPackageEndToEndTest(unittest.TestCase):
 
     def testRequest(self):
         with urllib.request.urlopen(
-                f'http://{_HOST}:{self.server.server_port}/profile') as response:
-            response_data = gzip.decompress(response.read())
+                f'http://{_HOST}:{self.server.server_port}/profile') as resp:
+            response_data = gzip.decompress(resp.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], f'{_PACKAGE_PATH} (package)')
         self.assertTrue(len(stats['callStats']) > 0)
@@ -105,8 +105,8 @@ class ProfilerFunctionEndToEndTest(unittest.TestCase):
             self._func, 'p', ('foo', 'bar'),
             host=_HOST, port=self.server.server_port)
         with urllib.request.urlopen(
-                f'http://{_HOST}:{self.server.server_port}/profile') as response:
-            response_data = gzip.decompress(response.read())
+                f'http://{_HOST}:{self.server.server_port}/profile') as resp:
+            response_data = gzip.decompress(resp.read())
         stats = json.loads(response_data.decode('utf-8'))
         curr_filename = inspect.getsourcefile(self._func)
         self.assertEqual(stats['p']['objectName'],

@@ -50,8 +50,8 @@ class CodeHeatmapModuleEndToEndTest(unittest.TestCase):
 
     def testRequest(self):
         with urllib.request.urlopen(
-                f'http://{_HOST}:{self.server.server_port}/profile') as response:
-            response_data = gzip.decompress(response.read())
+                f'http://{_HOST}:{self.server.server_port}/profile') as resp:
+            response_data = gzip.decompress(resp.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], _MODULE_FILENAME)
         self.assertTrue(stats['runTime'] > 0)
@@ -82,8 +82,8 @@ class CodeHeatmapPackageEndToEndTest(unittest.TestCase):
 
     def testRequest(self):
         with urllib.request.urlopen(
-                f'http://{_HOST}:{self.server.server_port}/profile') as response:
-            response_data = gzip.decompress(response.read())
+                f'http://{_HOST}:{self.server.server_port}/profile') as resp:
+            response_data = gzip.decompress(resp.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertEqual(stats['objectName'], _PACKAGE_PATH)
         self.assertTrue(stats['runTime'] > 0)
@@ -120,8 +120,8 @@ class CodeHeatmapFunctionEndToEndTest(unittest.TestCase):
             self._func, 'h', ('foo', 'bar'),
             host=_HOST, port=self.server.server_port)
         with urllib.request.urlopen(
-                f'http://{_HOST}:{self.server.server_port}/profile') as response:
-            response_data = gzip.decompress(response.read())
+                f'http://{_HOST}:{self.server.server_port}/profile') as resp:
+            response_data = gzip.decompress(resp.read())
         stats = json.loads(response_data.decode('utf-8'))
         self.assertTrue(stats['h']['runTime'] > 0)
         heatmaps = stats['h']['heatmaps']
