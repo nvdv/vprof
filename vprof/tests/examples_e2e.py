@@ -1,5 +1,4 @@
 """End-to-end tests for examples."""
-# pylint: disable=missing-docstring
 import contextlib
 import json
 import os
@@ -75,5 +74,3 @@ class PermutationsExampleEndToEndTest(unittest.TestCase):
             self.assertEqual(saved_stats['version'], __main__.__version__)
             for mode in _CONFIG:
                 self.assertIn(mode, saved_stats)
-
-# pylint: enable=missing-docstring

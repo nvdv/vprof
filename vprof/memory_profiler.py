@@ -1,17 +1,18 @@
 """Memory profiler module."""
 import builtins
+from collections import Counter
+from collections import deque
 import gc
 import inspect
-import os
 import operator
-import psutil
+import os
 import re
 import runpy
 import sys
 import time
 
-from collections import deque
-from collections import Counter
+import psutil
+
 from vprof import base_profiler
 
 
@@ -98,7 +99,7 @@ class _CodeEventsTracker:
         """Disables events tracker."""
         sys.settrace(self._original_trace_function)
 
-    def _trace_memory_usage(self, frame, event, arg):  #pylint: disable=unused-argument
+    def _trace_memory_usage(self, frame, event, _arg):
         """Checks memory usage when 'line' event occur."""
         if event == 'line' and frame.f_code.co_filename in self.target_modules:
             self._events_list.append(
@@ -172,7 +173,7 @@ class MemoryProfiler(base_profiler.BaseProfiler):
                 _CodeEventsTracker(target_modules) as prof:
                 code = compile(srcfile.read(), self._run_object, 'exec')
                 prof.compute_mem_overhead()
-                exec(code, self._globs, None)
+                exec(code, self._globs, None)  # pylint: disable=exec-used
         except SystemExit:
             pass
         return prof, None

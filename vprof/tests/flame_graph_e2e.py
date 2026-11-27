@@ -1,5 +1,5 @@
 """End-to-end tests for flame graph module."""
-# pylint: disable=missing-docstring, protected-access, disallowed-name
+# pylint: disable=protected-access
 import functools
 import gzip
 import json
@@ -12,7 +12,6 @@ import urllib.request
 from vprof import flame_graph
 from vprof import stats_server
 from vprof import runner
-from vprof.tests import test_pkg # pylint: disable=unused-import
 
 _HOST, _PORT = 'localhost', 0
 _MODULE_FILENAME = 'vprof/tests/test_pkg/dummy_module.py'
@@ -88,9 +87,9 @@ class FlameGraphFunctionEndToEndTest(unittest.TestCase):
 
     def setUp(self):
 
-        def _func(foo, bar):
-            baz = foo + bar
-            return baz
+        def _func(arg1, arg2):
+            result = arg1 + arg2
+            return result
         self._func = _func
 
         stats_handler = functools.partial(
@@ -121,5 +120,3 @@ class FlameGraphFunctionEndToEndTest(unittest.TestCase):
         self.assertTrue(stats['c']['runTime'] > 0)
         self.assertTrue(len(stats['c']['callStats']) >= 0)
         self.assertTrue(stats['c']['totalSamples'] >= 0)
-
-# pylint: enable=missing-docstring, disallowed-name, protected-access

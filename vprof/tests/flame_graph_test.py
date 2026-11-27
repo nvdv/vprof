@@ -1,4 +1,5 @@
-# pylint: disable=protected-access, missing-docstring
+"""Unit tests for flame graph module."""
+# pylint: disable=protected-access
 import unittest
 
 from vprof import flame_graph
@@ -45,5 +46,3 @@ class StatProfilerUnittest(unittest.TestCase):
             }]
         }
         self.assertDictEqual(self._profiler.call_tree, expected_result)
-
-# pylint:  enable=protected-access, missing-docstring

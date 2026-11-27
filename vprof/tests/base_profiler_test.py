@@ -1,9 +1,10 @@
-# pylint: disable=protected-access, missing-docstring
+"""Unit tests for base profiler module."""
+# pylint: disable=protected-access
 import sys
 import unittest
+from unittest import mock
 
 from vprof import base_profiler
-from unittest import mock
 
 
 class GetPkgModuleNamesUnittest(unittest.TestCase):
@@ -114,5 +115,3 @@ class BaseProfileUnittest(unittest.TestCase):
                 [self.profiler._run_object,
                  '-s', 'foo', '-a', 'bar', '-e', 'baz']
             )
-
-# pylint: enable=protected-access, missing-docstring

@@ -1,8 +1,9 @@
-# pylint: disable=protected-access, missing-docstring
+"""Unit tests for Python profiler wrapper."""
+# pylint: disable=protected-access
 import unittest
+from unittest import mock
 
 from vprof import profiler
-from unittest import mock
 
 
 class ProfilerUnittest(unittest.TestCase):
@@ -29,5 +30,3 @@ class ProfilerUnittest(unittest.TestCase):
 
         self.assertListEqual(
             self._profiler._transform_stats(prof), expected_results)
-
-# pylint:  enable=protected-access, missing-docstring

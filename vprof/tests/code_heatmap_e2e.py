@@ -1,5 +1,4 @@
 """End-to-end tests for code heatmap module."""
-# pylint: disable=missing-docstring, disallowed-name
 import functools
 import gzip
 import json
@@ -12,7 +11,6 @@ import urllib.request
 from vprof import code_heatmap
 from vprof import stats_server
 from vprof import runner
-from vprof.tests import test_pkg # pylint: disable=unused-import
 
 _HOST, _PORT = 'localhost', 0
 _MODULE_FILENAME = 'vprof/tests/test_pkg/dummy_module.py'
@@ -98,9 +96,9 @@ class CodeHeatmapFunctionEndToEndTest(unittest.TestCase):
 
     def setUp(self):
 
-        def _func(foo, bar):
-            baz = foo + bar
-            return baz
+        def _func(arg1, arg2):
+            result = arg1 + arg2
+            return result
         self._func = _func
 
         stats_handler = functools.partial(
@@ -135,8 +133,6 @@ class CodeHeatmapFunctionEndToEndTest(unittest.TestCase):
             {str(start_line + 1): 1, str(start_line + 2): 1})
         self.assertListEqual(
             heatmaps[0]['srcCode'],
-            [['line', start_line, '        def _func(foo, bar):\n'],
-             ['line', start_line + 1, '            baz = foo + bar\n'],
-             ['line', start_line + 2, '            return baz\n']])
-
-# pylint: enable=missing-docstring, disallowed-name
+            [['line', start_line, '        def _func(arg1, arg2):\n'],
+             ['line', start_line + 1, '            result = arg1 + arg2\n'],
+             ['line', start_line + 2, '            return result\n']])

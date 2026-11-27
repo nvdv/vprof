@@ -34,11 +34,11 @@ class _StatProfiler:
         self.run_time = time.perf_counter() - self._start_time
         signal.setitimer(signal.ITIMER_PROF, 0)
 
-    def sample(self, signum, frame):  #pylint: disable=unused-argument
+    def sample(self, _signum, frame):
         """Samples current stack and writes result in self._stats.
 
         Args:
-            signum: Signal that activates handler.
+            _signum: Signal that activates handler.
             frame: Frame on top of the stack when signal is handled.
         """
         stack = []
@@ -148,7 +148,7 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
             code = compile(srcfile.read(), self._run_object, 'exec')
             prof.base_frame = inspect.currentframe()
             try:
-                exec(code, self._globs, None)
+                exec(code, self._globs, None)  # pylint: disable=exec-used
             except SystemExit:
                 pass
 

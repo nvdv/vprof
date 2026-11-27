@@ -1,5 +1,4 @@
 """End-to-end tests for Python profiler wrapper."""
-# pylint: disable=missing-docstring, disallowed-name
 import functools
 import gzip
 import json
@@ -12,7 +11,6 @@ import urllib.request
 from vprof import profiler
 from vprof import stats_server
 from vprof import runner
-from vprof.tests import test_pkg # pylint: disable=unused-import
 
 _HOST, _PORT = 'localhost', 0
 _MODULE_FILENAME = 'vprof/tests/test_pkg/dummy_module.py'
@@ -82,10 +80,10 @@ class ProfilerFunctionEndToEndTest(unittest.TestCase):
 
     def setUp(self):
 
-        def _func(foo, bar):
-            baz = foo + bar
+        def _func(arg1, arg2):
+            result = arg1 + arg2
             time.sleep(0.1)
-            return baz
+            return result
         self._func = _func
 
         stats_handler = functools.partial(
@@ -115,6 +113,3 @@ class ProfilerFunctionEndToEndTest(unittest.TestCase):
         self.assertTrue(stats['p']['totalTime'] > 0)
         self.assertTrue(stats['p']['primitiveCalls'] > 0)
         self.assertTrue(stats['p']['totalCalls'] > 0)
-
-
-# pylint: enable=missing-docstring, disallowed-name

@@ -1,8 +1,8 @@
-# pylint: disable=protected-access, missing-docstring
+"""Unit tests for runner module."""
 import unittest
+from unittest import mock
 
 from vprof import runner
-from unittest import mock
 
 
 class RunnerUnittest(unittest.TestCase):
@@ -38,5 +38,3 @@ class RunnerUnittest(unittest.TestCase):
             'h': {'total': 200},
             'p': {'total': 500}
         })
-
-# pylint:  enable=protected-access, missing-docstring

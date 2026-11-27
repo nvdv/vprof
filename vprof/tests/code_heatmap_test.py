@@ -1,4 +1,5 @@
-# pylint: disable=protected-access, missing-docstring
+"""Unit tests for code heatmap module."""
+# pylint: disable=protected-access
 import os
 import sys
 import unittest
@@ -134,5 +135,3 @@ class CodeHeatmapProfileUnitTest(unittest.TestCase):
             ['skip', 2], ['line', 5, 'haha']]
         self.assertListEqual(
             self._profile._skip_lines(src_lines, skip_map), expected_result)
-
-# pylint: enable=protected-access, missing-docstring

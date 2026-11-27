@@ -55,7 +55,7 @@ class _CodeHeatmapCalculator:
             runtime = time.perf_counter() - self.prev_timestamp
             self.lines.append([self.prev_path, self.prev_lineno, runtime])
 
-    def record_line(self, frame, event, arg):  # pylint: disable=unused-argument
+    def record_line(self, frame, event, _arg):
         """Records line execution time."""
         if event == 'line':
             if self.prev_timestamp:
@@ -197,7 +197,7 @@ class CodeHeatmapProfiler(base_profiler.BaseProfiler):
             code = compile(src_code, self._run_object, 'exec')
         try:
             with _CodeHeatmapCalculator() as prof:
-                exec(code, self._globs, None)
+                exec(code, self._globs, None)  # pylint: disable=exec-used
         except SystemExit:
             pass
 

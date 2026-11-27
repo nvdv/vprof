@@ -58,15 +58,11 @@ ignore = ["test_pkg"]
 [tool.pylint."messages control"]
 disable = [
     "duplicate-code",
-    "exec-used",
-    "fixme",
     "invalid-name",
-    "no-member",
-    "too-many-arguments",
-    "too-many-locals",
-    "too-many-positional-arguments",
-    "wrong-import-order",
 ]
+
+[tool.pylint.basic]
+no-docstring-rgx = "^(_|test|setUp$|tearDown$|.*Test$|.*Unittest$)"
 
 [tool.pylint.format]
 max-line-length = 80

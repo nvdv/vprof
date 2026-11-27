@@ -1,10 +1,11 @@
 """Module with functions that run profilers."""
-# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-position, wrong-import-order
 import builtins
 import gzip
 import os
-import psutil
 import urllib.request
+
+import psutil
 
 # Take initial RSS in order to compute profiler memory overhead
 # when profiling single functions.
@@ -28,17 +29,14 @@ _PROFILERS = (
 
 class Error(Exception):
     """Base exception for current module."""
-    pass  # pylint: disable=unnecessary-pass
 
 
 class AmbiguousConfigurationError(Error):
     """Raised when profiler configuration is ambiguous."""
-    pass  # pylint: disable=unnecessary-pass
 
 
 class BadOptionError(Error):
     """Raised when unknown options are present in the configuration."""
-    pass  # pylint: disable=unnecessary-pass
 
 
 def run_profilers(run_object, prof_config, verbose=False):
@@ -73,7 +71,8 @@ def run_profilers(run_object, prof_config, verbose=False):
     return run_stats
 
 
-def run(func, options, args=(), kwargs={}, host='localhost', port=8000):  # pylint: disable=dangerous-default-value
+# pylint: disable=too-many-arguments, too-many-positional-arguments
+def run(func, options, args=(), kwargs=None, host='localhost', port=8000):
     """Runs profilers on a function.
 
     Args:
@@ -87,6 +86,8 @@ def run(func, options, args=(), kwargs={}, host='localhost', port=8000):  # pyli
     Returns:
         A result of func execution.
     """
+    if kwargs is None:
+        kwargs = {}
     run_stats = run_profilers((func, args, kwargs), options)
 
     result = None

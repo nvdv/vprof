@@ -1,10 +1,10 @@
-# pylint: disable=protected-access, missing-docstring, too-many-locals
-import unittest
-
+"""Unit tests for memory profiler module."""
+# pylint: disable=protected-access, too-many-locals
 from collections import deque
-from vprof import memory_profiler
+import unittest
+from unittest import mock
 
-from unittest import mock  # pylint: disable=ungrouped-imports
+from vprof import memory_profiler
 
 
 class GetObjectCountByTypeUnittest(unittest.TestCase):
@@ -110,5 +110,3 @@ class CodeEventsTrackerUnittest(unittest.TestCase):
              [2, 1, 2.0, name1, fname1],
              [3, 1, 3.0, name1, fname1],
              [4, 2, 1.0, name2, fname2]])
-
-# pylint: enable=protected-access, missing-docstring, too-many-locals

@@ -1,5 +1,4 @@
 """End-to-end tests for memory profiler module."""
-# pylint: disable=missing-docstring, disallowed-name
 import builtins
 import functools
 import gzip
@@ -12,7 +11,6 @@ import urllib.request
 from vprof import memory_profiler
 from vprof import stats_server
 from vprof import runner
-from vprof.tests import test_pkg  # pylint: disable=unused-import
 
 builtins.initial_rss_size = 0
 
@@ -84,9 +82,9 @@ class MemoryProfilerFunctionEndToEndTest(unittest.TestCase):
 
     def setUp(self):
 
-        def _func(foo, bar):
-            baz = foo + bar
-            return baz
+        def _func(arg1, arg2):
+            result = arg1 + arg2
+            return result
         self._func = _func
 
         stats_handler = functools.partial(
@@ -120,5 +118,3 @@ class MemoryProfilerFunctionEndToEndTest(unittest.TestCase):
         self.assertEqual(stats['m']['codeEvents'][1][0], 2)
         self.assertEqual(stats['m']['codeEvents'][1][1], start_line + 2)
         self.assertEqual(stats['m']['codeEvents'][1][3], '_func')
-
-# pylint: enable=missing-docstring, disallowed-name

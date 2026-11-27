@@ -1,5 +1,5 @@
 """Main module of the profiler."""
-# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-position, wrong-import-order
 import builtins
 import os
 import psutil
