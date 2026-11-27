@@ -50,18 +50,18 @@ class _CodeHeatmapCalculator:
         """Disables heatmap calculator."""
         sys.settrace(self.original_trace_function)
         if self.prev_timestamp:
-            runtime = time.time() - self.prev_timestamp
+            runtime = time.perf_counter() - self.prev_timestamp
             self.lines.append([self.prev_path, self.prev_lineno, runtime])
 
     def record_line(self, frame, event, arg):  # pylint: disable=unused-argument
         """Records line execution time."""
         if event == 'line':
             if self.prev_timestamp:
-                runtime = time.time() - self.prev_timestamp
+                runtime = time.perf_counter() - self.prev_timestamp
                 self.lines.append([self.prev_path, self.prev_lineno, runtime])
             self.prev_lineno = frame.f_lineno
             self.prev_path = frame.f_code.co_filename
-            self.prev_timestamp = time.time()
+            self.prev_timestamp = time.perf_counter()
         return self.record_line
 
     @property

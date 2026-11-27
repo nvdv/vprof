@@ -26,12 +26,12 @@ class _StatProfiler:
         """Enables statistical profiler."""
         signal.signal(signal.SIGPROF, self.sample)
         signal.setitimer(signal.ITIMER_PROF, _SAMPLE_INTERVAL)
-        self._start_time = time.time()
+        self._start_time = time.perf_counter()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tbf):
         """Disables statistical profiler."""
-        self.run_time = time.time() - self._start_time
+        self.run_time = time.perf_counter() - self._start_time
         signal.setitimer(signal.ITIMER_PROF, 0)
 
     def sample(self, signum, frame):  #pylint: disable=unused-argument
