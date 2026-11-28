@@ -10,8 +10,8 @@ const d3 = require('d3');
 /**
  * Represents flame graph.
  * @constructor
- * @param {Object} parent - Parent element for flame graph.
- * @param {Object} data - Data for flame graph rendering.
+ * @param {any} parent - Parent element for flame graph.
+ * @param {FlameGraphStats} data - Data for flame graph rendering.
  */
 class FlameGraph {
   constructor(parent, data) {
@@ -273,8 +273,8 @@ class FlameGraph {
 
 /**
  * Renders flame graph and attaches it to the parent.
- * @param {Object} data - Data for flame graph rendering.
- * @param {Object} parent - Flame graph parent element.
+ * @param {FlameGraphStats} data - Data for flame graph rendering.
+ * @param {any} parent - Flame graph parent element.
  */
 function renderFlameGraph(data, parent) {
   let flameGraph = new FlameGraph(parent, data);

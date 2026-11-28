@@ -38,3 +38,26 @@ class RunnerUnittest(unittest.TestCase):
             'h': {'total': 200},
             'p': {'total': 500}
         })
+
+    def testRunProfilers_AmbiguousConfig(self):
+        with self.assertRaises(runner.AmbiguousConfigurationError):
+            runner.run_profilers('dummy.py', 'mm')
+        with self.assertRaises(runner.AmbiguousConfigurationError):
+            runner.run_profilers('dummy.py', 'chc')
+
+    def testRunProfilers_BadOption(self):
+        with self.assertRaises(runner.BadOptionError):
+            runner.run_profilers('dummy.py', 'z')
+        with self.assertRaises(runner.BadOptionError):
+            runner.run_profilers('dummy.py', 'mx')
+
+    def testRunProfilers_RunsRequestedProfilers(self):
+        prof_m = mock.MagicMock()
+        prof_m.return_value.run.return_value = {'m_stat': 1}
+        prof_h = mock.MagicMock()
+        prof_h.return_value.run.return_value = {'h_stat': 2}
+        with mock.patch.object(
+                runner, '_PROFILERS', (('m', prof_m), ('h', prof_h))):
+            stats = runner.run_profilers('dummy.py', 'hm')
+        self.assertEqual(list(stats.keys()), ['m', 'h'])
+        self.assertEqual(stats, {'m': {'m_stat': 1}, 'h': {'h_stat': 2}})

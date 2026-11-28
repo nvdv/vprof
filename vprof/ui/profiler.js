@@ -10,8 +10,8 @@ const d3 = require('d3');
 /**
  * Represents Python profiler UI.
  * @constructor
- * @param {Object} parent - Parent element for profiler output.
- * @param {Object} data - Data for output rendering.
+ * @param {any} parent - Parent element for profiler output.
+ * @param {ProfilerStats} data - Data for output rendering.
  */
 class Profiler {
   constructor(parent, data) {
@@ -139,8 +139,8 @@ class Profiler {
 
 /**
  * Renders profiler output and attaches it to the parent.
- * @param {Object} data - Data for profiler output.
- * @param {Object} parent - Profiler output parent element.
+ * @param {ProfilerStats} data - Data for profiler output.
+ * @param {any} parent - Profiler output parent element.
  */
 function renderProfilerOutput(data, parent) {
   let profilerOutput = new Profiler(parent, data);

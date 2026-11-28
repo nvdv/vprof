@@ -26,8 +26,10 @@ describe('CPU flame graph test suite', () => {
   it('Check getLeafWithMaxY0', () => {
     let node1 = {'y0': 1};
     let node2 = {'y0': 2};
-    let nodes = {'children': [node1, node2]};
+    let nested = {'y0': 3};
+    let branch = {'y0': 1, 'children': [nested]};
+    let nodes = {'children': [node1, node2, branch]};
     assert.strictEqual(
-      flameGraphModule.FlameGraph.getLeafWithMaxY0_(nodes), node2);
+      flameGraphModule.FlameGraph.getLeafWithMaxY0_(nodes), nested);
   });
 });

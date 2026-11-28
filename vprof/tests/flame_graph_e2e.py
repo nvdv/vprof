@@ -2,6 +2,7 @@
 # pylint: disable=protected-access
 import functools
 import gzip
+import hashlib
 import json
 import inspect
 import signal
@@ -89,6 +90,8 @@ class FlameGraphFunctionEndToEndTest(unittest.TestCase):
 
         def _func(arg1, arg2):
             result = arg1 + arg2
+            hashlib.pbkdf2_hmac(
+                'sha256', result.encode('utf-8'), b'test', 80000)
             return result
         self._func = _func
 
@@ -117,6 +120,6 @@ class FlameGraphFunctionEndToEndTest(unittest.TestCase):
                          f'_func @ {curr_filename} (function)')
         self.assertEqual(
             stats['c']['sampleInterval'], flame_graph._SAMPLE_INTERVAL)
-        self.assertTrue(stats['c']['runTime'] > 0)
-        self.assertTrue(len(stats['c']['callStats']) >= 0)
-        self.assertTrue(stats['c']['totalSamples'] >= 0)
+        self.assertGreater(stats['c']['runTime'], 0)
+        self.assertGreater(len(stats['c']['callStats']), 0)
+        self.assertGreater(stats['c']['totalSamples'], 0)

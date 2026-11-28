@@ -11,8 +11,8 @@ hljs.registerLanguage('python', python);
 /**
  * Represents code heatmap.
  * @constructor
- * @param {Object} parent - Parent element for code heatmap.
- * @param {Object} data - Data for code heatmap rendering.
+ * @param {any} parent - Parent element for code heatmap.
+ * @param {CodeHeatmapStats} data - Data for code heatmap rendering.
  * @property {number} MIN_RUN_TIME - Min value for line execution time.
  * @property {number} MAX_RUN_TIME - Max value for line execution time.
  * @property {string} MIN_RUN_COLOR - Color that represents MIN_RUN_TIME.
@@ -227,8 +227,8 @@ class CodeHeatmap {
 
 /**
  * Renders code heatmap and attaches it to the parent.
- * @param {Object} data - Data for code heatmap rendering.
- * @param {Object} parent - Code heatmap parent element.
+ * @param {CodeHeatmapStats} data - Data for code heatmap rendering.
+ * @param {any} parent - Code heatmap parent element.
  */
 function renderCodeHeatmap(data, parent) {
   let heatmap = new CodeHeatmap(parent, data);

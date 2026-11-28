@@ -10,10 +10,12 @@
       "highlight.js/lib/*": ["vprof/ui/types.d.ts"]
     },
     "skipLibCheck": true,
+    "strictNullChecks": true,
     "target": "ES2022"
   },
   "include": [
     "vprof/ui/*.js",
+    "vprof/ui/__tests__/*.js",
     "vprof/ui/types.d.ts"
   ]
 }

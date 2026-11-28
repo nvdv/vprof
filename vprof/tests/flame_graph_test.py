@@ -1,6 +1,7 @@
 """Unit tests for flame graph module."""
 # pylint: disable=protected-access
 import unittest
+from unittest import mock
 
 from vprof import flame_graph
 
@@ -46,3 +47,24 @@ class StatProfilerUnittest(unittest.TestCase):
             }]
         }
         self.assertDictEqual(self._profiler.call_tree, expected_result)
+
+    def testCallTreeEmptyStats(self):
+        self._profiler._stats = {}
+        self.assertDictEqual(self._profiler.call_tree, {})
+
+    def testCallTreeSelectsDominantRoot(self):
+        self._profiler._stats = {
+            (('startup', 'imp.py', 1),): 1,
+            (('work', 'app.py', 10), ('<module>', 'app.py', 1)): 25,
+        }
+        tree = self._profiler.call_tree
+        self.assertEqual(tree['stack'], ('<module>', 'app.py', 1))
+        self.assertEqual(tree['sampleCount'], 25)
+
+    @mock.patch('vprof.flame_graph.signal.setitimer')
+    def testSampleIgnoresEmptyStack(self, unused_setitimer_mock):
+        prof = flame_graph._StatProfiler()
+        frame = flame_graph.inspect.currentframe()
+        prof.base_frame = frame
+        prof.sample(0, frame)
+        self.assertEqual(len(prof._stats), 0)

@@ -13,4 +13,9 @@ describe('Common module test suite', () => {
     assert.strictEqual(
       commonModule.shortenString('foobarfoobar', 10, false), 'foobarf...');
   });
+
+  it('Check formatTimestamp', () => {
+    let ts = Math.floor(new Date(2026, 4, 15, 9, 30, 45).getTime() / 1000);
+    assert.strictEqual(commonModule.formatTimestamp(ts), '5/15/2026 9:30:45');
+  });
 });

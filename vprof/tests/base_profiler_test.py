@@ -115,3 +115,30 @@ class BaseProfileUnittest(unittest.TestCase):
                 [self.profiler._run_object,
                  '-s', 'foo', '-a', 'bar', '-e', 'baz']
             )
+
+
+def _child_add(a, b):
+    return a + b
+
+
+def _child_raise():
+    raise ValueError('child boom')
+
+
+def _child_exit():
+    sys.exit(0)
+
+
+class RunInSeparateProcessUnittest(unittest.TestCase):
+
+    def testReturnsOutput(self):
+        result = base_profiler.run_in_separate_process(_child_add, 2, 3)
+        self.assertEqual(result, 5)
+
+    def testPropagatesException(self):
+        with self.assertRaisesRegex(ValueError, 'child boom'):
+            base_profiler.run_in_separate_process(_child_raise)
+
+    def testHandlesChildSystemExit(self):
+        with self.assertRaises(EOFError):
+            base_profiler.run_in_separate_process(_child_exit)

@@ -6,6 +6,7 @@ const memoryStatsModule = require('../memory_stats.js');
 
 describe('Memory stats test suite', () => {
   it('Check generateTooltipText_', () => {
+    /** @type {MemoryEvent} */
     let stats = [10, 11, 15, '<func>', 'foo.py'];
     let expectedResult = (
       '<p><b>Executed line:</b> 10</p>' +
@@ -17,5 +18,7 @@ describe('Memory stats test suite', () => {
     assert.strictEqual(
       memoryStatsModule.MemoryChart.generateTooltipText_(stats),
       expectedResult);
+    assert.strictEqual(
+      memoryStatsModule.MemoryChart.generateTooltipText_(null), '');
   });
 });

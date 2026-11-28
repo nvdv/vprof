@@ -49,6 +49,7 @@ class ProcessWithException(multiprocessing.Process):
         self.parent_conn, self.child_conn = multiprocessing.Pipe()
 
     def run(self) -> None:
+        self.parent_conn.close()
         try:
             output = self._target(*self._args, **self._kwargs)
             self.child_conn.send((output, None))
@@ -74,8 +75,11 @@ def run_in_separate_process(
     """
     process = ProcessWithException(target=func, args=args, kwargs=kwargs)
     process.start()
-    output, exc = process.recv_result()
-    process.join()
+    process.child_conn.close()
+    try:
+        output, exc = process.recv_result()
+    finally:
+        process.join()
     if exc:
         raise exc
     return output

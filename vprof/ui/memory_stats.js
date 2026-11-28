@@ -9,8 +9,8 @@ const d3 = require('d3');
 /**
  * Represents memory chart.
  * @constructor
- * @param {Object} parent - Parent element for memory chart.
- * @param {Object} data - Data for memory chart rendering.
+ * @param {any} parent - Parent element for memory chart.
+ * @param {MemoryStats} data - Data for memory chart rendering.
  */
 class MemoryChart {
   constructor(parent, data) {
@@ -241,7 +241,7 @@ class MemoryChart {
   /**
    * Generates tooltip text from line stats.
    * @static
-   * @param {Object[]} stats - Memory stats of line of code.
+   * @param {MemoryEvent | null} stats - Memory stats of line of code.
    * @returns {string}
    */
   static generateTooltipText_(stats) {
@@ -298,8 +298,8 @@ class MemoryChart {
 
 /**
  * Renders memory chart and attaches it to the parent.
- * @param {Object} data - Data for memory chart rendering.
- * @param {Object} parent - Memory chart parent element.
+ * @param {MemoryStats} data - Data for memory chart rendering.
+ * @param {any} parent - Memory chart parent element.
  */
 function renderMemoryStats(data, parent) {
   let memoryChart = new MemoryChart(parent, data);

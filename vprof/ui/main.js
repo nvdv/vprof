@@ -101,7 +101,7 @@ function createProfilerTab_(parent, status) {
 
 /**
  * Renders stats page.
- * @param {Object} data - Data for page rendering.
+ * @param {VprofProfilePayload} data - Data for page rendering.
  */
 function renderPage(data) {
   // Remove all existing tabs and their content
@@ -119,31 +119,39 @@ function renderPage(data) {
     let displayClass = (i === 0) ? 'active-tab' : 'inactive-tab';
     switch (props[i]) {
     case 'c': {
-      createFlameGraphTab_(tabHeader, status);
-      let flameGraph = createTabContent_('flame-graph-tab');
-      flameGraphModule.renderFlameGraph(data.c, flameGraph);
-      flameGraph.classed(displayClass, true);
+      if (data.c) {
+        createFlameGraphTab_(tabHeader, status);
+        let flameGraph = createTabContent_('flame-graph-tab');
+        flameGraphModule.renderFlameGraph(data.c, flameGraph);
+        flameGraph.classed(displayClass, true);
+      }
       break;
     }
     case 'm': {
-      createMemoryChartTab_(tabHeader, status);
-      let memoryChart = createTabContent_('memory-chart-tab');
-      memoryStatsModule.renderMemoryStats(data.m, memoryChart);
-      memoryChart.classed(displayClass, true);
+      if (data.m) {
+        createMemoryChartTab_(tabHeader, status);
+        let memoryChart = createTabContent_('memory-chart-tab');
+        memoryStatsModule.renderMemoryStats(data.m, memoryChart);
+        memoryChart.classed(displayClass, true);
+      }
       break;
     }
     case 'h': {
-      createCodeHeatmapTab_(tabHeader, status);
-      let codeHeatmap = createTabContent_('code-heatmap-tab');
-      codeHeatmapModule.renderCodeHeatmap(data.h, codeHeatmap);
-      codeHeatmap.classed(displayClass, true);
+      if (data.h) {
+        createCodeHeatmapTab_(tabHeader, status);
+        let codeHeatmap = createTabContent_('code-heatmap-tab');
+        codeHeatmapModule.renderCodeHeatmap(data.h, codeHeatmap);
+        codeHeatmap.classed(displayClass, true);
+      }
       break;
     }
     case 'p': {
-      createProfilerTab_(tabHeader, status);
-      let profilerOutput = createTabContent_('profiler-tab');
-      profilerModule.renderProfilerOutput(data.p, profilerOutput);
-      profilerOutput.classed(displayClass, true);
+      if (data.p) {
+        createProfilerTab_(tabHeader, status);
+        let profilerOutput = createTabContent_('profiler-tab');
+        profilerModule.renderProfilerOutput(data.p, profilerOutput);
+        profilerOutput.classed(displayClass, true);
+      }
       break;
     }
     }
@@ -201,4 +209,13 @@ function main() {
   }, POLL_INTERVAL);
 }
 
-main();
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+  main();
+}
+
+module.exports = {
+  'renderPage': renderPage,
+  'handleHelpDisplay': handleHelpDisplay,
+  'showTab_': showTab_,
+  'main': main,
+};
