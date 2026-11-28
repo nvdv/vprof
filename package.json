@@ -7,14 +7,14 @@
     "highlight.js": "^11.11.1"
   },
   "devDependencies": {
-    "browserify": "^17.0.1",
-    "eslint": "^9.0.0",
+    "esbuild": "^0.25.0",
+    "eslint": "^10.0.0",
     "typescript": "^5.9.3"
   },
   "scripts": {
     "lint": "eslint vprof/ui",
     "typecheck": "tsc --project jsconfig.json",
-    "build": "browserify vprof/ui/main.js -o vprof/ui/vprof_min.js",
+    "build": "esbuild vprof/ui/main.js --bundle --minify --main-fields=module,browser,main --outfile=vprof/ui/vprof_min.js",
     "test": "node --test 'vprof/ui/__tests__/*_test.js'"
   },
   "license": "BSD-2-Clause",

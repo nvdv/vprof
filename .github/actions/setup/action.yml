@@ -12,14 +12,14 @@ inputs:
   node-version:
     description: 'Node.js version to install'
     required: false
-    default: '22'
+    default: '24'
 
 runs:
   using: 'composite'
   steps:
     - name: Set up uv and Python ${{ inputs.python-version }}
       if: inputs.python-version != ''
-      uses: astral-sh/setup-uv@v5
+      uses: astral-sh/setup-uv@v6
       with:
         python-version: ${{ inputs.python-version }}
         enable-cache: true
@@ -31,7 +31,7 @@ runs:
 
     - name: Set up Node.js ${{ inputs.node-version }}
       if: inputs.setup-node == 'true'
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v5
       with:
         node-version: ${{ inputs.node-version }}
         cache: 'npm'
