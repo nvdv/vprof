@@ -1,0 +1,10 @@
+name: Feature request
+description: Suggest an enhancement or new feature for vprof
+labels: [enhancement]
+body:
+  - type: textarea
+    attributes:
+      label: Description
+      description: What would you like vprof to do, and why?
+    validations:
+      required: true

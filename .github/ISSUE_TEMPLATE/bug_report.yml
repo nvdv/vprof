@@ -1,0 +1,32 @@
+name: Bug report
+description: Report a bug or unexpected behavior in vprof
+labels: [bug]
+body:
+  - type: textarea
+    attributes:
+      label: Description
+      description: What happened and what did you expect instead?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Steps to reproduce
+      description: Command, code snippet or script used to run vprof.
+      render: shell
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: vprof version
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Python version
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: OS
+    validations:
+      required: true
