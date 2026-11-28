@@ -19,7 +19,7 @@ runs:
   steps:
     - name: Set up uv and Python ${{ inputs.python-version }}
       if: inputs.python-version != ''
-      uses: astral-sh/setup-uv@v6
+      uses: astral-sh/setup-uv@v7
       with:
         python-version: ${{ inputs.python-version }}
         enable-cache: true
