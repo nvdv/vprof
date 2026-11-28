@@ -6,16 +6,11 @@ vprof is a Python package providing rich and interactive visualizations for
 various Python program characteristics such as running time and memory usage.
 It supports Python 3.10+ and distributed under BSD license.
 
-The project is in active development and some of its features might not work as
-expected.
-
 ## Screenshots
 ![vprof-gif](https://i.imgur.com/ikBlfvQ.gif)
 
 ## Contributing
-All contributions are highly encouraged! You can add new features,
-report and fix existing bugs and write docs and tutorials.
-Feel free to open an issue or send a pull request!
+All contributions are highly encouraged. Feel free to open an issue or send a pull request.
 
 ## Prerequisites
 Dependencies to build `vprof` from source code:
@@ -57,7 +52,7 @@ vprof -c <config> <src>
 ```
 `<config>` is a combination of supported modes:
 
-* `c` - CPU flame graph  ⚠️ **Not available for windows [#62](https://github.com/nvdv/vprof/issues/62)**
+* `c` - CPU flame graph  ⚠️ **Not available for Windows [#62](https://github.com/nvdv/vprof/issues/62)**
 
 Shows CPU flame graph for `<src>`.
 
@@ -129,7 +124,7 @@ renders visualizations from previously saved file.
 
 Check `vprof -h` for full list of supported parameters.
 
-To show UI help, press `h` when visualizations are displayed.
+To show UI help, click the `?` button in the top-right corner when visualizations are displayed.
 
 Also you can check `examples` directory for more profiling examples.
 

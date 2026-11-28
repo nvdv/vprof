@@ -1,5 +1,4 @@
 """End-to-end tests for memory profiler module."""
-import builtins
 import functools
 import gzip
 import json
@@ -11,8 +10,6 @@ import urllib.request
 from vprof import memory_profiler
 from vprof import stats_server
 from vprof import runner
-
-builtins.initial_rss_size = 0
 
 _HOST, _PORT = 'localhost', 0
 _MODULE_FILENAME = 'vprof/tests/test_pkg/dummy_module.py'

@@ -25,9 +25,9 @@ class FlameGraph {
     this.LEGEND_Y = 100;
     this.MIN_TEXT_HEIGHT = 18;
     this.HELP_MESSAGE = (
-      '<p>&#8226 Hover over node to see node call stats</p>' +
-      '<p>&#8226 Click on node to zoom</p>'+
-      '<p>&#8226 Double click to restore original scale</p>');
+      '<p>&#8226; Hover over node to see node call stats</p>' +
+      '<p>&#8226; Click on node to zoom</p>'+
+      '<p>&#8226; Double click to restore original scale</p>');
     this.NO_DATA_MESSAGE = (
       'Sorry, no samples. Seems like run time is less than sampling interval.');
     this.data_ = data;

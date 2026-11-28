@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const {describe, it} = require('node:test');
 const commonModule = require('../common.js');
 
-describe('Profiler test suite', () => {
+describe('Common module test suite', () => {
   it('Check shortenString', () => {
     assert.strictEqual(
       commonModule.shortenString('foobar', 6, true), 'foobar');

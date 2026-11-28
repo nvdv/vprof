@@ -17,7 +17,7 @@ class Profiler {
   constructor(parent, data) {
     this.PATH_CHAR_COUNT = 70;
     this.HELP_MESSAGE = (
-      '<p>&#8226 Hover over record to see detailed stats</p>');
+      '<p>&#8226; Hover over record to see detailed stats</p>');
 
     this.data_ = data;
     this.parent_ = parent;

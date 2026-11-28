@@ -28,8 +28,8 @@ class MemoryChart {
     this.DOT_RADIUS = 3;
     this.TOOLTIP_OFFSET = 35;
     this.HELP_MESSAGE = (
-      '<p>&#8226 Scroll on graph to zoom</p>'+
-      '<p>&#8226 Drag to select required area</p>');
+      '<p>&#8226; Scroll on graph to zoom</p>'+
+      '<p>&#8226; Drag to select required area</p>');
 
     this.data_ = data;
     this.parent_ = parent;
@@ -188,9 +188,8 @@ class MemoryChart {
   }
 
   /**
-   * Shows graph focus, guiding lines and tooltip.
+   * Shows graph focus and guiding lines.
    * @param {Object} focus - Focus circle.
-   * @param {Object} tooltip - Graph tooltip.
    * @param {Object} focusXLine - Guiding line parallel to OY.
    * @param {Object} focusYLine - Guiding line parallel to OX.
    */

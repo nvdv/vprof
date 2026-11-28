@@ -1,25 +1,14 @@
 """Module with functions that run profilers."""
-import builtins
 from collections.abc import Callable
 import gzip
 import json
-import os
 from typing import Any
 import urllib.request
 
-import psutil
-
-# Take initial RSS in order to compute profiler memory overhead
-# when profiling single functions.
-if not hasattr(builtins, 'initial_rss_size'):
-    setattr(
-        builtins, 'initial_rss_size',
-        psutil.Process(os.getpid()).memory_info().rss)
-
-from vprof import code_heatmap  # pylint: disable=wrong-import-position
-from vprof import flame_graph  # pylint: disable=wrong-import-position
-from vprof import memory_profiler  # pylint: disable=wrong-import-position
-from vprof import profiler  # pylint: disable=wrong-import-position
+from vprof import code_heatmap
+from vprof import flame_graph
+from vprof import memory_profiler
+from vprof import profiler
 
 _PROFILERS: tuple[tuple[str, type], ...] = (
     ('m', memory_profiler.MemoryProfiler),

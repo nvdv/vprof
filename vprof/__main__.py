@@ -1,18 +1,10 @@
 """Main module of the profiler."""
 import argparse
-import builtins
 import json
-import os
 import sys
 
-import psutil
-
-# Take process RSS in order to compute profiler memory overhead.
-setattr(
-    builtins, 'initial_rss_size', psutil.Process(os.getpid()).memory_info().rss)
-
-from vprof import runner  # pylint: disable=wrong-import-position
-from vprof import stats_server  # pylint: disable=wrong-import-position
+from vprof import runner
+from vprof import stats_server
 
 __version__ = '0.38'
 

@@ -1,5 +1,4 @@
 """Memory profiler module."""
-import builtins
 from collections import Counter
 from collections import deque
 from collections.abc import Iterable
@@ -16,6 +15,7 @@ from typing import Any
 
 import psutil
 
+import vprof
 from vprof import base_profiler
 
 
@@ -107,7 +107,7 @@ class _CodeEventsTracker:
     def _trace_memory_usage(
             self, frame: FrameType, event: str, _arg: Any
     ) -> Any:
-        """Checks memory usage when 'line' event occur."""
+        """Checks memory usage when 'line' event occurs."""
         if event == 'line' and frame.f_code.co_filename in self.target_modules:
             self._events_list.append(
                 (frame.f_lineno, self._process.memory_info().rss,
@@ -151,8 +151,8 @@ class _CodeEventsTracker:
 
     def compute_mem_overhead(self) -> None:
         """Returns memory overhead."""
-        initial_rss = getattr(builtins, 'initial_rss_size', 0)
-        self.mem_overhead = self._process.memory_info().rss - initial_rss
+        self.mem_overhead = (
+            self._process.memory_info().rss - vprof.INITIAL_RSS_SIZE)
 
 
 class MemoryProfiler(base_profiler.BaseProfiler):

@@ -27,7 +27,7 @@ function createTabContent_(id) {
  *  Creates flame graph tab header with specified status and
  *  appends it to the parent node.
  *  @param {Object} parent - Parent element to append tab to.
- *  @param {status} status - Specified tab status.
+ *  @param {string} status - Specified tab status.
  */
 function createFlameGraphTab_(parent, status) {
   parent.append('li')
@@ -46,7 +46,7 @@ function createFlameGraphTab_(parent, status) {
  *  Creates memory stats tab header with specified status and
  *  appends it to the parent node.
  *  @param {Object} parent - Parent element to append tab to.
- *  @param {status} status - Specified tab status.
+ *  @param {string} status - Specified tab status.
  */
 function createMemoryChartTab_(parent, status) {
   parent.append('li')
@@ -65,7 +65,7 @@ function createMemoryChartTab_(parent, status) {
  *  Creates code heatmap tab header with specified status and
  *  appends it to the parent node.
  *  @param {Object} parent - Parent element to append tab to.
- *  @param {status} status - Specified tab status.
+ *  @param {string} status - Specified tab status.
  */
 function createCodeHeatmapTab_(parent, status) {
   parent.append('li')
@@ -84,7 +84,7 @@ function createCodeHeatmapTab_(parent, status) {
  *  Creates profiler tab header with specified status and
  *  appends it to the parent node.
  *  @param {Object} parent - Parent element to append tab to.
- *  @param {status} status - Specified tab status.
+ *  @param {string} status - Specified tab status.
  */
 function createProfilerTab_(parent, status) {
   parent.append('li')
@@ -158,7 +158,7 @@ function renderPage(data) {
 }
 
 /**
-  * Handles tab help display..
+  * Handles tab help display.
   * @param {Object} event - Mouse click event.
   */
 function handleHelpDisplay(event, helpButton) {

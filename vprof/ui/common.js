@@ -24,7 +24,7 @@ function shortenString(s, maxLength, front) {
 
 /**
  * Converts UNIX timestamp to string with specified format.
- * @param {number} timestamp - UNIX timestamp..
+ * @param {number} timestamp - UNIX timestamp.
  * @returns {string}
  */
 function formatTimestamp(timestamp) {

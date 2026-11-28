@@ -13,10 +13,10 @@ hljs.registerLanguage('python', python);
  * @constructor
  * @param {Object} parent - Parent element for code heatmap.
  * @param {Object} data - Data for code heatmap rendering.
- * @property {number} MIN_RUN_COUNT - Min value for line execution count.
- * @property {number} MAX_RUN_COUNT - Max value for line execution count.
- * @property {string} MIN_RUN_COLOR - Color that represents MIN_RUN_COUNT.
- * @property {string} MAX_RUN_COLOR - Color that represents MAX_RUN_COUNT.
+ * @property {number} MIN_RUN_TIME - Min value for line execution time.
+ * @property {number} MAX_RUN_TIME - Max value for line execution time.
+ * @property {string} MIN_RUN_COLOR - Color that represents MIN_RUN_TIME.
+ * @property {string} MAX_RUN_COLOR - Color that represents MAX_RUN_TIME.
  * @property {string} HELP_MESSAGE - Tooltip help message.
  */
 class CodeHeatmap {
@@ -26,7 +26,7 @@ class CodeHeatmap {
     this.MIN_RUN_COLOR = '#ebfaeb';
     this.MAX_RUN_COLOR = '#47d147';
     this.HELP_MESSAGE = (
-      '<p>&#8226 Hover over line to see execution time and ' +
+      '<p>&#8226; Hover over line to see execution time and ' +
       'line execution count.</p>');
 
     this.data_ = data;

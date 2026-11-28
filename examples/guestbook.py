@@ -110,7 +110,7 @@ def profiler_handler(uri):
     # HTTP method should be GET.
     if uri == 'main':
         runner.run(show_guestbook, 'cmhp')
-    # In this case HTTP method should be POST singe add_entry uses POST
+    # In this case HTTP method should be POST since add_entry uses POST
     elif uri == 'add':
         runner.run(add_entry, 'cmhp')
     return flask.redirect('/')
