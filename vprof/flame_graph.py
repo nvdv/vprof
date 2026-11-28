@@ -1,13 +1,17 @@
 """Flame graph module."""
+from collections import defaultdict
+from collections.abc import Iterable
 import inspect
 import runpy
 import signal
 import time
+from types import FrameType
+from typing import Any
 
-from collections import defaultdict
 from vprof import base_profiler
 
 _SAMPLE_INTERVAL = 0.001
+StackFrame = tuple[str, str, int]
 
 
 class _StatProfiler:
@@ -16,25 +20,25 @@ class _StatProfiler:
     Samples call stack at regular intervals specified by _SAMPLE_INTERVAL.
     """
 
-    def __init__(self):
-        self._stats = defaultdict(int)
-        self._start_time = None
-        self.base_frame = None
-        self.run_time = None
+    def __init__(self) -> None:
+        self._stats: dict[tuple[StackFrame, ...], int] = defaultdict(int)
+        self._start_time: float = 0.0
+        self.base_frame: FrameType | None = None
+        self.run_time: float = 0.0
 
-    def __enter__(self):
+    def __enter__(self) -> '_StatProfiler':
         """Enables statistical profiler."""
         signal.signal(signal.SIGPROF, self.sample)
         signal.setitimer(signal.ITIMER_PROF, _SAMPLE_INTERVAL)
         self._start_time = time.perf_counter()
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tbf):
+    def __exit__(self, exc_type: Any, exc_val: Any, exc_tbf: Any) -> None:
         """Disables statistical profiler."""
         self.run_time = time.perf_counter() - self._start_time
         signal.setitimer(signal.ITIMER_PROF, 0)
 
-    def sample(self, _signum, frame):
+    def sample(self, _signum: int, frame: FrameType | None) -> None:
         """Samples current stack and writes result in self._stats.
 
         Args:
@@ -52,7 +56,11 @@ class _StatProfiler:
         signal.setitimer(signal.ITIMER_PROF, _SAMPLE_INTERVAL)
 
     @staticmethod
-    def _insert_stack(stack, sample_count, call_tree):
+    def _insert_stack(
+            stack: Iterable[StackFrame],
+            sample_count: int,
+            call_tree: dict[str, Any]
+    ) -> None:
         """Inserts a stack into the call tree.
 
         Args:
@@ -65,27 +73,30 @@ class _StatProfiler:
             next_level_index = {
                 node['stack']: node for node in curr_level['children']}
             if func not in next_level_index:
-                new_node = {'stack': func, 'children': [], 'sampleCount': 0}
+                new_node: dict[str, Any] = {
+                    'stack': func, 'children': [], 'sampleCount': 0}
                 curr_level['children'].append(new_node)
                 curr_level = new_node
             else:
                 curr_level = next_level_index[func]
         curr_level['sampleCount'] = sample_count
 
-    def _fill_sample_count(self, node):
+    def _fill_sample_count(self, node: dict[str, Any]) -> int:
         """Counts and fills sample counts inside call tree."""
         node['sampleCount'] += sum(
             self._fill_sample_count(child) for child in node['children'])
         return node['sampleCount']
 
     @staticmethod
-    def _get_percentage(sample_count, total_samples):
+    def _get_percentage(sample_count: int, total_samples: int) -> float:
         """Return percentage of sample_count in total_samples."""
         if total_samples != 0:
             return 100 * round(float(sample_count) / total_samples, 3)
         return 0.0
 
-    def _format_tree(self, node, total_samples):
+    def _format_tree(
+            self, node: dict[str, Any], total_samples: int
+    ) -> dict[str, Any]:
         """Reformats call tree for the UI."""
         funcname, filename, _ = node['stack']
         sample_percent = self._get_percentage(
@@ -101,9 +112,10 @@ class _StatProfiler:
         }
 
     @property
-    def call_tree(self):
+    def call_tree(self) -> dict[str, Any]:
         """Returns call tree."""
-        call_tree = {'stack': 'base', 'sampleCount': 0, 'children': []}
+        call_tree: dict[str, Any] = {
+            'stack': 'base', 'sampleCount': 0, 'children': []}
         for stack, sample_count in self._stats.items():
             self._insert_stack(reversed(stack), sample_count, call_tree)
         self._fill_sample_count(call_tree)
@@ -119,7 +131,7 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
     Runs statistical profiler and returns collected stats.
     """
 
-    def _profile_package(self):
+    def _profile_package(self) -> dict[str, Any]:
         """Runs statistical profiler on a package."""
         with _StatProfiler() as prof:
             prof.base_frame = inspect.currentframe()
@@ -138,11 +150,11 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
             'timestamp': int(time.time())
         }
 
-    def profile_package(self):
+    def profile_package(self) -> dict[str, Any]:
         """Runs package profiler in a separate process."""
         return base_profiler.run_in_separate_process(self._profile_package)
 
-    def _profile_module(self):
+    def _profile_module(self) -> dict[str, Any]:
         """Runs statistical profiler on a module."""
         with open(self._run_object, 'rb') as srcfile, _StatProfiler() as prof:
             code = compile(srcfile.read(), self._run_object, 'exec')
@@ -162,11 +174,11 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
             'timestamp': int(time.time())
         }
 
-    def profile_module(self):
+    def profile_module(self) -> dict[str, Any]:
         """Runs module profiler in a separate process."""
         return base_profiler.run_in_separate_process(self._profile_module)
 
-    def profile_function(self):
+    def profile_function(self) -> dict[str, Any]:
         """Runs statistical profiler on a function."""
         with _StatProfiler() as prof:
             result = self._run_object(*self._run_args, **self._run_kwargs)

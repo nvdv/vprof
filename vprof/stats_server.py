@@ -1,4 +1,5 @@
 """Profiler server."""
+from collections.abc import Callable, Sequence
 import functools
 import gzip
 from http import server
@@ -7,6 +8,7 @@ import mimetypes
 import os
 import socketserver
 import sys
+from typing import Any
 import urllib.parse
 import webbrowser
 
@@ -19,30 +21,36 @@ class StatsServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     allow_reuse_address = True
 
     @property
-    def server_port(self):
+    def server_port(self) -> int:
         """Returns bound server port."""
-        return self.server_address[1]
+        return int(self.server_address[1])
 
 
 class StatsHandler(server.SimpleHTTPRequestHandler):
     """Program stats request handler."""
 
-    def __init__(self, profile_json, *args, debug_mode=True, **kwargs):
+    def __init__(
+            self,
+            profile_json: dict[str, Any],
+            *args: Any,
+            debug_mode: bool = True,
+            **kwargs: Any
+    ) -> None:
         self._profile_json = profile_json
         self._debug_mode = debug_mode
-        self.uri_map = {
+        self.uri_map: dict[str, Callable[[], tuple[bytes, str]]] = {
             '/': self._handle_root,
             '/profile': self._handle_profile,
         }
         super().__init__(*args, **kwargs)
 
-    def log_message(self, *args):
+    def log_message(self, *args: Any) -> None:
         """Logs HTTP server messages only when debug_mode is enabled."""
         if self._debug_mode:
             super().log_message(*args)
 
     @staticmethod
-    def _handle_root():
+    def _handle_root() -> tuple[bytes, str]:
         """Handles index.html requests."""
         res_filename = os.path.join(
             os.path.dirname(__file__), _PROFILE_HTML)
@@ -50,11 +58,11 @@ class StatsHandler(server.SimpleHTTPRequestHandler):
             content = res_file.read()
         return content, 'text/html'
 
-    def _handle_profile(self):
+    def _handle_profile(self) -> tuple[bytes, str]:
         """Handles profile stats requests."""
         return json.dumps(self._profile_json).encode(), 'application/json'
 
-    def _handle_other(self):
+    def _handle_other(self) -> tuple[bytes | None, str | None]:
         """Handles static files requests."""
         static_root = os.path.realpath(
             os.path.join(os.path.dirname(__file__), _STATIC_DIR))
@@ -68,7 +76,7 @@ class StatsHandler(server.SimpleHTTPRequestHandler):
         content_type, _ = mimetypes.guess_type(res_filename)
         return content, content_type or 'application/octet-stream'
 
-    def do_GET(self):
+    def do_GET(self) -> None:
         """Handles HTTP GET requests."""
         handler = self.uri_map.get(self.path) or self._handle_other
         content, content_type = handler()
@@ -82,7 +90,7 @@ class StatsHandler(server.SimpleHTTPRequestHandler):
                           ('Content-Length', str(len(compressed_content)))))
         self.wfile.write(compressed_content)
 
-    def do_POST(self):
+    def do_POST(self) -> None:
         """Handles HTTP POST requests."""
         post_data = self.rfile.read(int(self.headers['Content-Length']))
         json_data = gzip.decompress(post_data)
@@ -92,7 +100,12 @@ class StatsHandler(server.SimpleHTTPRequestHandler):
                           ('Content-Encoding', 'gzip'),
                           ('Content-Length', str(len(post_data)))))
 
-    def _send_response(self, http_code, message=None, headers=None):
+    def _send_response(
+            self,
+            http_code: int,
+            message: str | None = None,
+            headers: Sequence[tuple[str, str]] | None = None
+    ) -> None:
         """Sends HTTP response code, message and headers."""
         self.send_response(http_code, message)
         if headers:
@@ -101,7 +114,13 @@ class StatsHandler(server.SimpleHTTPRequestHandler):
             self.end_headers()
 
 
-def start(host, port, profiler_stats, dont_start_browser, debug_mode):
+def start(
+        host: str,
+        port: int,
+        profiler_stats: dict[str, Any],
+        dont_start_browser: bool,
+        debug_mode: bool
+) -> None:
     """Starts HTTP server with specified parameters.
 
     Args:

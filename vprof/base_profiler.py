@@ -1,13 +1,15 @@
 """Base class of a profiler wrapper."""
+from collections.abc import Callable
 import inspect
 import multiprocessing
 import os
 import pkgutil
 import sys
+from typing import Any
 import zlib
 
 
-def get_pkg_module_names(package_path):
+def get_pkg_module_names(package_path: str) -> set[str]:
     """Returns module filenames from package.
 
     Args:
@@ -17,13 +19,14 @@ def get_pkg_module_names(package_path):
     """
     module_names = set()
     for fobj, modname, _ in pkgutil.iter_modules(path=[package_path]):
-        filename = os.path.join(fobj.path, f'{modname}.py')
+        fobj_path = getattr(fobj, 'path', package_path)
+        filename = os.path.join(fobj_path, f'{modname}.py')
         if os.path.exists(filename):
             module_names.add(os.path.abspath(filename))
     return module_names
 
 
-def hash_name(name):
+def hash_name(name: str) -> int:
     """Computes hash of the name."""
     return zlib.adler32(name.encode('utf-8'))
 
@@ -37,11 +40,15 @@ class ProcessWithException(multiprocessing.Process):
         child_conn: Child end of multiprocessing.Pipe.
     """
 
-    def __init__(self, *args, **kwargs):
+    _target: Callable[..., Any]
+    _args: tuple[Any, ...]
+    _kwargs: dict[str, Any]
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.parent_conn, self.child_conn = multiprocessing.Pipe()
 
-    def run(self):
+    def run(self) -> None:
         try:
             output = self._target(*self._args, **self._kwargs)
             self.child_conn.send((output, None))
@@ -50,7 +57,7 @@ class ProcessWithException(multiprocessing.Process):
         finally:
             self.child_conn.close()
 
-    def recv_result(self):
+    def recv_result(self) -> tuple[Any, Exception | None]:
         """Returns (output, exception) tuple from child process."""
         try:
             return self.parent_conn.recv()
@@ -58,7 +65,8 @@ class ProcessWithException(multiprocessing.Process):
             self.parent_conn.close()
 
 
-def run_in_separate_process(func, *args, **kwargs):
+def run_in_separate_process(
+        func: Callable[..., Any], *args: Any, **kwargs: Any) -> Any:
     """Runs function in separate process.
 
     This function is used instead of a decorator, since Python multiprocessing
@@ -76,7 +84,14 @@ def run_in_separate_process(func, *args, **kwargs):
 class BaseProfiler:
     """Base class for a profiler wrapper."""
 
-    def __init__(self, run_object):
+    _run_object: Any
+    _run_args: Any
+    _run_kwargs: dict[str, Any]
+    _object_name: str
+    _globs: dict[str, Any]
+    profile: Callable[[], Any]
+
+    def __init__(self, run_object: Any) -> None:
         """Initializes profiler.
 
         Args:
@@ -91,7 +106,7 @@ class BaseProfiler:
             self.init_function(run_object)
 
     @staticmethod
-    def get_run_object_type(run_object):
+    def get_run_object_type(run_object: Any) -> str:
         """Determines run object type."""
         if isinstance(run_object, tuple):
             return 'function'
@@ -100,7 +115,7 @@ class BaseProfiler:
             return 'package'
         return 'module'
 
-    def init_module(self, run_object):
+    def init_module(self, run_object: str) -> None:
         """Initializes profiler with a module."""
         self.profile = self.profile_module
         self._run_object, _, self._run_args = run_object.partition(' ')
@@ -115,14 +130,17 @@ class BaseProfiler:
             sys.path.insert(0, program_path)
         self._replace_sysargs()
 
-    def init_package(self, run_object):
+    def init_package(self, run_object: str) -> None:
         """Initializes profiler with a package."""
         self.profile = self.profile_package
         self._run_object, _, self._run_args = run_object.partition(' ')
         self._object_name = f'{self._run_object} (package)'
         self._replace_sysargs()
 
-    def init_function(self, run_object):
+    def init_function(
+            self,
+            run_object: tuple[Callable[..., Any], Any, dict[str, Any]]
+    ) -> None:
         """Initializes profiler with a function."""
         self.profile = self.profile_function
         self._run_object, self._run_args, self._run_kwargs = run_object
@@ -130,13 +148,13 @@ class BaseProfiler:
         self._object_name = (
             f'{self._run_object.__name__} @ {filename} (function)')
 
-    def _replace_sysargs(self):
+    def _replace_sysargs(self) -> None:
         """Replaces sys.argv with proper args to pass to script."""
         sys.argv[:] = [self._run_object]
         if self._run_args:
             sys.argv += self._run_args.split()
 
-    def profile_package(self):
+    def profile_package(self) -> Any:
         """Profiles package specified by filesystem path.
 
         Runs object self._run_object as a package specified by filesystem path.
@@ -144,7 +162,7 @@ class BaseProfiler:
         """
         raise NotImplementedError
 
-    def profile_module(self):
+    def profile_module(self) -> Any:
         """Profiles a module.
 
         Runs object self._run_object as a Python module.
@@ -152,7 +170,7 @@ class BaseProfiler:
         """
         raise NotImplementedError
 
-    def profile_function(self):
+    def profile_function(self) -> Any:
         """Profiles a function.
 
         Runs object self._run_object as a Python function.
@@ -160,6 +178,6 @@ class BaseProfiler:
         """
         raise NotImplementedError
 
-    def run(self):
+    def run(self) -> dict[str, Any]:
         """Runs a profiler and returns collected stats."""
         return self.profile()

@@ -4,6 +4,7 @@ import operator
 import pstats
 import runpy
 import time
+from typing import Any
 
 from vprof import base_profiler
 
@@ -15,14 +16,14 @@ class Profiler(base_profiler.BaseProfiler):
     """
 
     @staticmethod
-    def _transform_stats(prof):
+    def _transform_stats(prof: Any) -> list[tuple[Any, ...]]:
         """Processes collected stats for UI."""
         records = []
         for info, params in prof.stats.items():
             filename, lineno, funcname = info
             cum_calls, num_calls, time_per_call, cum_time, _ = params
             if prof.total_tt == 0:
-                percentage = 0
+                percentage = 0.0
             else:
                 percentage = round(100 * (cum_time / prof.total_tt), 4)
             cum_time = round(cum_time, 4)
@@ -33,7 +34,7 @@ class Profiler(base_profiler.BaseProfiler):
                  cum_calls, time_per_call, filename, color_hash))
         return sorted(records, key=operator.itemgetter(4), reverse=True)
 
-    def _profile_package(self):
+    def _profile_package(self) -> dict[str, Any]:
         """Runs cProfile on a package."""
         prof = cProfile.Profile()
         prof.enable()
@@ -42,7 +43,7 @@ class Profiler(base_profiler.BaseProfiler):
         except SystemExit:
             pass
         prof.disable()
-        prof_stats = pstats.Stats(prof)
+        prof_stats: Any = pstats.Stats(prof)
         prof_stats.calc_callees()
         return {
             'objectName': self._object_name,
@@ -53,20 +54,20 @@ class Profiler(base_profiler.BaseProfiler):
             'timestamp': int(time.time())
         }
 
-    def profile_package(self):
+    def profile_package(self) -> dict[str, Any]:
         """Runs package profiler in a separate process."""
         return base_profiler.run_in_separate_process(self._profile_package)
 
-    def _profile_module(self):
+    def _profile_module(self) -> dict[str, Any]:
         """Runs cProfile on a module."""
         prof = cProfile.Profile()
         try:
             with open(self._run_object, 'rb') as srcfile:
-                code = compile(srcfile.read(), self._run_object, 'exec')
-            prof.runctx(code, self._globs, None)
+                code: Any = compile(srcfile.read(), self._run_object, 'exec')
+            prof.runctx(code, self._globs, self._globs)
         except SystemExit:
             pass
-        prof_stats = pstats.Stats(prof)
+        prof_stats: Any = pstats.Stats(prof)
         prof_stats.calc_callees()
         return {
             'objectName': self._object_name,
@@ -77,17 +78,17 @@ class Profiler(base_profiler.BaseProfiler):
             'timestamp': int(time.time())
         }
 
-    def profile_module(self):
+    def profile_module(self) -> dict[str, Any]:
         """Runs module profiler in a separate process."""
         return base_profiler.run_in_separate_process(self._profile_module)
 
-    def profile_function(self):
+    def profile_function(self) -> dict[str, Any]:
         """Runs cProfile on a function."""
         prof = cProfile.Profile()
         prof.enable()
         result = self._run_object(*self._run_args, **self._run_kwargs)
         prof.disable()
-        prof_stats = pstats.Stats(prof)
+        prof_stats: Any = pstats.Stats(prof)
         prof_stats.calc_callees()
         return {
             'objectName': self._object_name,

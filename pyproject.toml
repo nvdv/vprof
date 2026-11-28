@@ -68,8 +68,13 @@ no-docstring-rgx = "^(_|test|setUp$|tearDown$|.*Test$|.*Unittest$)"
 max-line-length = 80
 
 [tool.mypy]
-disable_error_code = [
-    "attr-defined",
-    "import-not-found",
-    "import-untyped",
-]
+check_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_defs = true
+exclude = ["^vprof/tests/"]
+warn_redundant_casts = true
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = ["psutil"]
+ignore_missing_imports = true

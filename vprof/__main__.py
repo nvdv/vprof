@@ -1,18 +1,18 @@
 """Main module of the profiler."""
-# pylint: disable=wrong-import-position, wrong-import-order
+import argparse
 import builtins
+import json
 import os
+import sys
+
 import psutil
 
 # Take process RSS in order to compute profiler memory overhead.
-builtins.initial_rss_size = psutil.Process(os.getpid()).memory_info().rss
+setattr(
+    builtins, 'initial_rss_size', psutil.Process(os.getpid()).memory_info().rss)
 
-import argparse
-import json
-import sys
-
-from vprof import runner
-from vprof import stats_server
+from vprof import runner  # pylint: disable=wrong-import-position
+from vprof import stats_server  # pylint: disable=wrong-import-position
 
 __version__ = '0.38'
 
@@ -33,7 +33,7 @@ _ERR_CODES = {
 }
 
 
-def main():
+def main() -> None:
     """Main function of the module."""
     parser = argparse.ArgumentParser(
         prog=_PROGRAM_NAME, description=_MODULE_DESC,
