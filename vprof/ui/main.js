@@ -160,6 +160,7 @@ function renderPage(data) {
 /**
   * Handles tab help display.
   * @param {Object} event - Mouse click event.
+  * @param {Object} helpButton - Help button element.
   */
 function handleHelpDisplay(event, helpButton) {
   if (event.target === helpButton.node()) {

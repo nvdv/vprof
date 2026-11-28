@@ -60,6 +60,16 @@ jobs:
       - name: Run JavaScript linter
         run: npm run lint
 
+  typecheck-javascript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+        with:
+          setup-node: 'true'
+      - name: Run JavaScript type checker
+        run: npm run typecheck
+
   unittest-python:
     runs-on: ubuntu-latest
     strategy:
@@ -105,6 +115,7 @@ jobs:
       - lint-python
       - typecheck-python
       - lint-javascript
+      - typecheck-javascript
       - unittest-python
       - unittest-javascript
       - e2e-tests

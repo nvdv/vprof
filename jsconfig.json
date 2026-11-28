@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "checkJs": true,
+    "maxNodeModuleJsDepth": 0,
+    "module": "commonjs",
+    "noEmit": true,
+    "paths": {
+      "d3": ["vprof/ui/types.d.ts"],
+      "highlight.js/lib/*": ["vprof/ui/types.d.ts"]
+    },
+    "skipLibCheck": true,
+    "target": "ES2022"
+  },
+  "include": [
+    "vprof/ui/*.js",
+    "vprof/ui/types.d.ts"
+  ]
+}

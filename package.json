@@ -8,10 +8,12 @@
   },
   "devDependencies": {
     "browserify": "^17.0.1",
-    "eslint": "^9.0.0"
+    "eslint": "^9.0.0",
+    "typescript": "^5.9.3"
   },
   "scripts": {
     "lint": "eslint vprof/ui",
+    "typecheck": "tsc --project jsconfig.json",
     "build": "browserify vprof/ui/main.js -o vprof/ui/vprof_min.js",
     "test": "node --test 'vprof/ui/__tests__/*_test.js'"
   },

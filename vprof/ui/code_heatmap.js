@@ -227,8 +227,8 @@ class CodeHeatmap {
 
 /**
  * Renders code heatmap and attaches it to the parent.
- * @param {Object} parent - Code heatmap parent element.
  * @param {Object} data - Data for code heatmap rendering.
+ * @param {Object} parent - Code heatmap parent element.
  */
 function renderCodeHeatmap(data, parent) {
   let heatmap = new CodeHeatmap(parent, data);

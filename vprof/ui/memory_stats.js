@@ -298,8 +298,8 @@ class MemoryChart {
 
 /**
  * Renders memory chart and attaches it to the parent.
- * @param {Object} parent - Memory chart parent element.
  * @param {Object} data - Data for memory chart rendering.
+ * @param {Object} parent - Memory chart parent element.
  */
 function renderMemoryStats(data, parent) {
   let memoryChart = new MemoryChart(parent, data);

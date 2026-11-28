@@ -139,8 +139,8 @@ class Profiler {
 
 /**
  * Renders profiler output and attaches it to the parent.
- * @param {Object} parent - Profiler output parent element.
  * @param {Object} data - Data for profiler output.
+ * @param {Object} parent - Profiler output parent element.
  */
 function renderProfilerOutput(data, parent) {
   let profilerOutput = new Profiler(parent, data);

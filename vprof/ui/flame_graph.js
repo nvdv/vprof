@@ -273,8 +273,8 @@ class FlameGraph {
 
 /**
  * Renders flame graph and attaches it to the parent.
- * @param {Object} parent - Flame graph parent element.
  * @param {Object} data - Data for flame graph rendering.
+ * @param {Object} parent - Flame graph parent element.
  */
 function renderFlameGraph(data, parent) {
   let flameGraph = new FlameGraph(parent, data);
