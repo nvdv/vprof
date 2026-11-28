@@ -20,10 +20,10 @@ class _StatProfiler:
     Samples call stack at regular intervals specified by _SAMPLE_INTERVAL.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, base_frame: FrameType | None = None) -> None:
         self._stats: dict[tuple[StackFrame, ...], int] = defaultdict(int)
         self._start_time: float = 0.0
-        self.base_frame: FrameType | None = None
+        self.base_frame: FrameType | None = base_frame
         self.run_time: float = 0.0
 
     def __enter__(self) -> '_StatProfiler':
@@ -37,6 +37,7 @@ class _StatProfiler:
         """Disables statistical profiler."""
         self.run_time = time.perf_counter() - self._start_time
         signal.setitimer(signal.ITIMER_PROF, 0)
+        signal.signal(signal.SIGPROF, signal.SIG_IGN)
 
     def sample(self, _signum: int, frame: FrameType | None) -> None:
         """Samples current stack and writes result in self._stats.
@@ -52,7 +53,8 @@ class _StatProfiler:
                 frame.f_code.co_filename,
                 frame.f_code.co_firstlineno))
             frame = frame.f_back
-        self._stats[tuple(stack)] += 1
+        if stack:
+            self._stats[tuple(stack)] += 1
         signal.setitimer(signal.ITIMER_PROF, _SAMPLE_INTERVAL)
 
     @staticmethod
@@ -121,8 +123,9 @@ class _StatProfiler:
         self._fill_sample_count(call_tree)
         if not call_tree['children']:
             return {}
-        return self._format_tree(
-            call_tree['children'][0], call_tree['sampleCount'])
+        root_node = max(
+            call_tree['children'], key=lambda node: node['sampleCount'])
+        return self._format_tree(root_node, call_tree['sampleCount'])
 
 
 class FlameGraphProfiler(base_profiler.BaseProfiler):
@@ -133,8 +136,7 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
 
     def _profile_package(self) -> dict[str, Any]:
         """Runs statistical profiler on a package."""
-        with _StatProfiler() as prof:
-            prof.base_frame = inspect.currentframe()
+        with _StatProfiler(base_frame=inspect.currentframe()) as prof:
             try:
                 runpy.run_path(self._run_object, run_name='__main__')
             except SystemExit:
@@ -156,9 +158,9 @@ class FlameGraphProfiler(base_profiler.BaseProfiler):
 
     def _profile_module(self) -> dict[str, Any]:
         """Runs statistical profiler on a module."""
-        with open(self._run_object, 'rb') as srcfile, _StatProfiler() as prof:
+        with open(self._run_object, 'rb') as srcfile:
             code = compile(srcfile.read(), self._run_object, 'exec')
-            prof.base_frame = inspect.currentframe()
+        with _StatProfiler(base_frame=inspect.currentframe()) as prof:
             try:
                 exec(code, self._globs, None)  # pylint: disable=exec-used
             except SystemExit:
