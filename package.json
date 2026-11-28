@@ -3,7 +3,7 @@
   "author": "nvdv",
   "main": "vprof/ui/main.js",
   "dependencies": {
-    "d3": "^4.13.0",
+    "d3": "^7.9.2",
     "highlight.js": "^11.11.1"
   },
   "devDependencies": {
